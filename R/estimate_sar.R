@@ -10,9 +10,14 @@ inv_logit <- function(x){
 negloglok_cb <- function(sar, infected, s0, i0 , generations, transform_inv_logit = TRUE){
 
   # The parameter should be transformed when using this function for optimization (estimation),
-  # but not when computing the hession (for standard errors).
+  # but not when computing the hessian (for standard errors) or when the parameter
+  # has already been transformed (in regression modelling).
   if (transform_inv_logit){
     sar <- inv_logit(sar)
+  } else {
+    if (any(sar < 0) | any(sar > 1)){
+      return(Inf)
+    }
   }
 
   -sum(log(dchainbinom(x = infected, s0 = s0, sar = sar, i0 = i0, generations = generations)))
