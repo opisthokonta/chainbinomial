@@ -1,6 +1,6 @@
 
 
-# Inverse logit function. Used to map real numbe line to (0,1), to help optim.
+# Inverse logit function. Used to map real number line to (0,1), to help optim.
 inv_logit <- function(x){
   1 / (1+exp(-x))
 }
@@ -69,7 +69,7 @@ estimate_sar <- function(infected, s0, i0 = 1, generations=Inf){
 
 
 
-
+#'@export
 confint.sar <- function(object, level = 0.95){
 
   upr <- min(object$sar_hat + (object$se * qnorm((1-level)/2, lower.tail = FALSE)) , 1)
