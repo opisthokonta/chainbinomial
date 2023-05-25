@@ -84,11 +84,6 @@ confint.sar <- function(object, level = 0.95){
 }
 
 
-# my_estimate <- list(sar_hat = 0.15, se = 0.03)
-# class(my_estimate) <- 'sar'
-# confint(my_estimate)
-
-
 
 
 
