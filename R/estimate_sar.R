@@ -60,7 +60,8 @@ estimate_sar <- function(infected, s0, i0 = 1, generations=Inf){
 
 
   res <- list(sar_hat = sar_hat,
-              se = sar_se)
+              se = sar_se,
+              loglikelihood = -optim_res$value)
 
   class(res) <- 'sar'
 
