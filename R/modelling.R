@@ -102,6 +102,15 @@ cbmod <- function(y, s0, x = NULL, i0 = 1, generations = Inf, link = 'identity')
 
   sar_hat <- cb_invlink(as.numeric(x %*% optim_res$par), link = link)
 
+  # Null model, useful for testing.
+  sar_hat_0 <- estimate_sar(infected = y, s0 = s0, i0 = i0, generations = generations)
+
+  # Fitted values (aka estimate of expected final attack rate).
+  yhat <- numeric(nrow(dta_analysis))
+  for (ii in 1:nrow(dta_analysis)){
+    pp <- dchainbinom(x  = 0:s0[ii], s0 = s0[ii], i0 = i0[ii], sar = sar_hat[ii])
+    yhat[ii] <- sum((0:s0[ii]) * pp)
+  }
 
 
   end_time <- Sys.time()
@@ -113,6 +122,7 @@ cbmod <- function(y, s0, x = NULL, i0 = 1, generations = Inf, link = 'identity')
               loglikelihood = -optim_res$value,
               npar = length(optim_res$par),
               sar_hat = sar_hat,
+              fitted_values = yhat,
               link = link,
               warnings = warning_messages,
               est_time = est_time)
@@ -144,5 +154,17 @@ summary.cbmod <- function(object, ...){
 
 }
 
+#' @export
+confint.cbmod <- function(object, level = 0.95){
 
+  upr <- pmin(object$parameters + (object$se * qnorm((1-level)/2, lower.tail = FALSE)) , 1)
+  lwr <- pmax(object$parameters + (object$se * qnorm((1-level)/2, lower.tail = TRUE)), 0)
 
+  cn <- sprintf('%.1f %%', c(100 * (1-level)/2, 100 * (1-((1-level)/2)) ))
+
+  res <- cbind(lwr, upr)
+  colnames(res) <- cn
+
+  return(res)
+
+}
