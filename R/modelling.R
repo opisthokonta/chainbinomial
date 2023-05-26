@@ -106,11 +106,7 @@ cbmod <- function(y, s0, x = NULL, i0 = 1, generations = Inf, link = 'identity')
   sar_hat_0 <- estimate_sar(infected = y, s0 = s0, i0 = i0, generations = generations)
 
   # Fitted values (aka estimate of expected final attack rate).
-  yhat <- numeric(nrow(dta_analysis))
-  for (ii in 1:nrow(dta_analysis)){
-    pp <- dchainbinom(x  = 0:s0[ii], s0 = s0[ii], i0 = i0[ii], sar = sar_hat[ii])
-    yhat[ii] <- sum((0:s0[ii]) * pp)
-  }
+  yhat <- echainbinom(s0 = s0, i0 = i0, sar = sar_hat, generations = generations)
 
 
   end_time <- Sys.time()

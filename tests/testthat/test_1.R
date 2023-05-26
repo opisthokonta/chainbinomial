@@ -209,6 +209,7 @@ test_that("PMF when g = 1", {
 })
 
 
+
 # Compare PMF with simulation ----
 
 # Function to approximate the chain binomial distribution after g generations
@@ -290,6 +291,120 @@ if (FALSE){
 
 
 }
+
+
+# Expected value ----
+
+# Expeced value should be same as for ordinary binomial when g=1.
+ecb_vs_eb_g1 <- function(s0, sar){
+  ecb <- echainbinom(s0 = s0, i0 = 1, sar = sar, generations = 1)
+  eb <- s0*sar #sum(0:s0 * dbinom(x=0:s0, size=s0, prob = sar))
+
+  abs(ecb - eb) < 0.00000001
+}
+
+test_that("Expected value g=1", {
+
+  expect_true(ecb_vs_eb_g1(s0 = 3, sar=0.1))
+  expect_true(ecb_vs_eb_g1(s0 = 3, sar=0.6))
+
+  expect_true(ecb_vs_eb_g1(s0 = 2, sar=0.1))
+  expect_true(ecb_vs_eb_g1(s0 = 2, sar=0.6))
+
+  expect_true(ecb_vs_eb_g1(s0 = 9, sar=0.1))
+  expect_true(ecb_vs_eb_g1(s0 = 9, sar=0.6))
+
+})
+
+# chain binomial expected value should be greater than ordinary binomial
+# when g > 1.
+
+ecb_vs_eb <- function(s0, sar, g){
+  ecb <- echainbinom(s0 = s0, i0 = 1, sar = sar, generations = g)
+  eb <- s0*sar
+
+  ecb > eb
+}
+
+
+test_that("Expected value g>1", {
+
+  expect_true(ecb_vs_eb(s0 = 3, sar=0.1, g=2))
+  expect_true(ecb_vs_eb(s0 = 3, sar=0.6, g=2))
+  expect_true(ecb_vs_eb(s0 = 2, sar=0.1, g=2))
+  expect_true(ecb_vs_eb(s0 = 2, sar=0.6, g=2))
+  expect_true(ecb_vs_eb(s0 = 9, sar=0.1, g=2))
+  expect_true(ecb_vs_eb(s0 = 9, sar=0.6, g=2))
+
+  expect_true(ecb_vs_eb(s0 = 3, sar=0.1, g=5))
+  expect_true(ecb_vs_eb(s0 = 3, sar=0.6, g=5))
+  expect_true(ecb_vs_eb(s0 = 2, sar=0.1, g=5))
+  expect_true(ecb_vs_eb(s0 = 2, sar=0.6, g=5))
+  expect_true(ecb_vs_eb(s0 = 9, sar=0.1, g=5))
+  expect_true(ecb_vs_eb(s0 = 9, sar=0.6, g=5))
+
+  expect_true(ecb_vs_eb(s0 = 3, sar=0.1, g=Inf))
+  expect_true(ecb_vs_eb(s0 = 3, sar=0.6, g=Inf))
+  expect_true(ecb_vs_eb(s0 = 2, sar=0.1, g=Inf))
+  expect_true(ecb_vs_eb(s0 = 2, sar=0.6, g=Inf))
+  expect_true(ecb_vs_eb(s0 = 9, sar=0.1, g=Inf))
+  expect_true(ecb_vs_eb(s0 = 9, sar=0.6, g=Inf))
+
+})
+
+# The expected value should never be greater than s0.
+ecb_le_s0 <- function(s0, sar, g){
+  ecb <- echainbinom(s0 = s0, i0 = 1, sar = sar, generations = g)
+  ecb < s0
+}
+
+test_that("Expected value < s0", {
+  expect_true(ecb_le_s0(s0 = 3, sar=0.1, g=2))
+  expect_true(ecb_le_s0(s0 = 3, sar=0.6, g=2))
+  expect_true(ecb_le_s0(s0 = 2, sar=0.1, g=2))
+  expect_true(ecb_le_s0(s0 = 2, sar=0.6, g=2))
+  expect_true(ecb_le_s0(s0 = 9, sar=0.1, g=2))
+  expect_true(ecb_le_s0(s0 = 9, sar=0.6, g=2))
+
+  expect_true(ecb_le_s0(s0 = 3, sar=0.1, g=5))
+  expect_true(ecb_le_s0(s0 = 3, sar=0.6, g=5))
+  expect_true(ecb_le_s0(s0 = 2, sar=0.1, g=5))
+  expect_true(ecb_le_s0(s0 = 2, sar=0.6, g=5))
+  expect_true(ecb_le_s0(s0 = 9, sar=0.1, g=5))
+  expect_true(ecb_le_s0(s0 = 9, sar=0.6, g=5))
+
+  expect_true(ecb_le_s0(s0 = 3, sar=0.1, g=Inf))
+  expect_true(ecb_le_s0(s0 = 3, sar=0.6, g=Inf))
+  expect_true(ecb_le_s0(s0 = 2, sar=0.1, g=Inf))
+  expect_true(ecb_le_s0(s0 = 2, sar=0.6, g=Inf))
+  expect_true(ecb_le_s0(s0 = 9, sar=0.1, g=Inf))
+  expect_true(ecb_le_s0(s0 = 9, sar=0.6, g=Inf))
+})
+
+# The expected value should equal s0 when sar = 1.
+ecb_eq_s0_sar_eq_1 <- function(s0, i0, g){
+  ecb <- echainbinom(s0 = s0, i0 = i0, sar = 1, generations = g)
+  ecb == s0
+}
+
+
+test_that("Expected value == s0", {
+
+  expect_true(ecb_eq_s0_sar_eq_1(s0  = 3, i0 = 1, g = 1))
+  expect_true(ecb_eq_s0_sar_eq_1(s0  = 3, i0 = 1, g = 2))
+  expect_true(ecb_eq_s0_sar_eq_1(s0  = 3, i0 = 1, g = 3))
+  expect_true(ecb_eq_s0_sar_eq_1(s0  = 3, i0 = 1, g = Inf))
+
+  expect_true(ecb_eq_s0_sar_eq_1(s0  = 3, i0 = 2, g = 1))
+  expect_true(ecb_eq_s0_sar_eq_1(s0  = 3, i0 = 2, g = 2))
+  expect_true(ecb_eq_s0_sar_eq_1(s0  = 3, i0 = 2, g = 3))
+  expect_true(ecb_eq_s0_sar_eq_1(s0  = 3, i0 = 2, g = Inf))
+
+  expect_true(ecb_eq_s0_sar_eq_1(s0  = 9, i0 = 2, g = 1))
+  expect_true(ecb_eq_s0_sar_eq_1(s0  = 9, i0 = 2, g = 2))
+  expect_true(ecb_eq_s0_sar_eq_1(s0  = 9, i0 = 2, g = 3))
+  expect_true(ecb_eq_s0_sar_eq_1(s0  = 9, i0 = 2, g = Inf))
+})
 
 
 

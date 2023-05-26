@@ -3,11 +3,14 @@
 \name{dchainbinom}
 \alias{dchainbinom}
 \alias{rchainbinom}
+\alias{echainbinom}
 \title{The Chain Binomial distribution}
 \usage{
 dchainbinom(x, s0, sar, i0 = 1, generations = Inf)
 
 rchainbinom(n, s0, sar, i0 = 1, generations = Inf)
+
+echainbinom(s0, sar, i0 = 1, generations = Inf)
 }
 \arguments{
 \item{x}{numeric vector of the number of infected.}

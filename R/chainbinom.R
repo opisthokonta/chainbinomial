@@ -327,4 +327,32 @@ rchainbinom <- function(n, s0, sar, i0 = 1, generations = Inf){
 }
 
 
+#' @rdname dchainbinom
+#' @export
+echainbinom <- function(s0, sar, i0 = 1, generations = Inf){
 
+  stopifnot(is.numeric(s0),
+            is.numeric(sar),
+            is.numeric(i0),
+            is.numeric(generations),
+            all(sar >= 0),
+            all(sar <= 1),
+            all(s0 >= 0),
+            all(i0 >= 1),
+            all(generations >= 1))
+
+  # Combine input to matrix, to expand/recycle input data.
+  inp <- as.matrix(cbind(s0, sar, i0, generations))
+
+  n <- nrow(inp)
+  res <- numeric(n)
+
+  for (ii in 1:n){
+    xx <- 0:inp[ii, 's0']
+    pp <- dchainbinom(x  = xx, s0 = inp[ii, 's0'], i0 = inp[ii, 'i0'], sar = inp[ii, 'sar'], generations = inp[ii, 'generations'])
+    res[ii] <- sum(xx * pp)
+  }
+
+  return(res)
+
+}
