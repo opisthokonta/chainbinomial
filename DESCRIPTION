@@ -14,3 +14,5 @@ Suggests:
     testthat (>= 3.0.0),
     numDeriv (>= 2016.8-1.1)
 Config/testthat/edition: 3
+Imports: 
+    generics
