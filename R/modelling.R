@@ -181,8 +181,8 @@ summary.cbmod <- function(object, ...){
 #' @export
 confint.cbmod <- function(object, level = 0.95){
 
-  upr <- pmin(object$parameters + (object$se * qnorm((1-level)/2, lower.tail = FALSE)) , 1)
-  lwr <- pmax(object$parameters + (object$se * qnorm((1-level)/2, lower.tail = TRUE)), 0)
+  upr <- object$parameters + (object$se * qnorm((1-level)/2, lower.tail = FALSE))
+  lwr <- object$parameters + (object$se * qnorm((1-level)/2, lower.tail = TRUE))
 
   cn <- sprintf('%.1f %%', c(100 * (1-level)/2, 100 * (1-((1-level)/2)) ))
 
@@ -202,3 +202,7 @@ vcov.cbmod <- function(object){
 coef.cbmod <- function(object){
   object$parameters
 }
+
+
+
+
