@@ -98,7 +98,11 @@ cbmod <- function(y, s0, x = NULL, i0 = 1, generations = Inf, link = 'identity')
   names(beta_hat) <- colnames(x)
 
   vcov <- solve(optim_res$hessian)
+  colnames(vcov) <- colnames(x)
+  rownames(vcov) <- colnames(x)
+
   beta_se <- sqrt(diag(vcov))
+  names(beta_se) <- colnames(x)
 
   sar_hat <- cb_invlink(as.numeric(x %*% optim_res$par), link = link)
 
@@ -120,6 +124,7 @@ cbmod <- function(y, s0, x = NULL, i0 = 1, generations = Inf, link = 'identity')
               sar_hat = sar_hat,
               fitted_values = yhat,
               link = link,
+              null_model = sar_hat_0,
               warnings = warning_messages,
               est_time = est_time)
 
@@ -133,16 +138,39 @@ cbmod <- function(y, s0, x = NULL, i0 = 1, generations = Inf, link = 'identity')
 #' @export
 summary.cbmod <- function(object, ...){
 
+  cat(sprintf('Chain Binomial model with %s link.\n', object$link))
+
   if (length(object$warnings) == 0){
-    cat(sprintf('Model sucsessfully fitted in %.2f seconds\n\n', object$est_time))
+    cat(sprintf('Model successfully fitted in %.2f seconds\n\n', object$est_time))
   } else {
     cat(sprintf('Model fitted with warnings (%d). Results may be unreliable.\n\n', length(object$warnings)))
   }
 
+
+  cat(sprintf('Model log-likelihood: %17.1f\n', object$loglikelihood))
+  cat(sprintf('Null log-likelihood: %18.1f\n', object$null_model$loglikelihood))
+
+  if (object$npar > 1){
+
+    lr_mod <- 2*(object$loglikelihood - object$null_model$loglikelihood)
+    lr_df <- object$npar-1
+    lr_pv <- pchisq(lr_mod, df = lr_df, lower.tail = FALSE)
+
+  } else {
+    lr_mod <- NA
+    lr_df <- 0
+    lr_pv <- NA
+  }
+
+  cat(sprintf('Chisq (df = %d): %23.3f\n', lr_df, lr_mod))
+  cat(sprintf('p-value: %30.3f\n', lr_pv))
+
+  cat('\n')
+
   term_names_length <- max(nchar(names(object$parameters)))
 
   cat('Coefficients:\n')
-  cat(sprintf('%-*s %8s %9s\n', term_names_length, '', 'Estimate', 'Std.error'))
+  cat(sprintf('%-*s %8s %9s\n', term_names_length, '', 'Estimate', 'Std. Error'))
 
   for (ii in 1:length(object$parameters)){
     cat(sprintf('%-*s % 8.3f % 9.3f\n', term_names_length, names(object$parameters)[ii], object$parameters[ii], object$se[ii]))
@@ -163,4 +191,14 @@ confint.cbmod <- function(object, level = 0.95){
 
   return(res)
 
+}
+
+#' @export
+vcov.cbmod <- function(object){
+  object$vcov
+}
+
+#' @export
+coef.cbmod <- function(object){
+  object$parameters
 }
