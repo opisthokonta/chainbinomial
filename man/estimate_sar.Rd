@@ -4,7 +4,7 @@
 \alias{estimate_sar}
 \title{Estimate Secondary Attack Rate of the Chain Binomial Model}
 \usage{
-estimate_sar(infected, s0, i0 = 1, generations = Inf)
+estimate_sar(infected, s0, i0 = 1, generations = Inf, se = TRUE)
 }
 \arguments{
 \item{infected}{numeric.}

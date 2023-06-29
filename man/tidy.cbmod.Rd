@@ -7,7 +7,7 @@
 \method{tidy}{cbmod}(x, conf.int = FALSE, conf.level = 0.95, ...)
 }
 \arguments{
-\item{x}{A `lm` object.}
+\item{x}{A `cbmod` object.}
 
 \item{conf.int}{Logical indicating whether or not to include a confidence interval in the tidied output. Defaults to FALSE.}
 
