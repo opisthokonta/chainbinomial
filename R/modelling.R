@@ -30,12 +30,14 @@ cb_invlink <- function(x, link){
 
 }
 
+
 # Objective function used with optim.
 cb_reg_obj <- function(par, xmat, y, s0, i0, generations, link){
   sar_hat <- cb_invlink(as.numeric(xmat %*% par), link = link)
   negloglok_cb(sar = sar_hat, infected = y, s0 = s0, i0 = i0, generations = generations,
                transform_inv_logit = FALSE)
 }
+
 
 
 # Initial parameters (regression coefficients).
@@ -135,6 +137,27 @@ cbmod <- function(y, s0, x = NULL, i0 = 1, generations = Inf, link = 'identity')
 }
 
 
+# Internal function for comparing the fitted model to the intercept-only model.
+# using likelihood ratio test.
+cbmod_lr_test <- function(object){
+
+  if (object$npar > 1){
+    lr_test_stat <- 2*(object$loglikelihood - object$null_model$loglikelihood)
+    lr_df <- object$npar-1
+    lr_pv <- pchisq(lr_test_stat, df = lr_df, lower.tail = FALSE)
+
+  } else {
+    lr_test_stat <- NA
+    lr_df <- 0
+    lr_pv <- NA
+  }
+
+  res <- list(lr = lr_test_stat, df = lr_df, p.value = lr_pv)
+  return(res)
+}
+
+
+
 #' @export
 summary.cbmod <- function(object, ...){
 
@@ -150,20 +173,10 @@ summary.cbmod <- function(object, ...){
   cat(sprintf('Model log-likelihood: %17.1f\n', object$loglikelihood))
   cat(sprintf('Null log-likelihood: %18.1f\n', object$null_model$loglikelihood))
 
-  if (object$npar > 1){
+  lr_res <- cbmod_lr_test(object)
 
-    lr_mod <- 2*(object$loglikelihood - object$null_model$loglikelihood)
-    lr_df <- object$npar-1
-    lr_pv <- pchisq(lr_mod, df = lr_df, lower.tail = FALSE)
-
-  } else {
-    lr_mod <- NA
-    lr_df <- 0
-    lr_pv <- NA
-  }
-
-  cat(sprintf('Chisq (df = %d): %23.3f\n', lr_df, lr_mod))
-  cat(sprintf('p-value: %30.3f\n', lr_pv))
+  cat(sprintf('Chisq (df = %d): %23.3f\n', lr_res$df, lr_res$lr))
+  cat(sprintf('p-value: %30.3f\n', lr_res$p.value))
 
   cat('\n')
 
