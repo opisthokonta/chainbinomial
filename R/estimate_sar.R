@@ -20,8 +20,13 @@ negloglok_cb <- function(sar, infected, s0, i0 , generations, transform_inv_logi
     }
   }
 
-  -sum(log(dchainbinom(x = infected, s0 = s0, sar = sar, i0 = i0, generations = generations)))
+  nll <- -sum(log(dchainbinom(x = infected, s0 = s0, sar = sar, i0 = i0, generations = generations)))
 
+  if (is.nan(nll)){
+    return(Inf)
+  } else {
+    return(nll)
+  }
 }
 
 
@@ -37,7 +42,7 @@ negloglok_cb <- function(sar, infected, s0, i0 , generations, transform_inv_logi
 #' @param generations numeric.
 #'
 #'@export
-estimate_sar <- function(infected, s0, i0 = 1, generations=Inf){
+estimate_sar <- function(infected, s0, i0 = 1, generations=Inf, se = TRUE){
 
   stopifnot(all(infected <= s0),
             all(infected >= 0))
@@ -52,11 +57,16 @@ estimate_sar <- function(infected, s0, i0 = 1, generations=Inf){
 
   sar_hat <- inv_logit(optim_res$par)
 
-  he <- numDeriv::hessian(negloglok_cb, x = sar_hat,
-                          infected = infected, s0 = s0, i0 = i0,
-                          generations = generations,
-                          transform_inv_logit = FALSE)
-  sar_se <- sqrt(as.numeric(solve(he)))
+  if (se){
+    he <- numDeriv::hessian(negloglok_cb, x = sar_hat,
+                            infected = infected, s0 = s0, i0 = i0,
+                            generations = generations,
+                            transform_inv_logit = FALSE)
+    sar_se <- sqrt(as.numeric(solve(he)))
+  } else {
+    sar_se <- NA
+  }
+
 
 
   res <- list(sar_hat = sar_hat,
