@@ -228,6 +228,11 @@ dchainbinom <- function(x, s0, sar, i0 = 1, generations = Inf){
 
       res[ii] <- NA
 
+    } else if (inp[ii, 'x'] == 0){
+
+      # Explicit formula for x=0, that applies for both final and incomplete outbreaks.
+      res[ii] <- (1-inp[ii, 'sar'])^(inp[ii, 'i0']*inp[ii, 's0'])
+
     } else if (is.infinite(inp[ii, 'generations'])){
 
       pii <- compute_factors(maxi = inp[ii, 'x'], i0 = inp[ii, 'i0'], sar = inp[ii, 'sar'])

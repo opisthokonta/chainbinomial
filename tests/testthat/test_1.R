@@ -187,7 +187,6 @@ test_that("PMF sum to 1", {
 # it should be the same as the ordinary binomial model.
 compare_g1_binom <- function(s0, sar, tol = 0.0000001){
 
-  #probvec1 <- dchainbinom_g(x = 0:s0, s0 = s0, sar = sar, g = 1)
   probvec1 <- dchainbinom(x = 0:s0, s0 = s0, sar = sar, generations = 1)
   probvec1_binom <- dbinom(x = 0:s0, size = s0, prob = sar)
 
@@ -207,6 +206,50 @@ test_that("PMF when g = 1", {
   expect_true(dchainbinom(x = 1, s0 = 0, sar = 0.1, generations = 1) == 0)
 
 })
+
+
+
+# Prob for x = 0 ----
+# The probability for x = 0 should be the same as the ordinary binomial, when i0=1,
+# but not neccecarily if i0 > 1.
+
+# Explicit formula for x=0, also implemented in the dchainbinom function.
+prob0 <- function(sar, s0, i0){
+  (1 - sar)^(i0*s0)
+}
+
+
+test_that("P(x=0)", {
+
+  expect_true(prob0(sar = 0.1, s0=1, i0 = 1) == dbinom(x = 0, size = 1, prob = 0.1))
+  expect_true(prob0(sar = 0.5, s0=1, i0 = 1) == dbinom(x = 0, size = 1, prob = 0.5))
+
+  expect_true(prob0(sar = 0.1, s0=2, i0 = 1) == dbinom(x = 0, size = 2, prob = 0.1))
+  expect_true(prob0(sar = 0.5, s0=2, i0 = 1) == dbinom(x = 0, size = 2, prob = 0.5))
+
+  expect_true(prob0(sar = 0.1, s0=4, i0 = 1) == dbinom(x = 0, size = 4, prob = 0.1))
+  expect_true(prob0(sar = 0.5, s0=4, i0 = 1) == dbinom(x = 0, size = 4, prob = 0.5))
+
+  expect_true(prob0(sar = 0.1, s0=2, i0 = 1) == dchainbinom(x = 0, s0 = 2, sar = 0.1, i0 = 1, generations = Inf))
+  expect_true(prob0(sar = 0.1, s0=2, i0 = 1) == dchainbinom(x = 0, s0 = 2, sar = 0.1, i0 = 1, generations = 1))
+
+  expect_true(prob0(sar = 0.1, s0=4, i0 = 1) == dchainbinom(x = 0, s0 = 4, sar = 0.1, i0 = 1, generations=Inf))
+  expect_true(prob0(sar = 0.1, s0=4, i0 = 1) == dchainbinom(x = 0, s0 = 4, sar = 0.1, i0 = 1, generations=2))
+
+  expect_true(dchainbinom(x = 0, s0 = 4, sar = 0.1, i0 = 1, generations = 2) == dchainbinom(x = 0, s0 = 4, sar = 0.1, i0=  1, generations = Inf))
+
+
+  expect_false(prob0(sar = 0.1, s0=1, i0 = 2) == dbinom(x = 0, size = 1, prob = 0.1))
+  expect_false(prob0(sar = 0.5, s0=1, i0 = 2) == dbinom(x = 0, size = 1, prob = 0.5))
+
+  expect_false(prob0(sar = 0.1, s0=3, i0 = 2) == dbinom(x = 0, size = 3, prob = 0.1))
+  expect_false(prob0(sar = 0.5, s0=3, i0 = 2) == dbinom(x = 0, size = 3, prob = 0.5))
+
+  expect_false(dchainbinom(x = 0, s0 = 4, sar = 0.1, i0 = 2, generations = 2) == dchainbinom(x = 0, s0 = 4, sar = 0.1, i0=  1, generations = Inf))
+
+
+})
+
 
 
 
