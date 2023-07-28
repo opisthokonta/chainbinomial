@@ -34,8 +34,15 @@ cb_invlink <- function(x, link){
 # Objective function used with optim.
 cb_reg_obj <- function(par, xmat, y, s0, i0, generations, link){
   sar_hat <- cb_invlink(as.numeric(xmat %*% par), link = link)
-  negloglok_cb(sar = sar_hat, infected = y, s0 = s0, i0 = i0, generations = generations,
-               transform_inv_logit = FALSE)
+
+  if (any(sar_hat > 1 | sar_hat < 0)){
+    return(Inf)
+  }
+
+  nll <- negloglok_cb(sar = sar_hat, infected = y, s0 = s0, i0 = i0, generations = generations,
+                     transform_inv_logit = FALSE)
+
+  return(nll)
 }
 
 
@@ -65,12 +72,15 @@ initial_params <- function(y, s0, x, link){
 #'
 #'
 #' @export
-cbmod <- function(y, s0, x = NULL, i0 = 1, generations = Inf, link = 'identity'){
+cbmod <- function(y, s0, x = NULL, i0 = 1, generations = Inf, link = 'identity',
+                  optim_method = 'BFGS'){
 
   stopifnot(length(y) == length(s0),
             is.null(x) | is.matrix(x),
             all(y >= 0),
-            all(s0 >= 1))
+            all(s0 >= 1),
+            length(optim_method) == 1,
+            optim_method %in% c('BFGS', 'L-BFGS-B', 'Nelder-Mead'))
 
   if (is.null(x)){
     x <- cbind(rep(1, length(y)))
@@ -85,7 +95,7 @@ cbmod <- function(y, s0, x = NULL, i0 = 1, generations = Inf, link = 'identity')
 
   par_init <- initial_params(y = y, s0 = s0, x = x, link = link)
 
-  optim_res <- optim(par = par_init, fn = cb_reg_obj, method = 'BFGS', hessian=TRUE,
+  optim_res <- optim(par = par_init, fn = cb_reg_obj, method = optim_method, hessian=TRUE,
                      xmat = x, y = y, s0 = s0, i0 = i0, generations = generations, link = link)
 
 
