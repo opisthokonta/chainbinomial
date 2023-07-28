@@ -174,7 +174,7 @@ compute_factors <- function(maxi, sar, i0){
     }
 
     # Eq. 1.14 in Ludwig (1975)
-    pii[ss+1] <- 1 - sum(pvec)
+    pii[ss+1] <- max(0, 1 - sum(pvec))
 
   }
 
