@@ -89,6 +89,9 @@ dcb_1_g5 <- dchainbinom(x = 0:5, s0 = 5, sar = 0.11, generations = 5)
 dcb_1_g6 <- dchainbinom(x = 0:5, s0 = 5, sar = 0.11, generations = 6)
 dcb_1_ginf <- dchainbinom(x = 0:5, s0 = 5, sar = 0.11, generations = Inf)
 
+dcb_2_ginf <- dchainbinom(x = 0:5, s0 = 5, sar = 0.00014, i0 = 1, generations = Inf)
+
+
 tol_sum_to_1 <- 2e-15
 
 test_that("PMF is ok", {
@@ -100,6 +103,7 @@ test_that("PMF is ok", {
   expect_true(abs(sum(dcb_1_g5) - 1) < tol_sum_to_1)
   expect_true(abs(sum(dcb_1_g6) - 1) < tol_sum_to_1)
   expect_true(abs(sum(dcb_1_ginf) - 1) < tol_sum_to_1)
+  expect_true(abs(sum(dcb_2_ginf) - 1) < tol_sum_to_1)
 
 
   expect_true(all(dcb_1_g1 >= 0))
@@ -109,6 +113,7 @@ test_that("PMF is ok", {
   expect_true(all(dcb_1_g5 >= 0))
   expect_true(all(dcb_1_g6 >= 0))
   expect_true(all(dcb_1_ginf >= 0))
+  expect_true(all(dcb_2_ginf >= 0))
 
 
   expect_true(all(dcb_1_g5 == dcb_1_g6))
@@ -158,6 +163,8 @@ test_that("PMF sum to 1", {
   expect_true(check_sum_to_1(s0 = 1, sar= 0.2, g = 8))
   expect_true(check_sum_to_1(s0 = 0, sar= 0.1, g = 8))
 
+
+  expect_true(abs(sum(dcb_2_ginf) - 1) < 1e-15)
 
   # with i0 = 2.
   expect_true(check_sum_to_1(s0 = 3, sar= 0.1, g = 1, i0=2))
@@ -449,6 +456,81 @@ test_that("Expected value == s0", {
   expect_true(ecb_eq_s0_sar_eq_1(s0  = 9, i0 = 2, g = Inf))
 })
 
+
+# Modelling ----
+
+# Example data set that works for all link-functions.
+mod_dat1 <- data.frame(infected = c(1, 0, 1, 0, 1, 0, 2, 1, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1,0, 2, 1, 1, 0, 0, 1, 0, 1, 0, 0),
+                       s0 = c(3, 1, 3, 2, 2, 1, 5, 2, 1, 1, 3, 2, 2, 1, 5, 3, 2, 1, 1, 2, 2, 1, 1, 1, 1, 2, 1, 1, 2, 1),
+                       x = c(-0.03, 1.48, 0.06, -0.35, -1.69, 1.83, -0.05, 1.25, 1.28, -1.55,1.53, -0.17, 0.08, 0.32,
+                             -1.39, 1.89, -0.47, -0.07, -1.19, -0.25, 0.65, 1.41, 0.84, -2.05, -0.15, 0.45, -1.48, -1.41, 2.16, -1.75))
+
+# Make model matrix.
+xmat <- model.matrix(~ x, data=mod_dat1)
+
+
+test_that("modelling works", {
+
+  expect_no_condition(
+    cb_mod_res_id <- cbmod(y = mod_dat1$infected, s0 = mod_dat1$s0, generations = Inf, x = xmat, link = 'identity')
+  )
+
+  expect_no_condition(
+    cb_mod_res_log <- cbmod(y = mod_dat1$infected, s0 = mod_dat1$s0, generations = Inf, x = xmat, link = 'log')
+  )
+
+  expect_no_condition(
+    cb_mod_res_logit <- cbmod(y = mod_dat1$infected, s0 = mod_dat1$s0, generations = Inf, x = xmat, link = 'logit')
+  )
+
+
+  expect_true('cbmod' %in% class(cb_mod_res_id))
+  expect_true('cbmod' %in% class(cb_mod_res_log))
+  expect_true('cbmod' %in% class(cb_mod_res_logit))
+
+  expect_true(cb_mod_res_id$link == 'identity')
+  expect_true(cb_mod_res_log$link == 'log')
+  expect_true(cb_mod_res_logit$link == 'logit')
+
+  expect_true(length(cb_mod_res_id$parameters) == 2)
+  expect_true(length(cb_mod_res_log$parameters) == 2)
+  expect_true(length(cb_mod_res_logit$parameters) == 2)
+
+  expect_true(all(!is.na(cb_mod_res_id$parameters)))
+  expect_true(all(!is.na(cb_mod_res_log$parameters)))
+  expect_true(all(!is.na(cb_mod_res_logit$parameters)))
+
+  expect_true(!is.na(cb_mod_res_id$loglikelihood))
+  expect_true(!is.na(cb_mod_res_log$loglikelihood))
+  expect_true(!is.na(cb_mod_res_logit$loglikelihood))
+
+  expect_true(length(cb_mod_res_id$fitted_values) == nrow(mod_dat1))
+  expect_true(length(cb_mod_res_log$fitted_values) == nrow(mod_dat1))
+  expect_true(length(cb_mod_res_logit$fitted_values) == nrow(mod_dat1))
+
+  expect_true(all(!is.na(cb_mod_res_id$fitted_values)))
+  expect_true(all(!is.na(cb_mod_res_log$fitted_values)))
+  expect_true(all(!is.na(cb_mod_res_logit$fitted_values)))
+
+  expect_true(length(cb_mod_res_id$sar_hat) == nrow(mod_dat1))
+  expect_true(length(cb_mod_res_log$sar_hat) == nrow(mod_dat1))
+  expect_true(length(cb_mod_res_logit$sar_hat) == nrow(mod_dat1))
+
+  expect_true(length(cb_mod_res_id$sar_hat) == nrow(mod_dat1))
+  expect_true(length(cb_mod_res_log$sar_hat) == nrow(mod_dat1))
+  expect_true(length(cb_mod_res_logit$sar_hat) == nrow(mod_dat1))
+
+
+  expect_true(nrow(cb_mod_res_id$vcov) == length(cb_mod_res_id$parameters))
+  expect_true(nrow(cb_mod_res_log$vcov) == length(cb_mod_res_log$parameters))
+  expect_true(nrow(cb_mod_res_logit$vcov) == length(cb_mod_res_logit$parameters))
+
+  expect_true(nrow(cb_mod_res_id$vcov) == ncol(cb_mod_res_id$vcov))
+  expect_true(nrow(cb_mod_res_log$vcov) == ncol(cb_mod_res_log$vcov))
+  expect_true(nrow(cb_mod_res_logit$vcov) == ncol(cb_mod_res_logit$vcov))
+
+
+})
 
 
 
