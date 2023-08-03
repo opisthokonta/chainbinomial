@@ -4,7 +4,15 @@
 \alias{cbmod}
 \title{Fitting models for Secondary Attack Rate with Chain Binomial response}
 \usage{
-cbmod(y, s0, x = NULL, i0 = 1, generations = Inf, link = "identity")
+cbmod(
+  y,
+  s0,
+  x = NULL,
+  i0 = 1,
+  generations = Inf,
+  link = "identity",
+  optim_method = "BFGS"
+)
 }
 \arguments{
 \item{y}{numeric, the number of infected cases.}
