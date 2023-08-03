@@ -68,10 +68,15 @@ estimate_sar <- function(infected, s0, i0 = 1, generations=Inf, se = TRUE){
   }
 
 
+  inp <- list(infected = infected,
+                    s0 = s0,
+                    i0 = i0,
+                    generations = generations)
 
   res <- list(sar_hat = sar_hat,
               se = sar_se,
-              loglikelihood = -optim_res$value)
+              loglikelihood = -optim_res$value,
+              data = inp)
 
   class(res) <- 'sar'
 
@@ -80,18 +85,122 @@ estimate_sar <- function(infected, s0, i0 = 1, generations=Inf, se = TRUE){
 
 
 
-#'@export
-confint.sar <- function(object, level = 0.95){
+# Function used by uniroot to find the value of the -2*log-likelihood-ratio
+# that corresponds to the desired critical value of the chi-square distribution.
+#
+# x = parameter value
+# infected, s0, i0, generations = data for the chain binomial likelihood.
+# max_loglik = log-likelihood at the ML estimate.
+# critical value = The value the -2*log-likelihood-ratio should be compared with,
+#                    intended to be the critical value from the chi-square distribution.
+obj_ci_wilks <- function(x, infected, s0, i0, generations, max_loglik, critical_value){
 
-  upr <- min(object$sar_hat + (object$se * qnorm((1-level)/2, lower.tail = FALSE)) , 1)
-  lwr <- max(object$sar_hat + (object$se * qnorm((1-level)/2, lower.tail = TRUE)), 0)
+  # Log likelihood at the parameter value x.
+  x_loglik <-  -negloglok_cb(sar = x, infected = infected, s0 = s0, i0 = i0,
+                             generations = generations, transform_inv_logit = FALSE)
+
+  # -2 log-likelihood ratio.
+  nll2 <-  -2 * (x_loglik - max_loglik)
+
+  critical_value - nll2
+
+}
+
+
+# Find the search interval for use with uniroot.
+find_intervall_upr <- function(sh){
+
+  if (sh >= 0.99){
+    search_int <- c(0, 1)
+  } else {
+    search_int <- c(sh, 0.999)
+  }
+
+  return(search_int)
+
+}
+
+find_intervall_lwr <- function(sh){
+
+  if (sh <= 0.01){
+    search_int <- c(0, 1)
+  } else {
+    search_int <- c(0.0001, sh)
+  }
+
+  return(search_int)
+
+}
+
+
+#'@export
+confint.sar <- function(object, method = 'chisq', level = 0.95){
+
+  stopifnot(method %in% c('chisq', 'normal'))
+
+  if (method == 'normal'){
+
+    # Compute Standard error if needed.
+    if (is.na(object$se)){
+
+      he <- numDeriv::hessian(negloglok_cb, x = object$sar_hat,
+                              infected = object$data$infected,
+                              s0 = object$data$s0,
+                              i0 = object$data$i0,
+                              generations = object$data$generations,
+                              transform_inv_logit = FALSE)
+      sar_se <- sqrt(as.numeric(solve(he)))
+
+    } else{
+      sar_se <- object$se
+    }
+
+    # compute CI using normal approximation.
+    ci_lwr <- max(object$sar_hat + (sar_se * qnorm((1-level)/2, lower.tail = TRUE)), 0)
+    ci_upr <- min(object$sar_hat + (sar_se * qnorm((1-level)/2, lower.tail = FALSE)) , 1)
+
+  } else if (method == 'chisq'){
+
+    plwr <- (1-level)/2
+    pupr <- 1 - plwr
+
+    critical_value_lower <- qchisq(plwr, df = 1, lower.tail = FALSE)
+
+    uniroot_res_lwr <- uniroot(f = obj_ci_wilks, interval = find_intervall_lwr(object$sar_hat),
+                       infected = object$data$infected, s0 = object$data$s0,
+                       i0 = object$data$i0, generations = object$data$generations,
+                       max_loglik = object$loglikelihood,
+                       critical_value = critical_value_lower,
+                       tol = 0.0000001)
+
+    critical_value_upper <- qchisq(pupr, df = 1, lower.tail = TRUE)
+
+    uniroot_res_upr <- uniroot(f = obj_ci_wilks, interval = find_intervall_upr(object$sar_hat),
+                       infected = object$data$infected, s0 = object$data$s0,
+                       i0 = object$data$i0, generations = object$data$generations,
+                       max_loglik = object$loglikelihood,
+                       critical_value = critical_value_upper,
+                       tol = 0.0000001)
+
+    ci_lwr <- min(object$sar_hat, uniroot_res_lwr$root)
+    ci_upr <- max(object$sar_hat, uniroot_res_upr$root)
+
+  }
+
 
   cn <- sprintf('%.1f %%', c(100 * (1-level)/2, 100 * (1-((1-level)/2)) ))
 
-  res <- c(lwr, upr)
+  res <- c(ci_lwr, ci_upr)
   names(res) <- cn
   return(res)
 }
+
+
+
+
+
+
+
 
 
 
