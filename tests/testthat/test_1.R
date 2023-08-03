@@ -457,7 +457,7 @@ test_that("Expected value == s0", {
 })
 
 
-# Modelling ----
+# Estimation and modelling ----
 
 # Example data set that works for all link-functions.
 mod_dat1 <- data.frame(infected = c(1, 0, 1, 0, 1, 0, 2, 1, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1,0, 2, 1, 1, 0, 0, 1, 0, 1, 0, 0),
@@ -467,6 +467,192 @@ mod_dat1 <- data.frame(infected = c(1, 0, 1, 0, 1, 0, 2, 1, 1, 0, 0, 1, 0, 0, 1,
 
 # Make model matrix.
 xmat <- model.matrix(~ x, data=mod_dat1)
+
+
+# Example data set where everyone are infected.
+mod_dat_all <- data.frame(infected = c(2, 1, 2, 2, 2, 2, 5, 1, 1, 1, 1, 3, 1, 2, 2, 2, 1, 2, 1, 3),
+                          s0 =  c(2, 1, 2, 2, 2, 2, 5, 1, 1, 1, 1, 3, 1, 2, 2, 2, 1, 2, 1, 3))
+
+
+# Example data set where no one is infected.
+mod_dat_none <- data.frame(infected = rep(0, 20),
+                          s0 =  c(2, 2, 1, 2, 2, 2, 5, 1, 1, 1, 5, 3, 1, 2, 2, 4, 1, 1, 1, 1))
+
+
+test_that("simple estimation works", {
+
+  expect_no_condition(
+    sar_est_1_ginf <- estimate_sar(infected = mod_dat1$infected, s0 = mod_dat1$s0, generations = Inf)
+  )
+
+  expect_no_condition(
+    sar_est_1_g1 <- estimate_sar(infected = mod_dat1$infected, s0 = mod_dat1$s0, generations = 1)
+  )
+
+  expect_no_condition(
+    sar_est_1_g2 <- estimate_sar(infected = mod_dat1$infected, s0 = mod_dat1$s0, generations = 2)
+  )
+
+  expect_true('sar' %in% class(sar_est_1_ginf))
+
+  # The reasonableness of results.
+  expect_true(!is.na(sar_est_1_ginf$sar_hat))
+  expect_true(is.numeric(sar_est_1_ginf$sar_hat))
+  expect_true(sar_est_1_ginf$sar_hat <= 1)
+  expect_true(sar_est_1_ginf$sar_hat >= 0)
+
+  expect_true(!is.na(sar_est_1_g1$sar_hat))
+  expect_true(is.numeric(sar_est_1_g1$sar_hat))
+  expect_true(sar_est_1_g1$sar_hat <= 1)
+  expect_true(sar_est_1_g1$sar_hat >= 0)
+
+  expect_true(!is.na(sar_est_1_g2$sar_hat))
+  expect_true(is.numeric(sar_est_1_g2$sar_hat))
+  expect_true(sar_est_1_g2$sar_hat <= 1)
+  expect_true(sar_est_1_g2$sar_hat >= 0)
+
+  # Estimates should not be the same.
+  expect_false(sar_est_1_g2$sar_hat == sar_est_1_g1$sar_hat)
+  expect_false(sar_est_1_g2$sar_hat == sar_est_1_ginf$sar_hat)
+  expect_false(sar_est_1_g1$sar_hat == sar_est_1_ginf$sar_hat)
+
+  # Confidence intervals.
+
+  expect_no_condition(
+    sar_est_1_ginf_ci_95_chisq <- confint(sar_est_1_ginf, method = 'chisq', level = 0.95)
+  )
+
+  expect_no_condition(
+    sar_est_1_ginf_ci_90_chisq <- confint(sar_est_1_ginf, method = 'chisq', level = 0.9)
+  )
+
+  # Check that the upper and lower ends are correct.
+  expect_true(sar_est_1_ginf_ci_95_chisq[1] < sar_est_1_ginf_ci_95_chisq[2])
+  expect_true(sar_est_1_ginf_ci_90_chisq[1] < sar_est_1_ginf_ci_90_chisq[2])
+
+  expect_true(sar_est_1_ginf_ci_95_chisq[1] < sar_est_1_ginf$sar_hat)
+  expect_true(sar_est_1_ginf_ci_95_chisq[2] > sar_est_1_ginf$sar_hat)
+
+  expect_true(sar_est_1_ginf_ci_90_chisq[1] < sar_est_1_ginf$sar_hat)
+  expect_true(sar_est_1_ginf_ci_90_chisq[2] > sar_est_1_ginf$sar_hat)
+
+  # Check that the 95% interval is wider than the 90% interval.
+  expect_true(sar_est_1_ginf_ci_95_chisq[1] < sar_est_1_ginf_ci_90_chisq[1])
+  expect_true(sar_est_1_ginf_ci_95_chisq[2] > sar_est_1_ginf_ci_90_chisq[2])
+
+
+  # for the generation = 1 estimates.
+  expect_no_condition(
+    sar_est_1_g1_ci_95_chisq <- confint(sar_est_1_g1, method = 'chisq', level = 0.95)
+  )
+
+  expect_no_condition(
+    sar_est_1_g1_ci_90_chisq <- confint(sar_est_1_g1, method = 'chisq', level = 0.9)
+  )
+
+  expect_true(sar_est_1_g1_ci_95_chisq[1] < sar_est_1_g1_ci_95_chisq[2])
+  expect_true(sar_est_1_g1_ci_90_chisq[1] < sar_est_1_g1_ci_90_chisq[2])
+  expect_true(sar_est_1_g1_ci_95_chisq[1] < sar_est_1_ginf$sar_hat)
+  expect_true(sar_est_1_g1_ci_95_chisq[2] > sar_est_1_ginf$sar_hat)
+  expect_true(sar_est_1_g1_ci_90_chisq[1] < sar_est_1_ginf$sar_hat)
+  expect_true(sar_est_1_g1_ci_90_chisq[2] > sar_est_1_ginf$sar_hat)
+  expect_true(sar_est_1_g1_ci_95_chisq[1] < sar_est_1_g1_ci_90_chisq[1])
+  expect_true(sar_est_1_g1_ci_95_chisq[2] > sar_est_1_g1_ci_90_chisq[2])
+
+  # Test confidence intervals computed using the the 'normal' method.
+
+  expect_no_condition(
+    sar_est_1_ginf_ci_95_norm <- confint(sar_est_1_ginf, method = 'normal', level = 0.95)
+  )
+
+  expect_no_condition(
+    sar_est_1_ginf_ci_90_norm <- confint(sar_est_1_ginf, method = 'normal', level = 0.90)
+  )
+
+
+  # Check that the upper and lower ends are correct.
+  expect_true(sar_est_1_ginf_ci_95_norm[1] < sar_est_1_ginf_ci_95_norm[2])
+  expect_true(sar_est_1_ginf_ci_90_norm[1] < sar_est_1_ginf_ci_90_norm[2])
+
+  expect_true(sar_est_1_ginf_ci_95_norm[1] < sar_est_1_ginf$sar_hat)
+  expect_true(sar_est_1_ginf_ci_95_norm[2] > sar_est_1_ginf$sar_hat)
+
+  expect_true(sar_est_1_ginf_ci_90_norm[1] < sar_est_1_ginf$sar_hat)
+  expect_true(sar_est_1_ginf_ci_90_norm[2] > sar_est_1_ginf$sar_hat)
+
+  # Check that the 95% interval is wider than the 90% interval.
+  expect_true(sar_est_1_ginf_ci_95_norm[1] < sar_est_1_ginf_ci_90_norm[1])
+  expect_true(sar_est_1_ginf_ci_95_norm[2] > sar_est_1_ginf_ci_90_norm[2])
+
+  # Check that the normal and chisq methods does not give exactly the same answers.
+  expect_false(sar_est_1_ginf_ci_95_norm[1] == sar_est_1_ginf_ci_95_chisq[1])
+  expect_false(sar_est_1_ginf_ci_95_norm[2] == sar_est_1_ginf_ci_95_chisq[2])
+  expect_false(sar_est_1_ginf_ci_90_norm[1] == sar_est_1_ginf_ci_90_chisq[1])
+  expect_false(sar_est_1_ginf_ci_90_norm[2] == sar_est_1_ginf_ci_90_chisq[2])
+
+
+  # Check the edge cases with none and all infected.
+
+  expect_no_condition(
+    sar_est_all_ginf <- estimate_sar(infected = mod_dat_all$infected, s0 = mod_dat_all$s0, generations = Inf)
+  )
+
+  expect_no_condition(
+    sar_est_none_ginf <- estimate_sar(infected = mod_dat_none$infected, s0 = mod_dat_none$s0, generations = Inf)
+  )
+
+  # The reasonableness of results.
+  expect_true(!is.na(sar_est_all_ginf$sar_hat))
+  expect_true(is.numeric(sar_est_all_ginf$sar_hat))
+  expect_true(sar_est_all_ginf$sar_hat <= 1)
+  expect_true(sar_est_all_ginf$sar_hat >= 0)
+  expect_true(sar_est_all_ginf$sar_hat >= 0.99) # Point estimate should be close to 1.
+
+  expect_true(!is.na(sar_est_none_ginf$sar_hat))
+  expect_true(is.numeric(sar_est_none_ginf$sar_hat))
+  expect_true(sar_est_none_ginf$sar_hat <= 1)
+  expect_true(sar_est_none_ginf$sar_hat >= 0)
+  expect_true(sar_est_none_ginf$sar_hat <= 0.01) # Point estimate should be close to 0.
+
+  # CI's for the "all infected" data.
+  expect_no_condition(
+    sar_est_all_ginf_ci_95_chisq <- confint(sar_est_all_ginf, method = 'chisq', level = 0.95)
+  )
+
+  expect_no_condition(
+    sar_est_all_ginf_ci_90_chisq <- confint(sar_est_all_ginf, method = 'chisq', level = 0.90)
+  )
+
+  expect_true(sar_est_all_ginf_ci_95_chisq[1] < sar_est_all_ginf_ci_95_chisq[2])
+  expect_true(sar_est_all_ginf_ci_90_chisq[1] < sar_est_all_ginf_ci_90_chisq[2])
+  expect_true(sar_est_all_ginf_ci_95_chisq[1] < sar_est_all_ginf$sar_hat)
+  expect_true(sar_est_all_ginf_ci_95_chisq[2] >= sar_est_all_ginf$sar_hat)
+  expect_true(sar_est_all_ginf_ci_90_chisq[1] < sar_est_all_ginf$sar_hat)
+  expect_true(sar_est_all_ginf_ci_90_chisq[2] >= sar_est_all_ginf$sar_hat)
+  expect_true(sar_est_all_ginf_ci_95_chisq[1] < sar_est_all_ginf_ci_90_chisq[1])
+  expect_true(sar_est_all_ginf_ci_95_chisq[2] >= sar_est_all_ginf_ci_90_chisq[2])
+
+  # CI's for the "none infected" data.
+  expect_no_condition(
+    sar_est_none_ginf_ci_95_chisq <- confint(sar_est_none_ginf, method = 'chisq', level = 0.95)
+  )
+
+  expect_no_condition(
+    sar_est_none_ginf_ci_90_chisq <- confint(sar_est_none_ginf, method = 'chisq', level = 0.90)
+  )
+
+  expect_true(sar_est_none_ginf_ci_95_chisq[1] < sar_est_none_ginf_ci_95_chisq[2])
+  expect_true(sar_est_none_ginf_ci_90_chisq[1] < sar_est_none_ginf_ci_90_chisq[2])
+  expect_true(sar_est_none_ginf_ci_95_chisq[1] <= sar_est_none_ginf$sar_hat)
+  expect_true(sar_est_none_ginf_ci_95_chisq[2] > sar_est_none_ginf$sar_hat)
+  expect_true(sar_est_none_ginf_ci_90_chisq[1] <= sar_est_none_ginf$sar_hat)
+  expect_true(sar_est_none_ginf_ci_90_chisq[2] > sar_est_none_ginf$sar_hat)
+  expect_true(sar_est_none_ginf_ci_95_chisq[1] <= sar_est_none_ginf_ci_90_chisq[1])
+  expect_true(sar_est_none_ginf_ci_95_chisq[2] > sar_est_none_ginf_ci_90_chisq[2])
+
+
+
+})
 
 
 test_that("modelling works", {
@@ -483,52 +669,109 @@ test_that("modelling works", {
     cb_mod_res_logit <- cbmod(y = mod_dat1$infected, s0 = mod_dat1$s0, generations = Inf, x = xmat, link = 'logit')
   )
 
+  expect_no_condition(
+    cb_mod_res_cloglog <- cbmod(y = mod_dat1$infected, s0 = mod_dat1$s0, generations = Inf, x = xmat, link = 'cloglog')
+  )
+
 
   expect_true('cbmod' %in% class(cb_mod_res_id))
   expect_true('cbmod' %in% class(cb_mod_res_log))
   expect_true('cbmod' %in% class(cb_mod_res_logit))
+  expect_true('cbmod' %in% class(cb_mod_res_cloglog))
 
   expect_true(cb_mod_res_id$link == 'identity')
   expect_true(cb_mod_res_log$link == 'log')
   expect_true(cb_mod_res_logit$link == 'logit')
+  expect_true(cb_mod_res_cloglog$link == 'cloglog')
 
   expect_true(length(cb_mod_res_id$parameters) == 2)
   expect_true(length(cb_mod_res_log$parameters) == 2)
   expect_true(length(cb_mod_res_logit$parameters) == 2)
+  expect_true(length(cb_mod_res_cloglog$parameters) == 2)
 
   expect_true(all(!is.na(cb_mod_res_id$parameters)))
   expect_true(all(!is.na(cb_mod_res_log$parameters)))
   expect_true(all(!is.na(cb_mod_res_logit$parameters)))
+  expect_true(all(!is.na(cb_mod_res_cloglog$parameters)))
 
   expect_true(!is.na(cb_mod_res_id$loglikelihood))
   expect_true(!is.na(cb_mod_res_log$loglikelihood))
   expect_true(!is.na(cb_mod_res_logit$loglikelihood))
+  expect_true(!is.na(cb_mod_res_cloglog$loglikelihood))
 
   expect_true(length(cb_mod_res_id$fitted_values) == nrow(mod_dat1))
   expect_true(length(cb_mod_res_log$fitted_values) == nrow(mod_dat1))
   expect_true(length(cb_mod_res_logit$fitted_values) == nrow(mod_dat1))
+  expect_true(length(cb_mod_res_cloglog$fitted_values) == nrow(mod_dat1))
 
   expect_true(all(!is.na(cb_mod_res_id$fitted_values)))
   expect_true(all(!is.na(cb_mod_res_log$fitted_values)))
   expect_true(all(!is.na(cb_mod_res_logit$fitted_values)))
+  expect_true(all(!is.na(cb_mod_res_cloglog$fitted_values)))
 
   expect_true(length(cb_mod_res_id$sar_hat) == nrow(mod_dat1))
   expect_true(length(cb_mod_res_log$sar_hat) == nrow(mod_dat1))
   expect_true(length(cb_mod_res_logit$sar_hat) == nrow(mod_dat1))
+  expect_true(length(cb_mod_res_cloglog$sar_hat) == nrow(mod_dat1))
 
   expect_true(length(cb_mod_res_id$sar_hat) == nrow(mod_dat1))
   expect_true(length(cb_mod_res_log$sar_hat) == nrow(mod_dat1))
   expect_true(length(cb_mod_res_logit$sar_hat) == nrow(mod_dat1))
-
+  expect_true(length(cb_mod_res_cloglog$sar_hat) == nrow(mod_dat1))
 
   expect_true(nrow(cb_mod_res_id$vcov) == length(cb_mod_res_id$parameters))
   expect_true(nrow(cb_mod_res_log$vcov) == length(cb_mod_res_log$parameters))
   expect_true(nrow(cb_mod_res_logit$vcov) == length(cb_mod_res_logit$parameters))
+  expect_true(nrow(cb_mod_res_cloglog$vcov) == length(cb_mod_res_logit$parameters))
 
   expect_true(nrow(cb_mod_res_id$vcov) == ncol(cb_mod_res_id$vcov))
   expect_true(nrow(cb_mod_res_log$vcov) == ncol(cb_mod_res_log$vcov))
   expect_true(nrow(cb_mod_res_logit$vcov) == ncol(cb_mod_res_logit$vcov))
+  expect_true(nrow(cb_mod_res_cloglog$vcov) == ncol(cb_mod_res_logit$vcov))
 
+
+  # Confidence intervals.
+  expect_no_condition(
+    cbmod_ci_id <- confint(cb_mod_res_id, level = 0.95)
+  )
+
+  expect_no_condition(
+    cbmod_ci_log <- confint(cb_mod_res_log, level = 0.95)
+  )
+
+  expect_no_condition(
+    cbmod_ci_logit <- confint(cb_mod_res_logit, level = 0.95)
+  )
+
+  expect_no_condition(
+    cbmod_ci_cloglog <- confint(cb_mod_res_cloglog, level = 0.95)
+  )
+
+
+  expect_true(all(dim(cbmod_ci_id) == c(2,2)))
+  expect_true(all(dim(cbmod_ci_log) == c(2,2)))
+  expect_true(all(dim(cbmod_ci_logit) == c(2,2)))
+  expect_true(all(dim(cbmod_ci_cloglog) == c(2,2)))
+
+  expect_false(any(is.na(cbmod_ci_id)))
+  expect_false(any(is.na(cbmod_ci_log)))
+  expect_false(any(is.na(cbmod_ci_logit)))
+  expect_false(any(is.na(cbmod_ci_cloglog)))
+
+  expect_true(all(cbmod_ci_id[,1] < cbmod_ci_id[,2]))
+  expect_true(all(cbmod_ci_log[,1] < cbmod_ci_log[,2]))
+  expect_true(all(cbmod_ci_logit[,1] < cbmod_ci_logit[,2]))
+  expect_true(all(cbmod_ci_cloglog[,1] < cbmod_ci_cloglog[,2]))
+
+  expect_true(all(cbmod_ci_id[,1] < cb_mod_res_id$parameters))
+  expect_true(all(cbmod_ci_log[,1] < cb_mod_res_log$parameters))
+  expect_true(all(cbmod_ci_logit[,1] < cb_mod_res_logit$parameters))
+  expect_true(all(cbmod_ci_cloglog[,1] < cb_mod_res_cloglog$parameters))
+
+  expect_true(all(cbmod_ci_id[,2] > cb_mod_res_id$parameters))
+  expect_true(all(cbmod_ci_log[,2] > cb_mod_res_log$parameters))
+  expect_true(all(cbmod_ci_logit[,2] > cb_mod_res_logit$parameters))
+  expect_true(all(cbmod_ci_cloglog[,2] > cb_mod_res_cloglog$parameters))
 
 })
 
