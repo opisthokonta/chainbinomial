@@ -479,6 +479,13 @@ mod_dat_none <- data.frame(infected = rep(0, 20),
                           s0 =  c(2, 2, 1, 2, 2, 2, 5, 1, 1, 1, 5, 3, 1, 2, 2, 4, 1, 1, 1, 1))
 
 
+# Example data set where, which caused problems with 99% CI.
+mod_dat2 <- data.frame(infected = c(2, 1, 2, 5, 2, 2, 2, 1, 3, 2),
+           s0 = c(2, 2, 2, 5, 2, 2, 2, 1, 3, 2),
+           generations = 1)
+
+
+
 test_that("simple estimation works", {
 
   expect_no_condition(
@@ -491,6 +498,10 @@ test_that("simple estimation works", {
 
   expect_no_condition(
     sar_est_1_g2 <- estimate_sar(infected = mod_dat1$infected, s0 = mod_dat1$s0, generations = 2)
+  )
+
+  expect_no_condition(
+    sar_est_2_g1 <- estimate_sar(infected = mod_dat2$infected, s0 = mod_dat2$s0, generations = 1)
   )
 
   expect_true('sar' %in% class(sar_est_1_ginf))
@@ -511,12 +522,21 @@ test_that("simple estimation works", {
   expect_true(sar_est_1_g2$sar_hat <= 1)
   expect_true(sar_est_1_g2$sar_hat >= 0)
 
+  expect_true(!is.na(sar_est_2_g1$sar_hat))
+  expect_true(is.numeric(sar_est_2_g1$sar_hat))
+  expect_true(sar_est_2_g1$sar_hat <= 1)
+  expect_true(sar_est_2_g1$sar_hat >= 0)
+
   # Estimates should not be the same.
   expect_false(sar_est_1_g2$sar_hat == sar_est_1_g1$sar_hat)
   expect_false(sar_est_1_g2$sar_hat == sar_est_1_ginf$sar_hat)
   expect_false(sar_est_1_g1$sar_hat == sar_est_1_ginf$sar_hat)
 
   # Confidence intervals.
+
+  expect_no_condition(
+    sar_est_1_ginf_ci_99_chisq <- confint(sar_est_1_ginf, method = 'chisq', level = 0.99)
+  )
 
   expect_no_condition(
     sar_est_1_ginf_ci_95_chisq <- confint(sar_est_1_ginf, method = 'chisq', level = 0.95)
@@ -527,21 +547,32 @@ test_that("simple estimation works", {
   )
 
   # Check that the upper and lower ends are correct.
+  expect_true(sar_est_1_ginf_ci_99_chisq[1] < sar_est_1_ginf_ci_99_chisq[2])
   expect_true(sar_est_1_ginf_ci_95_chisq[1] < sar_est_1_ginf_ci_95_chisq[2])
   expect_true(sar_est_1_ginf_ci_90_chisq[1] < sar_est_1_ginf_ci_90_chisq[2])
 
+  expect_true(sar_est_1_ginf_ci_99_chisq[1] < sar_est_1_ginf$sar_hat)
   expect_true(sar_est_1_ginf_ci_95_chisq[1] < sar_est_1_ginf$sar_hat)
   expect_true(sar_est_1_ginf_ci_95_chisq[2] > sar_est_1_ginf$sar_hat)
-
+  expect_true(sar_est_1_ginf_ci_99_chisq[2] > sar_est_1_ginf$sar_hat)
   expect_true(sar_est_1_ginf_ci_90_chisq[1] < sar_est_1_ginf$sar_hat)
   expect_true(sar_est_1_ginf_ci_90_chisq[2] > sar_est_1_ginf$sar_hat)
 
+
   # Check that the 95% interval is wider than the 90% interval.
+  expect_true(sar_est_1_ginf_ci_99_chisq[1] < sar_est_1_ginf_ci_95_chisq[1])
   expect_true(sar_est_1_ginf_ci_95_chisq[1] < sar_est_1_ginf_ci_90_chisq[1])
   expect_true(sar_est_1_ginf_ci_95_chisq[2] > sar_est_1_ginf_ci_90_chisq[2])
+  expect_true(sar_est_1_ginf_ci_99_chisq[2] > sar_est_1_ginf_ci_95_chisq[2])
 
 
   # for the generation = 1 estimates.
+
+  expect_no_condition(
+    sar_est_1_g1_ci_99_chisq <- confint(sar_est_1_g1, method = 'chisq', level = 0.99)
+  )
+
+
   expect_no_condition(
     sar_est_1_g1_ci_95_chisq <- confint(sar_est_1_g1, method = 'chisq', level = 0.95)
   )
@@ -550,14 +581,19 @@ test_that("simple estimation works", {
     sar_est_1_g1_ci_90_chisq <- confint(sar_est_1_g1, method = 'chisq', level = 0.9)
   )
 
+  expect_true(sar_est_1_g1_ci_99_chisq[1] < sar_est_1_g1_ci_99_chisq[2])
   expect_true(sar_est_1_g1_ci_95_chisq[1] < sar_est_1_g1_ci_95_chisq[2])
   expect_true(sar_est_1_g1_ci_90_chisq[1] < sar_est_1_g1_ci_90_chisq[2])
+  expect_true(sar_est_1_g1_ci_99_chisq[1] < sar_est_1_ginf$sar_hat)
+  expect_true(sar_est_1_g1_ci_99_chisq[2] > sar_est_1_ginf$sar_hat)
   expect_true(sar_est_1_g1_ci_95_chisq[1] < sar_est_1_ginf$sar_hat)
   expect_true(sar_est_1_g1_ci_95_chisq[2] > sar_est_1_ginf$sar_hat)
   expect_true(sar_est_1_g1_ci_90_chisq[1] < sar_est_1_ginf$sar_hat)
   expect_true(sar_est_1_g1_ci_90_chisq[2] > sar_est_1_ginf$sar_hat)
+  expect_true(sar_est_1_g1_ci_99_chisq[1] < sar_est_1_g1_ci_95_chisq[1])
   expect_true(sar_est_1_g1_ci_95_chisq[1] < sar_est_1_g1_ci_90_chisq[1])
   expect_true(sar_est_1_g1_ci_95_chisq[2] > sar_est_1_g1_ci_90_chisq[2])
+  expect_true(sar_est_1_g1_ci_99_chisq[2] > sar_est_1_g1_ci_95_chisq[2])
 
   # Test confidence intervals computed using the the 'normal' method.
 
@@ -615,6 +651,11 @@ test_that("simple estimation works", {
   expect_true(sar_est_none_ginf$sar_hat <= 0.01) # Point estimate should be close to 0.
 
   # CI's for the "all infected" data.
+
+  expect_no_condition(
+    sar_est_all_ginf_ci_99_chisq <- confint(sar_est_all_ginf, method = 'chisq', level = 0.99)
+  )
+
   expect_no_condition(
     sar_est_all_ginf_ci_95_chisq <- confint(sar_est_all_ginf, method = 'chisq', level = 0.95)
   )
@@ -623,16 +664,27 @@ test_that("simple estimation works", {
     sar_est_all_ginf_ci_90_chisq <- confint(sar_est_all_ginf, method = 'chisq', level = 0.90)
   )
 
+  expect_true(sar_est_all_ginf_ci_99_chisq[1] < sar_est_all_ginf_ci_99_chisq[2])
   expect_true(sar_est_all_ginf_ci_95_chisq[1] < sar_est_all_ginf_ci_95_chisq[2])
   expect_true(sar_est_all_ginf_ci_90_chisq[1] < sar_est_all_ginf_ci_90_chisq[2])
+
   expect_true(sar_est_all_ginf_ci_95_chisq[1] < sar_est_all_ginf$sar_hat)
   expect_true(sar_est_all_ginf_ci_95_chisq[2] >= sar_est_all_ginf$sar_hat)
   expect_true(sar_est_all_ginf_ci_90_chisq[1] < sar_est_all_ginf$sar_hat)
   expect_true(sar_est_all_ginf_ci_90_chisq[2] >= sar_est_all_ginf$sar_hat)
+
+  expect_true(sar_est_all_ginf_ci_99_chisq[1] < sar_est_all_ginf_ci_95_chisq[1])
   expect_true(sar_est_all_ginf_ci_95_chisq[1] < sar_est_all_ginf_ci_90_chisq[1])
   expect_true(sar_est_all_ginf_ci_95_chisq[2] >= sar_est_all_ginf_ci_90_chisq[2])
+  expect_true(sar_est_all_ginf_ci_99_chisq[2] >= sar_est_all_ginf_ci_95_chisq[2])
 
   # CI's for the "none infected" data.
+
+  expect_no_condition(
+    sar_est_none_ginf_ci_99_chisq <- confint(sar_est_none_ginf, method = 'chisq', level = 0.99)
+  )
+
+
   expect_no_condition(
     sar_est_none_ginf_ci_95_chisq <- confint(sar_est_none_ginf, method = 'chisq', level = 0.95)
   )
@@ -641,15 +693,45 @@ test_that("simple estimation works", {
     sar_est_none_ginf_ci_90_chisq <- confint(sar_est_none_ginf, method = 'chisq', level = 0.90)
   )
 
+
+  expect_true(sar_est_none_ginf_ci_99_chisq[1] < sar_est_none_ginf_ci_99_chisq[2])
   expect_true(sar_est_none_ginf_ci_95_chisq[1] < sar_est_none_ginf_ci_95_chisq[2])
   expect_true(sar_est_none_ginf_ci_90_chisq[1] < sar_est_none_ginf_ci_90_chisq[2])
+
+  expect_true(sar_est_none_ginf_ci_99_chisq[1] <= sar_est_none_ginf$sar_hat)
+  expect_true(sar_est_none_ginf_ci_99_chisq[2] > sar_est_none_ginf$sar_hat)
+
   expect_true(sar_est_none_ginf_ci_95_chisq[1] <= sar_est_none_ginf$sar_hat)
   expect_true(sar_est_none_ginf_ci_95_chisq[2] > sar_est_none_ginf$sar_hat)
   expect_true(sar_est_none_ginf_ci_90_chisq[1] <= sar_est_none_ginf$sar_hat)
   expect_true(sar_est_none_ginf_ci_90_chisq[2] > sar_est_none_ginf$sar_hat)
+
+  expect_true(sar_est_none_ginf_ci_99_chisq[1] <= sar_est_none_ginf_ci_95_chisq[1])
   expect_true(sar_est_none_ginf_ci_95_chisq[1] <= sar_est_none_ginf_ci_90_chisq[1])
   expect_true(sar_est_none_ginf_ci_95_chisq[2] > sar_est_none_ginf_ci_90_chisq[2])
+  expect_true(sar_est_none_ginf_ci_99_chisq[2] > sar_est_none_ginf_ci_95_chisq[2])
 
+
+  # Ci for mod_dat2.
+
+  expect_no_condition(
+    sar_est_2_g1_ci_99_chisq <- confint(sar_est_2_g1, method = 'chisq', level = 0.99)
+  )
+
+  expect_no_condition(
+    sar_est_2_g1_ci_95_chisq <- confint(sar_est_2_g1, method = 'chisq', level = 0.95)
+  )
+
+  expect_true(sar_est_2_g1_ci_99_chisq[1] < sar_est_2_g1_ci_99_chisq[2])
+  expect_true(sar_est_2_g1_ci_95_chisq[1] < sar_est_2_g1_ci_95_chisq[2])
+
+  expect_true(sar_est_2_g1_ci_99_chisq[1] < sar_est_2_g1$sar_hat)
+  expect_true(sar_est_2_g1_ci_99_chisq[2] > sar_est_2_g1$sar_hat)
+  expect_true(sar_est_2_g1_ci_95_chisq[1] < sar_est_2_g1$sar_hat)
+  expect_true(sar_est_2_g1_ci_95_chisq[2] > sar_est_2_g1$sar_hat)
+
+  expect_true(sar_est_2_g1_ci_99_chisq[1] < sar_est_2_g1_ci_95_chisq[1])
+  expect_true(sar_est_2_g1_ci_99_chisq[2] > sar_est_2_g1_ci_95_chisq[2])
 
 
 })
