@@ -113,7 +113,7 @@ find_intervall_upr <- function(sh){
   if (sh >= 0.99){
     search_int <- c(0, 1)
   } else {
-    search_int <- c(sh, 0.999)
+    search_int <- c(sh, 1)
   }
 
   return(search_int)
@@ -125,7 +125,7 @@ find_intervall_lwr <- function(sh){
   if (sh <= 0.01){
     search_int <- c(0, 1)
   } else {
-    search_int <- c(0.0001, sh)
+    search_int <- c(0, sh)
   }
 
   return(search_int)
@@ -164,6 +164,7 @@ confint.sar <- function(object, method = 'chisq', level = 0.95){
     plwr <- (1-level)/2
     pupr <- 1 - plwr
 
+
     critical_value_lower <- qchisq(plwr, df = 1, lower.tail = FALSE)
 
     uniroot_res_lwr <- uniroot(f = obj_ci_wilks, interval = find_intervall_lwr(object$sar_hat),
@@ -174,6 +175,15 @@ confint.sar <- function(object, method = 'chisq', level = 0.95){
                        tol = 0.0000001)
 
     critical_value_upper <- qchisq(pupr, df = 1, lower.tail = TRUE)
+
+    # browser()
+
+    # -negloglok_cb(sar = 1, infected = object$data$infected, s0 = object$data$s0,
+    #               i0 = object$data$i0, generations = object$data$generations, transform_inv_logit = FALSE)
+    #
+    # obj_ci_wilks(x = 0.9999, infected = object$data$infected, s0 = object$data$s0,
+    #              i0 = object$data$i0, generations = object$data$generations,
+    #              max_loglik = object$loglikelihood, critical_value_upper)
 
     uniroot_res_upr <- uniroot(f = obj_ci_wilks, interval = find_intervall_upr(object$sar_hat),
                        infected = object$data$infected, s0 = object$data$s0,
