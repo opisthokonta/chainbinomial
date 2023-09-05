@@ -228,4 +228,46 @@ coef.cbmod <- function(object){
 
 
 
+#' Predict Method for cbmod Fits
+#'
+#' @param object a fitted object of class inheriting from "cbmod".
+#' @param x matrix of predictors (design matrix). Must have the same column names and order as the x matrix used to fit the model.
+#' @param type the type of prediction, either 'link' (default) or 'sar'. The default is on the scale
+#' of the linear predictors. 'sar' gives the predicted secondary attack rate, by transforming the linear
+#'  predictors by the inverse link function used in the model fit.
+#'
+#' @return a vector of predictions.
+#' @export
+predict.cbmod <- function(object, x = NULL, type = 'link'){
+
+  if(!identical(colnames(x), names(object$parameters))){
+    stop('The column names and order in newdata must match those of names(object$parameters).')
+  }
+
+  stopifnot(length(type) == 1)
+  stopifnot(type %in% c('link', 'response', 'sar'))
+
+
+  eta_hat <- as.numeric(x %*% object$parameters)
+
+  if (type %in% c('response', 'sar')){
+    sar_hat <- cb_invlink(eta_hat, link = object$link)
+
+    if (any(sar_hat < 0) | any(sar_hat > 1)){
+      warning('predicted SAR smaller outside 0-1 range.')
+    }
+
+  }
+
+
+  if (type == 'link'){
+    return(eta_hat)
+  } else if (type %in% c('response', 'sar')){
+    return(sar_hat)
+  }
+
+}
+
+
+
 

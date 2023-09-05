@@ -858,7 +858,92 @@ test_that("modelling works", {
 })
 
 
+# Copypasta from "modelling works"
+cb_mod_res_id <- cbmod(y = mod_dat1$infected, s0 = mod_dat1$s0, generations = Inf, x = xmat, link = 'identity')
+cb_mod_res_log <- cbmod(y = mod_dat1$infected, s0 = mod_dat1$s0, generations = Inf, x = xmat, link = 'log')
+cb_mod_res_logit <- cbmod(y = mod_dat1$infected, s0 = mod_dat1$s0, generations = Inf, x = xmat, link = 'logit')
+cb_mod_res_cloglog <- cbmod(y = mod_dat1$infected, s0 = mod_dat1$s0, generations = Inf, x = xmat, link = 'cloglog')
+
+# extreme value x = -50 gives negative sar for identity link.
+my_new_data <- data.frame(x=c(-50, -2, -1, 0, 1, 2))
+newx <- model.matrix(~ x, data = my_new_data)
+
+
+test_that("making predictions", {
+
+  expect_no_condition(
+    cb_mod_pred_link_id <- predict(cb_mod_res_id, x = newx, type = 'link')
+  )
+
+  expect_no_condition(
+    cb_mod_pred_link_log <- predict(cb_mod_res_log, x = newx, type = 'link')
+  )
+
+  expect_no_condition(
+    cb_mod_pred_link_logit <- predict(cb_mod_res_logit, x = newx, type = 'link')
+  )
+
+  expect_no_condition(
+    cb_mod_pred_link_cloglog <- predict(cb_mod_res_cloglog, x = newx, type = 'link')
+  )
+
+  expect_warning(
+    cb_mod_pred_sar_id <- predict(cb_mod_res_id, x = newx, type = 'sar') # gives a warning.
+  )
+
+  expect_no_condition(
+    cb_mod_pred_sar_log <- predict(cb_mod_res_log, x = newx, type = 'sar')
+  )
+
+  expect_no_condition(
+    cb_mod_pred_sar_logit <- predict(cb_mod_res_logit, x = newx, type = 'sar')
+  )
+
+  expect_no_condition(
+    cb_mod_pred_sar_cloglog <- predict(cb_mod_res_cloglog, x = newx, type = 'sar')
+  )
 
 
 
+  expect_true(length(cb_mod_pred_link_id) == nrow(newx))
+  expect_true(length(cb_mod_pred_link_log) == nrow(newx))
+  expect_true(length(cb_mod_pred_link_logit) == nrow(newx))
+  expect_true(length(cb_mod_pred_link_cloglog) == nrow(newx))
+
+  expect_true(any(!is.na(cb_mod_pred_link_id)))
+  expect_true(any(!is.na(cb_mod_pred_link_log)))
+  expect_true(any(!is.na(cb_mod_pred_link_logit)))
+  expect_true(any(!is.na(cb_mod_pred_link_cloglog)))
+
+  expect_true(length(cb_mod_pred_sar_id) == nrow(newx))
+  expect_true(length(cb_mod_pred_sar_log) == nrow(newx))
+  expect_true(length(cb_mod_pred_sar_logit) == nrow(newx))
+  expect_true(length(cb_mod_pred_sar_cloglog) == nrow(newx))
+
+  expect_true(any(!is.na(cb_mod_pred_sar_id)))
+  expect_true(any(!is.na(cb_mod_pred_sar_log)))
+  expect_true(any(!is.na(cb_mod_pred_sar_logit)))
+  expect_true(any(!is.na(cb_mod_pred_sar_cloglog)))
+
+  expect_true(identical(cb_mod_pred_link_id, cb_mod_pred_sar_id))
+  expect_false(identical(cb_mod_pred_link_log, cb_mod_pred_sar_log))
+  expect_false(identical(cb_mod_pred_link_logit, cb_mod_pred_sar_logit))
+  expect_false(identical(cb_mod_pred_link_cloglog, cb_mod_pred_sar_cloglog))
+
+  expect_true(all(cb_mod_pred_sar_log > 0))
+  expect_true(all(cb_mod_pred_sar_logit > 0))
+  expect_true(all(cb_mod_pred_sar_cloglog > 0))
+
+  expect_true(all(cb_mod_pred_sar_log < 1))
+  expect_true(all(cb_mod_pred_sar_logit < 1))
+  expect_true(all(cb_mod_pred_sar_cloglog < 1))
+
+  # Check that predict gives the same sar hat as the fitted model object.
+  expect_true(all(predict(cb_mod_res_id, x = xmat, type = 'sar') == cb_mod_res_id$sar_hat))
+  expect_true(all(predict(cb_mod_res_log, x = xmat, type = 'sar') == cb_mod_res_log$sar_hat))
+  expect_true(all(predict(cb_mod_res_logit, x = xmat, type = 'sar') == cb_mod_res_logit$sar_hat))
+  expect_true(all(predict(cb_mod_res_cloglog, x = xmat, type = 'sar') == cb_mod_res_cloglog$sar_hat))
+
+
+})
 
