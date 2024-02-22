@@ -21,7 +21,8 @@ tidy.cbmod <- function(x, conf.int=FALSE, conf.level = 0.95, ...){
 
   res <- tibble::tibble(term = names(x$parameters),
                         estimate = x$parameters,
-                        std.error = x$se)
+                        std.error = x$se,
+                        p.value = x$p_values)
 
   if (conf.int) {
     ci <- confint(x, level = conf.level)

@@ -124,6 +124,9 @@ cbmod <- function(y, s0, x = NULL, i0 = 1, generations = Inf, link = 'identity',
   # Fitted values (aka estimate of expected final attack rate).
   yhat <- echainbinom(s0 = s0, i0 = i0, sar = sar_hat, generations = generations)
 
+  # p-values
+  p_values <- pnorm(abs(beta_hat), mean = 0, sd = beta_se, lower.tail = FALSE) * 2
+
 
   end_time <- Sys.time()
   est_time <- difftime(end_time, start_time, units='secs')
@@ -131,6 +134,7 @@ cbmod <- function(y, s0, x = NULL, i0 = 1, generations = Inf, link = 'identity',
   res <- list(parameters = beta_hat,
               se = beta_se,
               vcov = vcov,
+              p_values = p_values,
               loglikelihood = -optim_res$value,
               npar = length(optim_res$par),
               sar_hat = sar_hat,
@@ -193,10 +197,10 @@ summary.cbmod <- function(object, ...){
   term_names_length <- max(nchar(names(object$parameters)))
 
   cat('Coefficients:\n')
-  cat(sprintf('%-*s %8s %9s\n', term_names_length, '', 'Estimate', 'Std. Error'))
+  cat(sprintf('%-*s %8s %9s %8s\n', term_names_length, '', 'Estimate', 'Std. Error', 'P-value'))
 
   for (ii in 1:length(object$parameters)){
-    cat(sprintf('%-*s % 8.3f % 9.3f\n', term_names_length, names(object$parameters)[ii], object$parameters[ii], object$se[ii]))
+    cat(sprintf('%-*s % 8.3f % 9.3f % 9.3f\n', term_names_length, names(object$parameters)[ii], object$parameters[ii], object$se[ii], object$p_values[ii]))
   }
 
 }

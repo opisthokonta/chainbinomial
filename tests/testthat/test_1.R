@@ -14,7 +14,7 @@ cp_0a <- chain_prob(x = c(0,1,0), s0 = 4, sar = 0.8)
 cp_0b <- chain_prob(x = c(1,0,1), s0 = 4, sar = 0.8)
 
 
-# Chain of length 1 (index case only) is not defined. Shoudl give NA.
+# Chain of length 1 (index case only) is not defined. Should give NA.
 cp_na1 <- chain_prob(x = c(0), s0 = 4, sar = 0.8)
 cp_na2 <- chain_prob(x = c(1), s0 = 4, sar = 0.8)
 
