@@ -201,7 +201,7 @@ summary(cbmod_res)
 ```
 
     ## Chain Binomial model with identity link.
-    ## Model successfully fitted in 0.06 seconds
+    ## Model successfully fitted in 0.07 seconds
     ## 
     ## Model log-likelihood:             -19.6
     ## Null log-likelihood:              -24.0
@@ -209,9 +209,9 @@ summary(cbmod_res)
     ## p-value:                          0.003
     ## 
     ## Coefficients:
-    ##             Estimate Std. Error
-    ## (Intercept)    0.204     0.058
-    ## strain_type    0.328     0.113
+    ##             Estimate Std. Error  P-value
+    ## (Intercept)    0.204     0.058     0.000
+    ## strain_type    0.328     0.113     0.004
 
 ``` r
 confint(cbmod_res)
@@ -227,7 +227,7 @@ work in more complicated models with more than one predictor or when the
 predictor(s) are numerical rather than categorical. In that case you
 should use `link='logit'`.
 
-`tidy` and `glance` are also methods available for `cbmod` objects.
+`tidy` and `glance` methods are also available for `cbmod` objects.
 
 ## Litterature
 
@@ -238,5 +238,5 @@ should use `link='logit'`.
   risk: Binomial considered biased. PLoS Comput Biol 17(1): e1008601.
   <https://doi.org/10.1371/journal.pcbi.1008601>
 
-- Lindstrøm JC, et al (2023) Estimating the household secondary attack
+- Lindstrøm JC, et al (2024) Estimating the household secondary attack
   rate with the Incomplete Chain Binomial model. In preparation.
