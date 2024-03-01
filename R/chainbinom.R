@@ -201,17 +201,26 @@ compute_factors <- function(maxi, sar, i0){
 #' @export
 dchainbinom <- function(x, s0, sar, i0 = 1, generations = Inf){
 
-  stopifnot(is.numeric(x),
-            is.numeric(s0),
-            is.numeric(sar),
-            is.numeric(i0),
-            is.numeric(generations),
-            all(sar >= 0),
-            all(sar <= 1),
-            all(x >= 0),
-            all(s0 >= 0),
-            all(i0 >= 1),
-            all(generations >= 1))
+  # Check input.
+  stopifnot(is.numeric(x) | is.logical(x),
+            is.numeric(s0) | is.logical(s0),
+            is.numeric(sar) | is.logical(sar),
+            is.numeric(i0) | is.logical(i0),
+            is.numeric(generations) | is.logical(generations),
+            all(sar >= 0, na.rm = TRUE),
+            all(sar <= 1, na.rm = TRUE),
+            all(x >= 0, na.rm = TRUE),
+            all(s0 >= 0, na.rm = TRUE),
+            all(i0 >= 1, na.rm = TRUE),
+            all(generations >= 1, na.rm = TRUE))
+
+  # Coerce to numericals, in case of logicals being provided.
+  x <- as.numeric(x)
+  s0 <- as.numeric(s0)
+  sar <- as.numeric(sar)
+  i0 <- as.numeric(i0)
+  generations <- as.numeric(generations)
+
 
   # Combine input to matrix, to expand/recycle input data.
   inp <- as.matrix(cbind(x, s0, sar, i0, generations))
@@ -295,6 +304,11 @@ rchainbinom <- function(n, s0, sar, i0 = 1, generations = Inf){
 
     inp_idx <- ((ii-1) %% nrow(inp))+1
 
+    if (any(is.na(inp[inp_idx,]))){
+      res[ii] <- NA
+      next
+    }
+
     sg <- inp[inp_idx,'s0'] # Remaining suceptibles in generation g.
     ig <- inp[inp_idx,'i0'] # Infected in generation g.
     i_cum <- 0 # Cumulative number of infected.
@@ -336,15 +350,21 @@ rchainbinom <- function(n, s0, sar, i0 = 1, generations = Inf){
 #' @export
 echainbinom <- function(s0, sar, i0 = 1, generations = Inf){
 
-  stopifnot(is.numeric(s0),
-            is.numeric(sar),
-            is.numeric(i0),
-            is.numeric(generations),
-            all(sar >= 0),
-            all(sar <= 1),
-            all(s0 >= 0),
-            all(i0 >= 1),
-            all(generations >= 1))
+  stopifnot(is.numeric(s0) | is.logical(s0),
+            is.numeric(sar) | is.logical(sar),
+            is.numeric(i0) | is.logical(i0),
+            is.numeric(generations) | is.logical(generations),
+            all(sar >= 0, na.rm = TRUE),
+            all(sar <= 1, na.rm = TRUE),
+            all(s0 >= 0, na.rm = TRUE),
+            all(i0 >= 1, na.rm = TRUE),
+            all(generations >= 1, na.rm = TRUE))
+
+  # Coerce to numericals, in case of logicals being provided.
+  s0 <- as.numeric(s0)
+  sar <- as.numeric(sar)
+  i0 <- as.numeric(i0)
+  generations <- as.numeric(generations)
 
   # Combine input to matrix, to expand/recycle input data.
   inp <- as.matrix(cbind(s0, sar, i0, generations))
@@ -353,6 +373,11 @@ echainbinom <- function(s0, sar, i0 = 1, generations = Inf){
   res <- numeric(n)
 
   for (ii in 1:n){
+
+    if (any(is.na(inp[ii,]))){
+      res[ii] <- NA
+      next
+    }
     xx <- 0:inp[ii, 's0']
     pp <- dchainbinom(x  = xx, s0 = inp[ii, 's0'], i0 = inp[ii, 'i0'], sar = inp[ii, 'sar'], generations = inp[ii, 'generations'])
     res[ii] <- sum(xx * pp)

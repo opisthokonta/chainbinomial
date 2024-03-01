@@ -296,6 +296,8 @@ compare_pmf_vs_simulation <- function(s0, sar, g, i0 = 1, tol = 0.001, maxtries 
 
 }
 
+
+
 if (FALSE){
   test_that("PMF vs simulation", {
 
@@ -944,6 +946,79 @@ test_that("making predictions", {
   expect_true(all(predict(cb_mod_res_logit, x = xmat, type = 'sar') == cb_mod_res_logit$sar_hat))
   expect_true(all(predict(cb_mod_res_cloglog, x = xmat, type = 'sar') == cb_mod_res_cloglog$sar_hat))
 
+
+})
+
+
+# Missing values ----
+
+x_input_na <- c(NA, 0, 2, 3, NA, NA)
+dcb_na1 <- dchainbinom(x = x_input_na, s0 = 5, sar = 0.11, generations = 1)
+
+s0_input_na <- c(3, 3, 4, 5, 6, NA)
+dcb_na2 <- dchainbinom(x = 0:5, s0 = s0_input_na, sar = 0.11, generations = 1)
+
+sar_input_na <- c(NA, 0.2, 0.1, 0.5, 0.21, NA)
+dcb_na3 <- dchainbinom(x = 0:5, s0 = 3, sar = sar_input_na, generations = Inf)
+
+generations_input_na <- c(1, 2, 3, NA, Inf, NA)
+dcb_na4 <- dchainbinom(x = 0:5, s0 = 5, sar = 0.11, generations = generations_input_na)
+
+# One NA that causes all values to be NA because of recycling.
+dcb_na5 <- dchainbinom(x = NA, s0 = 5, sar = 0.11, generations = 2)
+dcb_na6 <- dchainbinom(x = 0:5, s0 = NA, sar = 0.11, generations = 2)
+dcb_na7 <- dchainbinom(x = NA, s0 = 5, sar = NA, generations = Inf)
+dcb_na8 <- dchainbinom(x = NA, s0 = 5, sar = 0.11, generations = NA)
+
+
+test_that("dchainbinom NA", {
+
+  expect_true(all(is.na(dcb_na1) == is.na(x_input_na)))
+  expect_true(all(is.na(dcb_na2) == is.na(s0_input_na)))
+  expect_true(all(is.na(dcb_na3) == is.na(sar_input_na)))
+  expect_true(all(is.na(dcb_na4) == is.na(generations_input_na)))
+
+  expect_true(all(is.na(dcb_na5)))
+  expect_true(all(is.na(dcb_na6)))
+  expect_true(all(is.na(dcb_na7)))
+  expect_true(all(is.na(dcb_na8)))
+
+})
+
+
+
+rcb_na2 <- rchainbinom(n = 6, s0 = s0_input_na, sar = 0.11, generations = 2)
+rcb_na3 <- rchainbinom(n = 6, s0 = 5, sar = sar_input_na, generations = Inf)
+rcb_na4 <- rchainbinom(n = 6, s0 = 5, sar = 0.34, generations = generations_input_na)
+
+
+test_that("rchainbinom NA", {
+
+  expect_true(all(is.na(rcb_na2) == is.na(s0_input_na)))
+  expect_true(all(is.na(rcb_na3) == is.na(sar_input_na)))
+  expect_true(all(is.na(rcb_na4) == is.na(generations_input_na)))
+
+})
+
+
+ecb_na2 <- echainbinom(s0 = s0_input_na, sar = 0.11, generations = 2)
+ecb_na3 <- echainbinom(s0 = 5, sar = sar_input_na, generations = Inf)
+ecb_na4 <- echainbinom(s0 = 5, sar = 0.34, generations = generations_input_na)
+
+# One NA that causes all values to be NA because of recycling.
+ecb_na6 <- echainbinom(s0 = NA, sar = 0.41, generations = 1:4)
+ecb_na7 <- echainbinom(s0 = 5, sar = NA, generations = 1:4)
+ecb_na8 <- echainbinom(s0 = 1:4, sar = 0.41, generations = NA)
+
+test_that("echainbinom NA", {
+
+  expect_true(all(is.na(ecb_na2) == is.na(s0_input_na)))
+  expect_true(all(is.na(ecb_na3) == is.na(sar_input_na)))
+  expect_true(all(is.na(ecb_na4) == is.na(generations_input_na)))
+
+  expect_true(all(is.na(ecb_na6)))
+  expect_true(all(is.na(ecb_na7)))
+  expect_true(all(is.na(ecb_na8)))
 
 })
 
