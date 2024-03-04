@@ -487,6 +487,15 @@ mod_dat2 <- data.frame(infected = c(2, 1, 2, 5, 2, 2, 2, 1, 3, 2),
            generations = 1)
 
 
+# modified data sets with missing values.
+mod_dat1_na <- mod_dat1
+mod_dat1_na$infected[c(5)] <- NA
+
+mod_dat1_na2 <- mod_dat1
+mod_dat1_na2$s0[c(8)] <- NA
+
+
+
 
 test_that("simple estimation works", {
 
@@ -533,6 +542,7 @@ test_that("simple estimation works", {
   expect_false(sar_est_1_g2$sar_hat == sar_est_1_g1$sar_hat)
   expect_false(sar_est_1_g2$sar_hat == sar_est_1_ginf$sar_hat)
   expect_false(sar_est_1_g1$sar_hat == sar_est_1_ginf$sar_hat)
+
 
   # Confidence intervals.
 
@@ -652,6 +662,9 @@ test_that("simple estimation works", {
   expect_true(sar_est_none_ginf$sar_hat >= 0)
   expect_true(sar_est_none_ginf$sar_hat <= 0.01) # Point estimate should be close to 0.
 
+
+
+
   # CI's for the "all infected" data.
 
   expect_no_condition(
@@ -734,6 +747,64 @@ test_that("simple estimation works", {
 
   expect_true(sar_est_2_g1_ci_99_chisq[1] < sar_est_2_g1_ci_95_chisq[1])
   expect_true(sar_est_2_g1_ci_99_chisq[2] > sar_est_2_g1_ci_95_chisq[2])
+
+
+
+  # Missing values.
+
+  # Missing in infected
+  expect_no_condition(
+    sar_est_1_ginf_na <- estimate_sar(infected = mod_dat1_na$infected, s0 = mod_dat1_na$s0, generations = Inf)
+  )
+
+  expect_no_condition(
+    sar_est_1_g1_na <- estimate_sar(infected = mod_dat1_na$infected, s0 = mod_dat1_na$s0, generations = 1)
+  )
+
+  expect_no_condition(
+    sar_est_1_g2_na <- estimate_sar(infected = mod_dat1_na$infected, s0 = mod_dat1_na$s0, generations = 2)
+  )
+
+
+  # missing in s0
+  expect_no_condition(
+    sar_est_1_ginf_na2 <- estimate_sar(infected = mod_dat1_na2$infected, s0 = mod_dat1_na2$s0, generations = Inf)
+  )
+
+  expect_no_condition(
+    sar_est_1_g1_na2 <- estimate_sar(infected = mod_dat1_na2$infected, s0 = mod_dat1_na2$s0, generations = 1)
+  )
+
+  expect_no_condition(
+    sar_est_1_g2_na2 <- estimate_sar(infected = mod_dat1_na2$infected, s0 = mod_dat1_na2$s0, generations = 2)
+  )
+
+  # Check that the estimates are not identical.
+  expect_true(sar_est_1_ginf_na$sar_hat != sar_est_1_ginf$sar_hat)
+  expect_true(sar_est_1_g1_na$sar_hat != sar_est_1_g1$sar_hat)
+  expect_true(sar_est_1_g2_na$sar_hat != sar_est_1_g2$sar_hat)
+
+  expect_true(sar_est_1_ginf_na2$sar_hat != sar_est_1_ginf$sar_hat)
+  expect_true(sar_est_1_g1_na2$sar_hat != sar_est_1_g1$sar_hat)
+  expect_true(sar_est_1_g2_na2$sar_hat != sar_est_1_g2$sar_hat)
+
+  # missing values CI
+  expect_no_condition(
+    sar_est_1_ginf_ci_95_chisq_na <- confint(sar_est_1_ginf_na, method = 'chisq', level = 0.95)
+  )
+
+  expect_no_condition(
+    sar_est_1_ginf_ci_95_norm_na <- confint(sar_est_1_ginf_na, method = 'normal', level = 0.95)
+  )
+
+  expect_true(sar_est_1_ginf_ci_95_chisq_na[1] < sar_est_1_ginf_ci_95_chisq_na[2])
+  expect_true(sar_est_1_ginf_ci_95_norm_na[1] < sar_est_1_ginf_ci_95_norm_na[2])
+
+  # Reasonableness when there are missing values
+  expect_true(!is.na(sar_est_1_ginf_na$sar_hat))
+  expect_true(is.numeric(sar_est_1_ginf_na$sar_hat))
+  expect_true(sar_est_1_ginf_na$sar_hat <= 1)
+  expect_true(sar_est_1_ginf_na$sar_hat >= 0)
 
 
 })
@@ -1021,4 +1092,12 @@ test_that("echainbinom NA", {
   expect_true(all(is.na(ecb_na8)))
 
 })
+
+
+
+
+
+
+
+
 

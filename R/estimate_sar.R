@@ -20,7 +20,7 @@ negloglok_cb <- function(sar, infected, s0, i0 , generations, transform_inv_logi
     }
   }
 
-  nll <- -sum(log(dchainbinom(x = infected, s0 = s0, sar = sar, i0 = i0, generations = generations)))
+  nll <- -sum(log(dchainbinom(x = infected, s0 = s0, sar = sar, i0 = i0, generations = generations)), na.rm = TRUE)
 
   if (is.nan(nll)){
     return(Inf)
@@ -44,9 +44,20 @@ negloglok_cb <- function(sar, infected, s0, i0 , generations, transform_inv_logi
 #'@export
 estimate_sar <- function(infected, s0, i0 = 1, generations=Inf, se = TRUE){
 
-  stopifnot(all(infected <= s0),
-            all(infected >= 0))
+  stopifnot(is.numeric(infected) | is.logical(infected),
+            is.numeric(s0) | is.logical(s0),
+            is.numeric(i0) | is.logical(i0),
+            is.numeric(generations) | is.logical(generations),
+            all(infected <= s0, na.rm = TRUE),
+            all(infected >= 0, na.rm = TRUE),
+            all(i0 > 0, na.rm = TRUE),
+            all(!is.na(generations)),
+            is.logical(se),
+            length(logical) == 1)
 
+
+  # inp <- as.matrix(cbind(x, s0, sar, i0, generations))
+  # if()
 
   sar_init <- 0.5
   optim_res <- optim(par = sar_init,
