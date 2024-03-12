@@ -240,3 +240,4 @@ should use `link='logit'`.
 
 - Lindstrøm JC, et al (2024) Estimating the household secondary attack
   rate with the Incomplete Chain Binomial model. In preparation.
+  <https://doi.org/10.48550/arXiv.2403.03948>

@@ -151,4 +151,4 @@ Here we used the identity link function, which is the default. This gives the ea
 
 -   Sharker Y, Kenah E (2021) Estimating and interpreting secondary attack risk: Binomial considered biased. PLoS Comput Biol 17(1): e1008601. <https://doi.org/10.1371/journal.pcbi.1008601>
 
--   Lindstrøm JC, et al (2024) Estimating the household secondary attack rate with the Incomplete Chain Binomial model. In preparation.
+-   Lindstrøm JC, et al (2024) Estimating the household secondary attack rate with the Incomplete Chain Binomial model. In preparation. <https://doi.org/10.48550/arXiv.2403.03948>
