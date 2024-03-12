@@ -77,8 +77,12 @@ cbmod <- function(y, s0, x = NULL, i0 = 1, generations = Inf, link = 'identity',
 
   stopifnot(length(y) == length(s0),
             is.null(x) | is.matrix(x),
-            all(y >= 0),
-            all(s0 >= 1),
+            all(y >= 0, na.rm = TRUE),
+            all(s0 >= 1, na.rm = TRUE),
+            all(i0 >= 1, na.rm = TRUE),
+            all(generations >= 1, na.rm = TRUE),
+            length(link) == 1,
+            is.character(link),
             length(optim_method) == 1,
             optim_method %in% c('BFGS', 'L-BFGS-B', 'Nelder-Mead'))
 
@@ -89,13 +93,38 @@ cbmod <- function(y, s0, x = NULL, i0 = 1, generations = Inf, link = 'identity',
               ncol(x) <= length(y))
   }
 
+  if (length(i0) > 1){
+    stopifnot(length(i0) == length(y))
+  } else {
+    i0 <- rep(i0, length(y))
+  }
+
+  if (length(generations) > 1){
+    stopifnot(length(generations) == length(y))
+  }else {
+    generations <- rep(generations, length(y))
+  }
+
+  # Check for missing values.
+  is_na_y <- is.na(y) | is.na(s0) | is.na(i0) | is.na(generations)
+  is_na_x <- apply(x, FUN = function(x){any(is.na(x))}, MARGIN = 1)
+  is_na <- is_na_y | is_na_x
+
+  if (any(is_na)){
+    y <- y[!is_na]
+    s0 <- s0[!is_na]
+    i0 <- i0[!is_na]
+    generations <- generations[!is_na]
+    x <- x[!is_na,]
+  }
+
   warning_messages <- character(0)
 
   start_time <- Sys.time()
 
   par_init <- initial_params(y = y, s0 = s0, x = x, link = link)
 
-  optim_res <- optim(par = par_init, fn = cb_reg_obj, method = optim_method, hessian=TRUE,
+  optim_res <- optim(par = par_init, fn = cb_reg_obj, method = optim_method, hessian = TRUE,
                      xmat = x, y = y, s0 = s0, i0 = i0, generations = generations, link = link)
 
 
@@ -142,7 +171,8 @@ cbmod <- function(y, s0, x = NULL, i0 = 1, generations = Inf, link = 'identity',
               link = link,
               null_model = sar_hat_0,
               warnings = warning_messages,
-              est_time = est_time)
+              est_time = est_time,
+              omitted_values = which(is_na))
 
   class(res) <- 'cbmod'
 

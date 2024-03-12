@@ -470,6 +470,9 @@ mod_dat1 <- data.frame(infected = c(1, 0, 1, 0, 1, 0, 2, 1, 1, 0, 0, 1, 0, 0, 1,
 # Make model matrix.
 xmat <- model.matrix(~ x, data=mod_dat1)
 
+# model matrix with missing values.
+xmat_na <- xmat
+xmat_na[16,2] <- NA
 
 # Example data set where everyone are infected.
 mod_dat_all <- data.frame(infected = c(2, 1, 2, 2, 2, 2, 5, 1, 1, 1, 1, 3, 1, 2, 2, 2, 1, 2, 1, 3),
@@ -494,7 +497,9 @@ mod_dat1_na$infected[c(5)] <- NA
 mod_dat1_na2 <- mod_dat1
 mod_dat1_na2$s0[c(8)] <- NA
 
-
+mod_dat1_na3 <- mod_dat1
+mod_dat1_na3$s0[c(8)] <- NA
+mod_dat1_na3$infected[c(5)] <- NA
 
 
 test_that("simple estimation works", {
@@ -810,6 +815,21 @@ test_that("simple estimation works", {
 })
 
 
+# cbmod(y = mod_dat1_na$infected, s0 = mod_dat1_na$s0, generations = Inf, x = xmat, link = 'identity')
+
+# inp <- as.matrix(cbind(xmat, mod_dat1_na$infected, mod_dat1_na$s0, i0 = 1, generations = Inf))
+# na_idx <- apply(inp, FUN = function(x){any(is.na(x))}, MARGIN = 1)
+# inp <- inp[!na_idx,]
+#
+#
+#
+# glm_res_na <- glm(mod_dat1_na$infected ~ xmat, family = poisson())
+# glm_res_na$na.action
+#
+# na.omit(mod_dat1_na$infected)
+# na.omit(xmat, mod_dat1_na$infected)
+
+
 test_that("modelling works", {
 
   expect_no_condition(
@@ -828,61 +848,138 @@ test_that("modelling works", {
     cb_mod_res_cloglog <- cbmod(y = mod_dat1$infected, s0 = mod_dat1$s0, generations = Inf, x = xmat, link = 'cloglog')
   )
 
+  # with missing values
+  expect_no_condition(
+    cb_mod_res_id_na <- cbmod(y = mod_dat1_na$infected, s0 = mod_dat1_na$s0, generations = Inf, x = xmat, link = 'identity')
+  )
+
+  expect_no_condition(
+    cb_mod_res_id_na2 <- cbmod(y = mod_dat1_na2$infected, s0 = mod_dat1_na2$s0, generations = Inf, x = xmat, link = 'identity')
+  )
+
+  expect_no_condition(
+    cb_mod_res_id_na3 <- cbmod(y = mod_dat1_na3$infected, s0 = mod_dat1_na3$s0, generations = Inf, x = xmat, link = 'identity')
+  )
+
+  expect_no_condition(
+    cb_mod_res_id_na4 <- cbmod(y = mod_dat1$infected, s0 = mod_dat1$s0, generations = Inf, x = xmat_na, link = 'identity')
+  )
+
+
+  expect_no_condition(
+    cb_mod_res_id_na5 <- cbmod(y = mod_dat1_na3$infected, s0 = mod_dat1_na3$s0, generations = Inf, x = xmat_na, link = 'identity')
+  )
 
   expect_true('cbmod' %in% class(cb_mod_res_id))
   expect_true('cbmod' %in% class(cb_mod_res_log))
   expect_true('cbmod' %in% class(cb_mod_res_logit))
   expect_true('cbmod' %in% class(cb_mod_res_cloglog))
+  expect_true('cbmod' %in% class(cb_mod_res_id_na))
+  expect_true('cbmod' %in% class(cb_mod_res_id_na2))
+  expect_true('cbmod' %in% class(cb_mod_res_id_na3))
+  expect_true('cbmod' %in% class(cb_mod_res_id_na4))
+  expect_true('cbmod' %in% class(cb_mod_res_id_na5))
 
   expect_true(cb_mod_res_id$link == 'identity')
   expect_true(cb_mod_res_log$link == 'log')
   expect_true(cb_mod_res_logit$link == 'logit')
   expect_true(cb_mod_res_cloglog$link == 'cloglog')
+  expect_true(cb_mod_res_id_na$link == 'identity')
+  expect_true(cb_mod_res_id_na2$link == 'identity')
+  expect_true(cb_mod_res_id_na3$link == 'identity')
+  expect_true(cb_mod_res_id_na4$link == 'identity')
+  expect_true(cb_mod_res_id_na5$link == 'identity')
 
   expect_true(length(cb_mod_res_id$parameters) == 2)
   expect_true(length(cb_mod_res_log$parameters) == 2)
   expect_true(length(cb_mod_res_logit$parameters) == 2)
   expect_true(length(cb_mod_res_cloglog$parameters) == 2)
+  expect_true(length(cb_mod_res_id_na$parameters) == 2)
+  expect_true(length(cb_mod_res_id_na2$parameters) == 2)
+  expect_true(length(cb_mod_res_id_na3$parameters) == 2)
+  expect_true(length(cb_mod_res_id_na4$parameters) == 2)
+  expect_true(length(cb_mod_res_id_na5$parameters) == 2)
 
   expect_true(all(!is.na(cb_mod_res_id$parameters)))
   expect_true(all(!is.na(cb_mod_res_log$parameters)))
   expect_true(all(!is.na(cb_mod_res_logit$parameters)))
   expect_true(all(!is.na(cb_mod_res_cloglog$parameters)))
+  expect_true(all(!is.na(cb_mod_res_id_na$parameters)))
+  expect_true(all(!is.na(cb_mod_res_id_na2$parameters)))
+  expect_true(all(!is.na(cb_mod_res_id_na3$parameters)))
+  expect_true(all(!is.na(cb_mod_res_id_na4$parameters)))
+  expect_true(all(!is.na(cb_mod_res_id_na5$parameters)))
 
   expect_true(!is.na(cb_mod_res_id$loglikelihood))
   expect_true(!is.na(cb_mod_res_log$loglikelihood))
   expect_true(!is.na(cb_mod_res_logit$loglikelihood))
   expect_true(!is.na(cb_mod_res_cloglog$loglikelihood))
+  expect_true(!is.na(cb_mod_res_id_na$loglikelihood))
+  expect_true(!is.na(cb_mod_res_id_na2$loglikelihood))
+  expect_true(!is.na(cb_mod_res_id_na3$loglikelihood))
+  expect_true(!is.na(cb_mod_res_id_na4$loglikelihood))
+  expect_true(!is.na(cb_mod_res_id_na5$loglikelihood))
 
   expect_true(length(cb_mod_res_id$fitted_values) == nrow(mod_dat1))
   expect_true(length(cb_mod_res_log$fitted_values) == nrow(mod_dat1))
   expect_true(length(cb_mod_res_logit$fitted_values) == nrow(mod_dat1))
   expect_true(length(cb_mod_res_cloglog$fitted_values) == nrow(mod_dat1))
+  expect_true(length(cb_mod_res_id_na$fitted_values) == nrow(mod_dat1) - 1) # minus 1 because of one missing value.
+  expect_true(length(cb_mod_res_id_na2$fitted_values) == nrow(mod_dat1) - 1) # minus 1 because of one missing value.
+  expect_true(length(cb_mod_res_id_na3$fitted_values) == nrow(mod_dat1) - 2) # minus 2 because of two missing values.
+  expect_true(length(cb_mod_res_id_na4$fitted_values) == nrow(mod_dat1) - 1) # minus 1 because of one missing value.
+  expect_true(length(cb_mod_res_id_na5$fitted_values) == nrow(mod_dat1) - 3) # minus 3 because of three missing value.
 
   expect_true(all(!is.na(cb_mod_res_id$fitted_values)))
   expect_true(all(!is.na(cb_mod_res_log$fitted_values)))
   expect_true(all(!is.na(cb_mod_res_logit$fitted_values)))
   expect_true(all(!is.na(cb_mod_res_cloglog$fitted_values)))
+  expect_true(all(!is.na(cb_mod_res_id_na$fitted_values)))
+  expect_true(all(!is.na(cb_mod_res_id_na2$fitted_values)))
+  expect_true(all(!is.na(cb_mod_res_id_na3$fitted_values)))
+  expect_true(all(!is.na(cb_mod_res_id_na4$fitted_values)))
+  expect_true(all(!is.na(cb_mod_res_id_na5$fitted_values)))
 
   expect_true(length(cb_mod_res_id$sar_hat) == nrow(mod_dat1))
   expect_true(length(cb_mod_res_log$sar_hat) == nrow(mod_dat1))
   expect_true(length(cb_mod_res_logit$sar_hat) == nrow(mod_dat1))
   expect_true(length(cb_mod_res_cloglog$sar_hat) == nrow(mod_dat1))
-
-  expect_true(length(cb_mod_res_id$sar_hat) == nrow(mod_dat1))
-  expect_true(length(cb_mod_res_log$sar_hat) == nrow(mod_dat1))
-  expect_true(length(cb_mod_res_logit$sar_hat) == nrow(mod_dat1))
-  expect_true(length(cb_mod_res_cloglog$sar_hat) == nrow(mod_dat1))
+  expect_true(length(cb_mod_res_id_na$sar_hat) == nrow(mod_dat1) - 1) # minus 1 because of one missing value.
+  expect_true(length(cb_mod_res_id_na2$sar_hat) == nrow(mod_dat1) - 1) # minus 1 because of one missing value.
+  expect_true(length(cb_mod_res_id_na3$sar_hat) == nrow(mod_dat1) - 2) # minus 2 because of two missing values.
+  expect_true(length(cb_mod_res_id_na4$sar_hat) == nrow(mod_dat1) - 1) # minus 1 because of one missing value.
+  expect_true(length(cb_mod_res_id_na5$sar_hat) == nrow(mod_dat1) - 3) # minus 3 because of three missing value.
 
   expect_true(nrow(cb_mod_res_id$vcov) == length(cb_mod_res_id$parameters))
   expect_true(nrow(cb_mod_res_log$vcov) == length(cb_mod_res_log$parameters))
   expect_true(nrow(cb_mod_res_logit$vcov) == length(cb_mod_res_logit$parameters))
-  expect_true(nrow(cb_mod_res_cloglog$vcov) == length(cb_mod_res_logit$parameters))
+  expect_true(nrow(cb_mod_res_cloglog$vcov) == length(cb_mod_res_cloglog$parameters))
+  expect_true(nrow(cb_mod_res_id_na$vcov) == length(cb_mod_res_id_na$parameters))
+  expect_true(nrow(cb_mod_res_id_na2$vcov) == length(cb_mod_res_id_na2$parameters))
+  expect_true(nrow(cb_mod_res_id_na3$vcov) == length(cb_mod_res_id_na3$parameters))
+  expect_true(nrow(cb_mod_res_id_na4$vcov) == length(cb_mod_res_id_na4$parameters))
+  expect_true(nrow(cb_mod_res_id_na5$vcov) == length(cb_mod_res_id_na5$parameters))
 
   expect_true(nrow(cb_mod_res_id$vcov) == ncol(cb_mod_res_id$vcov))
   expect_true(nrow(cb_mod_res_log$vcov) == ncol(cb_mod_res_log$vcov))
   expect_true(nrow(cb_mod_res_logit$vcov) == ncol(cb_mod_res_logit$vcov))
-  expect_true(nrow(cb_mod_res_cloglog$vcov) == ncol(cb_mod_res_logit$vcov))
+  expect_true(nrow(cb_mod_res_cloglog$vcov) == ncol(cb_mod_res_cloglog$vcov))
+  expect_true(nrow(cb_mod_res_id_na$vcov) == ncol(cb_mod_res_id_na$vcov))
+  expect_true(nrow(cb_mod_res_id_na2$vcov) == ncol(cb_mod_res_id_na2$vcov))
+  expect_true(nrow(cb_mod_res_id_na3$vcov) == ncol(cb_mod_res_id_na3$vcov))
+  expect_true(nrow(cb_mod_res_id_na4$vcov) == ncol(cb_mod_res_id_na4$vcov))
+  expect_true(nrow(cb_mod_res_id_na5$vcov) == ncol(cb_mod_res_id_na5$vcov))
+
+
+  expect_true(length(cb_mod_res_id$omitted_values) == 0)
+  expect_true(length(cb_mod_res_log$omitted_values) == 0)
+  expect_true(length(cb_mod_res_logit$omitted_values) == 0)
+  expect_true(length(cb_mod_res_cloglog$omitted_values) == 0)
+  expect_true(length(cb_mod_res_id_na$omitted_values) == 1)
+  expect_true(length(cb_mod_res_id_na2$omitted_values) == 1)
+  expect_true(length(cb_mod_res_id_na3$omitted_values) == 2)
+  expect_true(length(cb_mod_res_id_na4$omitted_values) == 1)
+  expect_true(length(cb_mod_res_id_na5$omitted_values) == 3)
 
 
   # Confidence intervals.
@@ -902,31 +999,76 @@ test_that("modelling works", {
     cbmod_ci_cloglog <- confint(cb_mod_res_cloglog, level = 0.95)
   )
 
+  expect_no_condition(
+    cbmod_ci_id_na <- confint(cb_mod_res_id_na, level = 0.95)
+  )
+
+  expect_no_condition(
+    cbmod_ci_id_na2 <- confint(cb_mod_res_id_na2, level = 0.95)
+  )
+
+  expect_no_condition(
+    cbmod_ci_id_na3 <- confint(cb_mod_res_id_na3, level = 0.95)
+  )
+
+  expect_no_condition(
+    cbmod_ci_id_na4 <- confint(cb_mod_res_id_na4, level = 0.95)
+  )
+
+  expect_no_condition(
+    cbmod_ci_id_na5 <- confint(cb_mod_res_id_na5, level = 0.95)
+  )
+
 
   expect_true(all(dim(cbmod_ci_id) == c(2,2)))
   expect_true(all(dim(cbmod_ci_log) == c(2,2)))
   expect_true(all(dim(cbmod_ci_logit) == c(2,2)))
   expect_true(all(dim(cbmod_ci_cloglog) == c(2,2)))
+  expect_true(all(dim(cbmod_ci_id_na) == c(2,2)))
+  expect_true(all(dim(cbmod_ci_id_na2) == c(2,2)))
+  expect_true(all(dim(cbmod_ci_id_na3) == c(2,2)))
+  expect_true(all(dim(cbmod_ci_id_na4) == c(2,2)))
+  expect_true(all(dim(cbmod_ci_id_na5) == c(2,2)))
 
   expect_false(any(is.na(cbmod_ci_id)))
   expect_false(any(is.na(cbmod_ci_log)))
   expect_false(any(is.na(cbmod_ci_logit)))
   expect_false(any(is.na(cbmod_ci_cloglog)))
+  expect_false(any(is.na(cbmod_ci_id_na)))
+  expect_false(any(is.na(cbmod_ci_id_na2)))
+  expect_false(any(is.na(cbmod_ci_id_na3)))
+  expect_false(any(is.na(cbmod_ci_id_na4)))
+  expect_false(any(is.na(cbmod_ci_id_na5)))
 
   expect_true(all(cbmod_ci_id[,1] < cbmod_ci_id[,2]))
   expect_true(all(cbmod_ci_log[,1] < cbmod_ci_log[,2]))
   expect_true(all(cbmod_ci_logit[,1] < cbmod_ci_logit[,2]))
   expect_true(all(cbmod_ci_cloglog[,1] < cbmod_ci_cloglog[,2]))
+  expect_true(all(cbmod_ci_id_na[,1] < cbmod_ci_id_na[,2]))
+  expect_true(all(cbmod_ci_id_na2[,1] < cbmod_ci_id_na2[,2]))
+  expect_true(all(cbmod_ci_id_na3[,1] < cbmod_ci_id_na3[,2]))
+  expect_true(all(cbmod_ci_id_na4[,1] < cbmod_ci_id_na4[,2]))
+  expect_true(all(cbmod_ci_id_na5[,1] < cbmod_ci_id_na5[,2]))
 
   expect_true(all(cbmod_ci_id[,1] < cb_mod_res_id$parameters))
   expect_true(all(cbmod_ci_log[,1] < cb_mod_res_log$parameters))
   expect_true(all(cbmod_ci_logit[,1] < cb_mod_res_logit$parameters))
   expect_true(all(cbmod_ci_cloglog[,1] < cb_mod_res_cloglog$parameters))
+  expect_true(all(cbmod_ci_id_na[,1] < cb_mod_res_id_na$parameters))
+  expect_true(all(cbmod_ci_id_na2[,1] < cb_mod_res_id_na2$parameters))
+  expect_true(all(cbmod_ci_id_na3[,1] < cb_mod_res_id_na3$parameters))
+  expect_true(all(cbmod_ci_id_na4[,1] < cb_mod_res_id_na4$parameters))
+  expect_true(all(cbmod_ci_id_na5[,1] < cb_mod_res_id_na5$parameters))
 
   expect_true(all(cbmod_ci_id[,2] > cb_mod_res_id$parameters))
   expect_true(all(cbmod_ci_log[,2] > cb_mod_res_log$parameters))
   expect_true(all(cbmod_ci_logit[,2] > cb_mod_res_logit$parameters))
   expect_true(all(cbmod_ci_cloglog[,2] > cb_mod_res_cloglog$parameters))
+  expect_true(all(cbmod_ci_id_na[,2] > cb_mod_res_id_na$parameters))
+  expect_true(all(cbmod_ci_id_na2[,2] > cb_mod_res_id_na2$parameters))
+  expect_true(all(cbmod_ci_id_na3[,2] > cb_mod_res_id_na3$parameters))
+  expect_true(all(cbmod_ci_id_na4[,2] > cb_mod_res_id_na4$parameters))
+  expect_true(all(cbmod_ci_id_na5[,2] > cb_mod_res_id_na5$parameters))
 
 })
 
