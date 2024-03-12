@@ -187,16 +187,19 @@ compute_factors <- function(maxi, sar, i0){
 # Probability mass function for the Chain Binomial distribution.
 #' The Chain Binomial distribution
 #'
-#' Probability mass function, and random generation, for the chain binomial distribution,
+#' Probability mass function, expected value, and random generation, for the chain binomial distribution,
 #' with parameters s0, sar, i0, and number of generations, for the number of infected
 #' cases in a population of size s0 after a given number of generations.
 #'
 #' @param x numeric vector of the number of infected.
 #' @param n number of observations. If length(n) > 1, the length is taken to be the number required.
-#' @param s0 the number of initial suceptibles.
+#' @param s0 the number of initial susceptibles.
 #' @param sar the secondary attack rate, or the per person risk of infection by an infected.
 #' @param i0 the number of primary cases.
 #' @param generations the number of generations. Default is Inf, which represents the entire epidemic.
+#'
+#' @returns `dchainbinom` gives the probability of x infected, given s0, i0, sar and generations. `echainbinom` gives the expected value.
+#' `rchainbinom` generates random data.
 #'
 #' @export
 dchainbinom <- function(x, s0, sar, i0 = 1, generations = Inf){

@@ -15,7 +15,7 @@ echainbinom(s0, sar, i0 = 1, generations = Inf)
 \arguments{
 \item{x}{numeric vector of the number of infected.}
 
-\item{s0}{the number of initial suceptibles.}
+\item{s0}{the number of initial susceptibles.}
 
 \item{sar}{the secondary attack rate, or the per person risk of infection by an infected.}
 
@@ -25,8 +25,12 @@ echainbinom(s0, sar, i0 = 1, generations = Inf)
 
 \item{n}{number of observations. If length(n) > 1, the length is taken to be the number required.}
 }
+\value{
+`dchainbinom` gives the probability of x infected, given s0, i0, sar and generations. `echainbinom` gives the expected value.
+`rchainbinom` generates random data.
+}
 \description{
-Probability mass function, and random generation, for the chain binomial distribution,
+Probability mass function, expected value, and random generation, for the chain binomial distribution,
 with parameters s0, sar, i0, and number of generations, for the number of infected
 cases in a population of size s0 after a given number of generations.
 }

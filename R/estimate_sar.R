@@ -40,6 +40,13 @@ negloglok_cb <- function(sar, infected, s0, i0 , generations, transform_inv_logi
 #' @param s0 numeric.
 #' @param i0 numeric.
 #' @param generations numeric.
+#' @param se logical. If TRUE (default), the standard error is computed.
+#'
+#' @returns A list of class `sar` with the following components:
+#' * `sar_hat` The point estimate of the secondary attack rate.
+#' * `se` Standard error of the estimate (if se = TRUE).
+#' * `loglikelihood` the log likelihood value at the point estimate.
+#' * `data` the input data.
 #'
 #'@export
 estimate_sar <- function(infected, s0, i0 = 1, generations=Inf, se = TRUE){
@@ -53,11 +60,8 @@ estimate_sar <- function(infected, s0, i0 = 1, generations=Inf, se = TRUE){
             all(i0 > 0, na.rm = TRUE),
             all(!is.na(generations)),
             is.logical(se),
-            length(logical) == 1)
+            length(se) == 1)
 
-
-  # inp <- as.matrix(cbind(x, s0, sar, i0, generations))
-  # if()
 
   sar_init <- 0.5
   optim_res <- optim(par = sar_init,
@@ -80,9 +84,9 @@ estimate_sar <- function(infected, s0, i0 = 1, generations=Inf, se = TRUE){
 
 
   inp <- list(infected = infected,
-                    s0 = s0,
-                    i0 = i0,
-                    generations = generations)
+              s0 = s0,
+              i0 = i0,
+              generations = generations)
 
   res <- list(sar_hat = sar_hat,
               se = sar_se,

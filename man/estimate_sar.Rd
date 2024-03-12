@@ -14,6 +14,15 @@ estimate_sar(infected, s0, i0 = 1, generations = Inf, se = TRUE)
 \item{i0}{numeric.}
 
 \item{generations}{numeric.}
+
+\item{se}{logical. If TRUE (default), the standard error is computed.}
+}
+\value{
+A list of class `sar` with the following components:
+* `sar_hat` The point estimate of the secondary attack rate.
+* `se` Standard error of the estimate (if se = TRUE).
+* `loglikelihood` the log likelihood value at the point estimate.
+* `data` the input data.
 }
 \description{
 Given data on the number of infected after a number of generation, initial

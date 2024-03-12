@@ -63,13 +63,17 @@ initial_params <- function(y, s0, x, link){
 #' Fitting models for Secondary Attack Rate with Chain Binomial response
 #'
 #' @param y numeric, the number of infected cases.
-#' @param s0 numeric, the number of initial suceptibles.
+#' @param s0 numeric, the number of initial susceptibles.
 #' @param x matrix of predictors (design matrix).
 #' @param i0 numeric, number of initial infected. Default is 1.
 #' @param generations numeric.
-#' @param link Link function. Default is 'identitity'.
+#' @param link Link function. Default is 'identity'.
+#' @param optim_method Optimization method used by optim.
 #'
+#' @details
+#' The following link functions are available: `identity`, `log`, `logit`, and `cloglog`.
 #'
+#' @returns A list of class `cbmod`.
 #'
 #' @export
 cbmod <- function(y, s0, x = NULL, i0 = 1, generations = Inf, link = 'identity',

@@ -17,7 +17,7 @@ cbmod(
 \arguments{
 \item{y}{numeric, the number of infected cases.}
 
-\item{s0}{numeric, the number of initial suceptibles.}
+\item{s0}{numeric, the number of initial susceptibles.}
 
 \item{x}{matrix of predictors (design matrix).}
 
@@ -25,8 +25,16 @@ cbmod(
 
 \item{generations}{numeric.}
 
-\item{link}{Link function. Default is 'identitity'.}
+\item{link}{Link function. Default is 'identity'.}
+
+\item{optim_method}{Optimization method used by optim.}
+}
+\value{
+A list of class `cbmod`.
 }
 \description{
 Fitting models for Secondary Attack Rate with Chain Binomial response
+}
+\details{
+The following link functions are available: `identity`, `log`, `logit`, and `cloglog`.
 }
