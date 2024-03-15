@@ -1,0 +1,6 @@
+furter_cases overcrowding crowded uncrowded
+0 112 155 156
+1 35 41 55
+2 17 24 19
+3 11 15 10
+4 6 6 2
