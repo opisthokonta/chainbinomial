@@ -1,7 +1,7 @@
 Package: chainbinomial
 Type: Package
 Title: Chain Binomial Models For Analysis Of Infectious Disease Data
-Version: 0.1.2
+Version: 0.1.3
 Author: Jonas Christoffer Lindstrøm
 Maintainer: Jonas Christoffer Lindstrøm <jonaslindstrom88@gmail.com>
 Description: Implements the chain binomial model for analysis of infectious disease data
@@ -12,9 +12,12 @@ LazyData: true
 RoxygenNote: 7.2.3
 Suggests: 
     testthat (>= 3.0.0),
-    numDeriv (>= 2016.8-1.1)
+    numDeriv (>= 2016.8-1.1),
+    knitr,
+    rmarkdown
 Config/testthat/edition: 3
 Imports: 
     generics
 Depends: 
-    R (>= 2.10)
+    R (>= 3.5.0)
+VignetteBuilder: knitr
