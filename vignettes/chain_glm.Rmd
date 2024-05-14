@@ -32,6 +32,7 @@ The chain data is included in the `chainbinomial` package as `heasman_reid_1961_
 # Load packages
 library(chainbinomial)
 library(dplyr)
+library(tidyr)
 
 # Take a look at the chain data
 head(heasman_reid_1961_chains)
@@ -235,9 +236,6 @@ glm_res2 <- glm(cbind(ESCAPED, I_next) ~ 1,
 
 
 summary(glm_res2)
-
-
-
 ```
 
 As before we can transform the estimate of the coefficient to be an estimate of the SAR:
@@ -285,14 +283,5 @@ glm_res3 <- glm(cbind(ESCAPED, I_next) ~ as.character(generation) - 1,
 - Becker, N.G. (1989) Analysis of Infectious Disease Data
 
 - Becker, N.G. (1981) A General Chain Binomial Model for Infectious Diseases
-
-
-
-
-
-
-
-
-
 
 

@@ -26,6 +26,8 @@ This package contains functions related to the Chain Binomial probability distri
 
 ```{r loadpackage}
 library(chainbinomial)
+require(dplyr)
+require(tidyr)
 ```
 
 
