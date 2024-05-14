@@ -64,7 +64,7 @@ estimate_sar <- function(infected, s0, i0 = 1, generations=Inf, se = TRUE){
 
 
   sar_init <- 0.5
-  optim_res <- optim(par = sar_init,
+  optim_res <- stats::optim(par = sar_init,
                      fn = negloglok_cb, method = 'L-BFGS-B',
                      hessian = FALSE,
                      infected = infected, s0 = s0, i0 = i0, generations = generations)
@@ -171,8 +171,8 @@ confint.sar <- function(object, method = 'chisq', level = 0.95){
     }
 
     # compute CI using normal approximation.
-    ci_lwr <- max(object$sar_hat + (sar_se * qnorm((1-level)/2, lower.tail = TRUE)), 0)
-    ci_upr <- min(object$sar_hat + (sar_se * qnorm((1-level)/2, lower.tail = FALSE)) , 1)
+    ci_lwr <- max(object$sar_hat + (sar_se * stats::qnorm((1-level)/2, lower.tail = TRUE)), 0)
+    ci_upr <- min(object$sar_hat + (sar_se * stats::qnorm((1-level)/2, lower.tail = FALSE)) , 1)
 
   } else if (method == 'chisq'){
 
@@ -180,27 +180,18 @@ confint.sar <- function(object, method = 'chisq', level = 0.95){
     pupr <- 1 - plwr
 
 
-    critical_value_lower <- qchisq(plwr, df = 1, lower.tail = FALSE)
+    critical_value_lower <- stats::qchisq(plwr, df = 1, lower.tail = FALSE)
 
-    uniroot_res_lwr <- uniroot(f = obj_ci_wilks, interval = find_intervall_lwr(object$sar_hat),
+    uniroot_res_lwr <- stats::uniroot(f = obj_ci_wilks, interval = find_intervall_lwr(object$sar_hat),
                        infected = object$data$infected, s0 = object$data$s0,
                        i0 = object$data$i0, generations = object$data$generations,
                        max_loglik = object$loglikelihood,
                        critical_value = critical_value_lower,
                        tol = 0.0000001)
 
-    critical_value_upper <- qchisq(pupr, df = 1, lower.tail = TRUE)
+    critical_value_upper <- stats::qchisq(pupr, df = 1, lower.tail = TRUE)
 
-    # browser()
-
-    # -negloglok_cb(sar = 1, infected = object$data$infected, s0 = object$data$s0,
-    #               i0 = object$data$i0, generations = object$data$generations, transform_inv_logit = FALSE)
-    #
-    # obj_ci_wilks(x = 0.9999, infected = object$data$infected, s0 = object$data$s0,
-    #              i0 = object$data$i0, generations = object$data$generations,
-    #              max_loglik = object$loglikelihood, critical_value_upper)
-
-    uniroot_res_upr <- uniroot(f = obj_ci_wilks, interval = find_intervall_upr(object$sar_hat),
+    uniroot_res_upr <- stats::uniroot(f = obj_ci_wilks, interval = find_intervall_upr(object$sar_hat),
                        infected = object$data$infected, s0 = object$data$s0,
                        i0 = object$data$i0, generations = object$data$generations,
                        max_loglik = object$loglikelihood,

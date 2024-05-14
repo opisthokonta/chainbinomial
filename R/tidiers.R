@@ -25,7 +25,7 @@ tidy.cbmod <- function(x, conf.int=FALSE, conf.level = 0.95, ...){
                         p.value = x$p_values)
 
   if (conf.int) {
-    ci <- confint(x, level = conf.level)
+    ci <- confint.cbmod(x, level = conf.level)
     res$conf.low <- ci[,1]
     res$conf.high <- ci[,2]
   }

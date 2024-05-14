@@ -128,7 +128,7 @@ cbmod <- function(y, s0, x = NULL, i0 = 1, generations = Inf, link = 'identity',
 
   par_init <- initial_params(y = y, s0 = s0, x = x, link = link)
 
-  optim_res <- optim(par = par_init, fn = cb_reg_obj, method = optim_method, hessian = TRUE,
+  optim_res <- stats::optim(par = par_init, fn = cb_reg_obj, method = optim_method, hessian = TRUE,
                      xmat = x, y = y, s0 = s0, i0 = i0, generations = generations, link = link)
 
 
@@ -158,7 +158,7 @@ cbmod <- function(y, s0, x = NULL, i0 = 1, generations = Inf, link = 'identity',
   yhat <- echainbinom(s0 = s0, i0 = i0, sar = sar_hat, generations = generations)
 
   # p-values
-  p_values <- pnorm(abs(beta_hat), mean = 0, sd = beta_se, lower.tail = FALSE) * 2
+  p_values <- stats::pnorm(abs(beta_hat), mean = 0, sd = beta_se, lower.tail = FALSE) * 2
 
 
   end_time <- Sys.time()
@@ -192,7 +192,7 @@ cbmod_lr_test <- function(object){
   if (object$npar > 1){
     lr_test_stat <- 2*(object$loglikelihood - object$null_model$loglikelihood)
     lr_df <- object$npar-1
-    lr_pv <- pchisq(lr_test_stat, df = lr_df, lower.tail = FALSE)
+    lr_pv <- stats::pchisq(lr_test_stat, df = lr_df, lower.tail = FALSE)
 
   } else {
     lr_test_stat <- NA
@@ -242,8 +242,8 @@ summary.cbmod <- function(object, ...){
 #' @export
 confint.cbmod <- function(object, level = 0.95){
 
-  upr <- object$parameters + (object$se * qnorm((1-level)/2, lower.tail = FALSE))
-  lwr <- object$parameters + (object$se * qnorm((1-level)/2, lower.tail = TRUE))
+  upr <- object$parameters + (object$se * stats::qnorm((1-level)/2, lower.tail = FALSE))
+  lwr <- object$parameters + (object$se * stats::qnorm((1-level)/2, lower.tail = TRUE))
 
   cn <- sprintf('%.1f %%', c(100 * (1-level)/2, 100 * (1-((1-level)/2)) ))
 
