@@ -10,7 +10,7 @@
 #'
 #'
 #' @usage heasman_reid_1961_chains
-#' @usage heasman_reid_1961_crowded
+#' @usage heasman_reid_1961_crowding
 #' @usage heasman_reid_1961_intro_case_status
 #'
 #' @section Chain Data:
@@ -31,7 +31,7 @@
 #' Each outbreak classified according to the degree of domestic overcrowding. Heasman & Reid (1961), Table IV.
 #' Overcrowded homes have either one or two rooms, crowded homes have three rooms, while uncrowded homes have more than three rooms.
 #'
-#' `heasman_reid_1961_crowded`: A data frame with 5 rows and 4 columns:
+#' `heasman_reid_1961_crowding`: A data frame with 5 rows and 4 columns:
 #'
 #' \describe{
 #'   \item{further_cases}{The number of cases in the outbreak, in addition to the primary case.}
@@ -63,8 +63,13 @@
 #' }
 #'
 #'@name heasman_reid_1961
-NULL
+"heasman_reid_1961_chains"
 
 
+#'@rdname heasman_reid_1961
+"heasman_reid_1961_intro_case_status"
 
+
+#'@rdname heasman_reid_1961
+"heasman_reid_1961_crowding"
 
