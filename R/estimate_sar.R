@@ -48,6 +48,11 @@ negloglok_cb <- function(sar, infected, s0, i0 , generations, transform_inv_logi
 #' * `loglikelihood` the log likelihood value at the point estimate.
 #' * `data` the input data.
 #'
+#' @examples
+#' set.seed(234)
+#' mydata <- rchainbinom(n = 15, s0 = 5, sar = 0.2, i0 = 1, generations = Inf)
+#' res <- estimate_sar(infected = mydata, s0 = 5, i0 = 1, generations = Inf)
+#'
 #'@export
 estimate_sar <- function(infected, s0, i0 = 1, generations=Inf, se = TRUE){
 

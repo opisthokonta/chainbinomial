@@ -29,3 +29,9 @@ Given data on the number of infected after a number of generation, initial
 number of susceptible, and initial number of infected, estimate the
 secondary attack rate (SAR) using maximum likelihood.
 }
+\examples{
+set.seed(234)
+mydata <- rchainbinom(n = 15, s0 = 5, sar = 0.2, i0 = 1, generations = Inf)
+res <- estimate_sar(infected = mydata, s0 = 5, i0 = 1, generations = Inf)
+
+}

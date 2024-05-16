@@ -201,6 +201,11 @@ compute_factors <- function(maxi, sar, i0){
 #' @returns `dchainbinom` gives the probability of x infected, given s0, i0, sar and generations. `echainbinom` gives the expected value.
 #' `rchainbinom` generates random data.
 #'
+#' @examples
+#' dchainbinom(x = 0:5, s0 = 5, sar = 0.2, i0 = 1, generations = Inf)
+#' rchainbinom(n = 10, s0 = 5, sar = 0.2, i0 = 1, generations = Inf)
+#' echainbinom(s0 = 5, sar = 0.2, i0 = 1, generations = Inf)
+#'
 #' @export
 dchainbinom <- function(x, s0, sar, i0 = 1, generations = Inf){
 

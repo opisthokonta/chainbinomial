@@ -75,6 +75,15 @@ initial_params <- function(y, s0, x, link){
 #'
 #' @returns A list of class `cbmod`.
 #'
+#' @examples
+#' set.seed(234)
+#' mydata <- data.frame(infected = rchainbinom(n = 15, s0 = 5, sar = 0.2, i0 = 1, generations = Inf),
+#'                      s0 = 5, i0 = 1, generations = Inf)
+#' xmat <- model.matrix(~ 1, data = mydata)
+#' res <- cbmod(y = mydata$infected, s0 = mydata$s0, x = xmat, i0 = mydata$i0, generations = mydata$generations)
+#' summary(res)
+#'
+#'
 #' @export
 cbmod <- function(y, s0, x = NULL, i0 = 1, generations = Inf, link = 'identity',
                   optim_method = 'BFGS'){
@@ -275,6 +284,16 @@ coef.cbmod <- function(object){
 #'  predictors by the inverse link function used in the model fit.
 #'
 #' @return a vector of predictions.
+#'
+#' @examples
+#' set.seed(234)
+#' mydata <- data.frame(infected = rchainbinom(n = 15, s0 = 5, sar = 0.2, i0 = 1, generations = Inf),
+#'                      s0 = 5, i0 = 1, generations = Inf)
+#' xmat <- model.matrix(~ 1, data = mydata)
+#' res <- cbmod(y = mydata$infected, s0 = mydata$s0, x = xmat, i0 = mydata$i0, generations = mydata$generations, link = 'identity')
+#' summary(res)
+#' predict(res, x = xmat, type = 'sar')
+#'
 #' @export
 predict.cbmod <- function(object, x = NULL, type = 'link'){
 

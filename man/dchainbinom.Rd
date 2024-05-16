@@ -34,3 +34,9 @@ Probability mass function, expected value, and random generation, for the chain 
 with parameters s0, sar, i0, and number of generations, for the number of infected
 cases in a population of size s0 after a given number of generations.
 }
+\examples{
+dchainbinom(x = 0:5, s0 = 5, sar = 0.2, i0 = 1, generations = Inf)
+rchainbinom(n = 10, s0 = 5, sar = 0.2, i0 = 1, generations = Inf)
+echainbinom(s0 = 5, sar = 0.2, i0 = 1, generations = Inf)
+
+}
