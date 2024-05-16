@@ -111,7 +111,7 @@ longdata %>%
 Now we can consider how to formulate the Binomial model for the chain data so that we can estimate the SAR. The number of infected in generation $g+1$ is modeled as a binomial variable of $S_g$ trials, with the binomial parameter $\pi(I_g)$ that will depend on the number of infected in generation $g$:
 
 $$
-P(I_{g+1} = y) \sim \mathrm{Binomial(\pi(I_g), n = S_g)} \\
+P(I_{g+1} = y) \sim \mathrm{Binomial}(\pi(I_g), n = S_g) \\
 $$
 
 $\pi(I_g)$ is the the per-person risk of getting infected, and is itself a binomial probability of getting at least one "success" in $I_g$ trials, with the secondary attack rate $\theta$. Hence
