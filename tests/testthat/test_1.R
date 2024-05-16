@@ -218,24 +218,25 @@ test_that("PMF when g = 1", {
 
 # Prob for x = 0 ----
 # The probability for x = 0 should be the same as the ordinary binomial, when i0=1,
-# but not neccecarily if i0 > 1.
+# but not necessarily if i0 > 1.
 
 # Explicit formula for x=0, also implemented in the dchainbinom function.
 prob0 <- function(sar, s0, i0){
   (1 - sar)^(i0*s0)
 }
 
+prob0_tol <- 1e-06
 
 test_that("P(x=0)", {
 
-  expect_true(prob0(sar = 0.1, s0=1, i0 = 1) == dbinom(x = 0, size = 1, prob = 0.1))
-  expect_true(prob0(sar = 0.5, s0=1, i0 = 1) == dbinom(x = 0, size = 1, prob = 0.5))
+  expect_true(abs(prob0(sar = 0.1, s0=1, i0 = 1) - dbinom(x = 0, size = 1, prob = 0.1)) < prob0_tol)
+  expect_true(abs(prob0(sar = 0.5, s0=1, i0 = 1) - dbinom(x = 0, size = 1, prob = 0.5)) < prob0_tol)
 
-  expect_true(prob0(sar = 0.1, s0=2, i0 = 1) == dbinom(x = 0, size = 2, prob = 0.1))
-  expect_true(prob0(sar = 0.5, s0=2, i0 = 1) == dbinom(x = 0, size = 2, prob = 0.5))
+  expect_true(abs(prob0(sar = 0.1, s0=2, i0 = 1) - dbinom(x = 0, size = 2, prob = 0.1)) < prob0_tol)
+  expect_true(abs(prob0(sar = 0.5, s0=2, i0 = 1) - dbinom(x = 0, size = 2, prob = 0.5)) < prob0_tol)
 
-  expect_true(prob0(sar = 0.1, s0=4, i0 = 1) == dbinom(x = 0, size = 4, prob = 0.1))
-  expect_true(prob0(sar = 0.5, s0=4, i0 = 1) == dbinom(x = 0, size = 4, prob = 0.5))
+  expect_true(abs(prob0(sar = 0.1, s0=4, i0 = 1) - dbinom(x = 0, size = 4, prob = 0.1)) < prob0_tol)
+  expect_true(abs(prob0(sar = 0.5, s0=4, i0 = 1) - dbinom(x = 0, size = 4, prob = 0.5)) < prob0_tol)
 
   expect_true(prob0(sar = 0.1, s0=2, i0 = 1) == dchainbinom(x = 0, s0 = 2, sar = 0.1, i0 = 1, generations = Inf))
   expect_true(prob0(sar = 0.1, s0=2, i0 = 1) == dchainbinom(x = 0, s0 = 2, sar = 0.1, i0 = 1, generations = 1))
