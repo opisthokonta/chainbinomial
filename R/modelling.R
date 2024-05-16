@@ -77,10 +77,12 @@ initial_params <- function(y, s0, x, link){
 #'
 #' @examples
 #' set.seed(234)
-#' mydata <- data.frame(infected = rchainbinom(n = 15, s0 = 5, sar = 0.2, i0 = 1, generations = Inf),
-#'                      s0 = 5, i0 = 1, generations = Inf)
+#' mydata <- data.frame(infected = rchainbinom(n = 15, s0 = 5, sar = 0.2,
+#'    i0 = 1, generations = Inf),
+#'    s0 = 5, i0 = 1, generations = Inf)
 #' xmat <- model.matrix(~ 1, data = mydata)
-#' res <- cbmod(y = mydata$infected, s0 = mydata$s0, x = xmat, i0 = mydata$i0, generations = mydata$generations)
+#' res <- cbmod(y = mydata$infected, s0 = mydata$s0, x = xmat, i0 = mydata$i0,
+#'    generations = mydata$generations)
 #' summary(res)
 #'
 #'
@@ -287,10 +289,12 @@ coef.cbmod <- function(object){
 #'
 #' @examples
 #' set.seed(234)
-#' mydata <- data.frame(infected = rchainbinom(n = 15, s0 = 5, sar = 0.2, i0 = 1, generations = Inf),
-#'                      s0 = 5, i0 = 1, generations = Inf)
+#' mydata <- data.frame(infected = rchainbinom(n = 15, s0 = 5, sar = 0.2,
+#'   i0 = 1, generations = Inf),
+#'   s0 = 5, i0 = 1, generations = Inf)
 #' xmat <- model.matrix(~ 1, data = mydata)
-#' res <- cbmod(y = mydata$infected, s0 = mydata$s0, x = xmat, i0 = mydata$i0, generations = mydata$generations, link = 'identity')
+#' res <- cbmod(y = mydata$infected, s0 = mydata$s0, x = xmat, i0 = mydata$i0,
+#'   generations = mydata$generations, link = 'identity')
 #' summary(res)
 #' predict(res, x = xmat, type = 'sar')
 #'
