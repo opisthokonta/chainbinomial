@@ -251,10 +251,40 @@ summary.cbmod <- function(object, ...){
 }
 
 #' @export
-confint.cbmod <- function(object, level = 0.95){
+confint.cbmod <- function(object, parm = NULL, level = 0.95, ...){
 
-  upr <- object$parameters + (object$se * stats::qnorm((1-level)/2, lower.tail = FALSE))
-  lwr <- object$parameters + (object$se * stats::qnorm((1-level)/2, lower.tail = TRUE))
+  if (!is.null(parm)){
+
+    stopifnot(is.character(parm) | is.numeric(parm),
+              length(parm) >= 1)
+
+    if (is.character(parm)){
+      parm_idx <- na.omit(match(parm, names(object$parameters)))
+
+      if (length(parm_idx) == 0){
+        stop('No matching parameter names in parm.')
+      }
+
+      if (length(attr(parm_idx, 'na.action')) >= 1){
+        warning('Not all coefficient names given to argument parm found in cbmod object.')
+      }
+
+    } else if (is.numeric(parm)){
+
+      parm_idx <- parm
+
+      if (any(parm_idx < 1 | parm_idx > length(object$parameters))){
+        stop('Argument parm out of range.')
+      }
+    }
+
+  } else {
+    parm_idx <- 1:length(object$parameters)
+  }
+
+
+  upr <- object$parameters[parm_idx] + (object$se[parm_idx] * stats::qnorm((1-level)/2, lower.tail = FALSE))
+  lwr <- object$parameters[parm_idx] + (object$se[parm_idx] * stats::qnorm((1-level)/2, lower.tail = TRUE))
 
   cn <- sprintf('%.1f %%', c(100 * (1-level)/2, 100 * (1-((1-level)/2)) ))
 
@@ -266,12 +296,12 @@ confint.cbmod <- function(object, level = 0.95){
 }
 
 #' @export
-vcov.cbmod <- function(object){
+vcov.cbmod <- function(object, ...){
   object$vcov
 }
 
 #' @export
-coef.cbmod <- function(object){
+coef.cbmod <- function(object, ...){
   object$parameters
 }
 
@@ -299,14 +329,29 @@ coef.cbmod <- function(object){
 #' predict(res, x = xmat, type = 'sar')
 #'
 #' @export
-predict.cbmod <- function(object, x = NULL, type = 'link'){
+predict.cbmod <- function(object, ... ){
+
+  dots <- list(...)
+
+  if (is.null(dots$x)){
+    stop('predict.cbmod needs an x argument.')
+  } else {
+    x <- dots$x
+  }
+
 
   if(!identical(colnames(x), names(object$parameters))){
     stop('The column names and order in newdata must match those of names(object$parameters).')
   }
 
-  stopifnot(length(type) == 1)
-  stopifnot(type %in% c('link', 'response', 'sar'))
+  if (is.null(dots$type)){
+    type <- 'link'
+  } else {
+    type <- dots$type
+  }
+
+  stopifnot(length(dots$type) == 1)
+  stopifnot(dots$type %in% c('link', 'response', 'sar'))
 
 
   eta_hat <- as.numeric(x %*% object$parameters)

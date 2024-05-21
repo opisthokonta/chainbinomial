@@ -552,6 +552,11 @@ test_that("simple estimation works", {
 
   # Confidence intervals.
 
+  # Check default values
+  expect_no_condition(
+    sar_est_1_ginf_ci_default <- confint(sar_est_1_ginf)
+  )
+
   expect_no_condition(
     sar_est_1_ginf_ci_99_chisq <- confint(sar_est_1_ginf, method = 'chisq', level = 0.99)
   )
@@ -565,9 +570,15 @@ test_that("simple estimation works", {
   )
 
   # Check that the upper and lower ends are correct.
+  expect_true(sar_est_1_ginf_ci_default[1] < sar_est_1_ginf_ci_default[2])
   expect_true(sar_est_1_ginf_ci_99_chisq[1] < sar_est_1_ginf_ci_99_chisq[2])
   expect_true(sar_est_1_ginf_ci_95_chisq[1] < sar_est_1_ginf_ci_95_chisq[2])
   expect_true(sar_est_1_ginf_ci_90_chisq[1] < sar_est_1_ginf_ci_90_chisq[2])
+
+  # Compare default arguments with explicitly provided arguments.
+  expect_true(sar_est_1_ginf_ci_default[1] == sar_est_1_ginf_ci_95_chisq[1])
+  expect_true(sar_est_1_ginf_ci_default[2] == sar_est_1_ginf_ci_95_chisq[2])
+
 
   expect_true(sar_est_1_ginf_ci_99_chisq[1] < sar_est_1_ginf$sar_hat)
   expect_true(sar_est_1_ginf_ci_95_chisq[1] < sar_est_1_ginf$sar_hat)
@@ -585,6 +596,10 @@ test_that("simple estimation works", {
 
 
   # for the generation = 1 estimates.
+
+  expect_no_condition(
+    sar_est_1_g1_ci_default <- confint(sar_est_1_g1)
+  )
 
   expect_no_condition(
     sar_est_1_g1_ci_99_chisq <- confint(sar_est_1_g1, method = 'chisq', level = 0.99)
@@ -612,6 +627,10 @@ test_that("simple estimation works", {
   expect_true(sar_est_1_g1_ci_95_chisq[1] < sar_est_1_g1_ci_90_chisq[1])
   expect_true(sar_est_1_g1_ci_95_chisq[2] > sar_est_1_g1_ci_90_chisq[2])
   expect_true(sar_est_1_g1_ci_99_chisq[2] > sar_est_1_g1_ci_95_chisq[2])
+
+  expect_true(sar_est_1_g1_ci_default[1] == sar_est_1_g1_ci_95_chisq[1])
+  expect_true(sar_est_1_g1_ci_default[2] == sar_est_1_g1_ci_95_chisq[2])
+
 
   # Test confidence intervals computed using the the 'normal' method.
 
@@ -1019,6 +1038,19 @@ test_that("modelling works", {
   expect_no_condition(
     cbmod_ci_id_na5 <- confint(cb_mod_res_id_na5, level = 0.95)
   )
+
+  # Test parm argument
+  expect_no_condition(confint(cb_mod_res_id, parm = c('x')))
+  expect_no_condition(confint(cb_mod_res_id, parm = c('(Intercept)')))
+  expect_no_condition(confint(cb_mod_res_id, parm = c('x', '(Intercept)')))
+  expect_warning(confint(cb_mod_res_id, parm = c('x', '(Intercept)', 'zzz')))
+  expect_error(confint(cb_mod_res_id, parm = c('zzz')))
+  expect_no_condition(confint(cb_mod_res_id, parm = 1))
+  expect_no_condition(confint(cb_mod_res_id, parm = 2))
+  expect_no_condition(confint(cb_mod_res_id, parm = 1:2))
+  expect_error(confint(cb_mod_res_id, parm = 1:3))
+  expect_error(confint(cb_mod_res_id, parm = 3))
+  expect_error(confint(cb_mod_res_id, parm = 0))
 
 
   expect_true(all(dim(cbmod_ci_id) == c(2,2)))

@@ -153,8 +153,17 @@ find_intervall_lwr <- function(sh){
 }
 
 
+
 #'@export
-confint.sar <- function(object, method = 'chisq', level = 0.95){
+confint.sar <- function(object, parm = NULL, level = 0.95, ...){
+
+  dots <- list(...)
+
+  if (is.null(dots$method)){
+    method <- 'chisq'
+  } else {
+    method <- dots$method
+  }
 
   stopifnot(method %in% c('chisq', 'normal'))
 
