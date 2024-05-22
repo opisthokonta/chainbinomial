@@ -259,7 +259,7 @@ confint.cbmod <- function(object, parm = NULL, level = 0.95, ...){
               length(parm) >= 1)
 
     if (is.character(parm)){
-      parm_idx <- na.omit(match(parm, names(object$parameters)))
+      parm_idx <- stats::na.omit(match(parm, names(object$parameters)))
 
       if (length(parm_idx) == 0){
         stop('No matching parameter names in parm.')
