@@ -314,6 +314,7 @@ coef.cbmod <- function(object, ...){
 #' @param type the type of prediction, either 'link' (default) or 'sar'. The default is on the scale
 #' of the linear predictors. 'sar' gives the predicted secondary attack rate, by transforming the linear
 #'  predictors by the inverse link function used in the model fit.
+#' @param ... additional arguments.
 #'
 #' @return a vector of predictions.
 #'
@@ -329,30 +330,31 @@ coef.cbmod <- function(object, ...){
 #' predict(res, x = xmat, type = 'sar')
 #'
 #' @export
-predict.cbmod <- function(object, ... ){
+predict.cbmod <- function(object, x, type = 'identity', ...){
 
-  dots <- list(...)
-
-  if (is.null(dots$x)){
-    stop('predict.cbmod needs an x argument.')
-  } else {
-    x <- dots$x
-  }
+  # dots <- list(...)
+  #
+  # if (is.null(dots$x)){
+  #   stop('predict.cbmod needs an x argument.')
+  # } else {
+  #   x <- dots$x
+  # }
 
 
   if(!identical(colnames(x), names(object$parameters))){
     stop('The column names and order in newdata must match those of names(object$parameters).')
   }
 
-  if (is.null(dots$type)){
-    type <- 'link'
-  } else {
-    type <- dots$type
-  }
+  # if (is.null(dots$type)){
+  #   type <- 'link'
+  # } else {
+  #   type <- dots$type
+  # }
 
-  stopifnot(length(dots$type) == 1)
-  stopifnot(dots$type %in% c('link', 'response', 'sar'))
-
+  #stopifnot(length(dots$type) == 1)
+  #stopifnot(dots$type %in% c('link', 'response', 'sar'))
+  stopifnot(length(type) == 1)
+  stopifnot(type %in% c('link', 'response', 'sar'))
 
   eta_hat <- as.numeric(x %*% object$parameters)
 

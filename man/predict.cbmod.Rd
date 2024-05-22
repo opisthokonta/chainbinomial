@@ -4,7 +4,7 @@
 \alias{predict.cbmod}
 \title{Predict Method for cbmod Fits}
 \usage{
-\method{predict}{cbmod}(object, ...)
+\method{predict}{cbmod}(object, x, type = "identity", ...)
 }
 \arguments{
 \item{object}{a fitted object of class inheriting from "cbmod".}
@@ -14,6 +14,8 @@
 \item{type}{the type of prediction, either 'link' (default) or 'sar'. The default is on the scale
 of the linear predictors. 'sar' gives the predicted secondary attack rate, by transforming the linear
  predictors by the inverse link function used in the model fit.}
+
+\item{...}{additional arguments.}
 }
 \value{
 a vector of predictions.
