@@ -18,11 +18,13 @@ estimate_sar(infected, s0, i0 = 1, generations = Inf, se = TRUE)
 \item{se}{logical. If TRUE (default), the standard error is computed.}
 }
 \value{
-A list of class `sar` with the following components:
-* `sar_hat` The point estimate of the secondary attack rate.
-* `se` Standard error of the estimate (if se = TRUE).
-* `loglikelihood` the log likelihood value at the point estimate.
-* `data` the input data.
+A list of class \code{sar} with the following components:
+\itemize{
+\item \code{sar_hat} The point estimate of the secondary attack rate.
+\item \code{se} Standard error of the estimate (if se = TRUE).
+\item \code{loglikelihood} The log likelihood value at the point estimate.
+\item \code{data} The input data.
+}
 }
 \description{
 Given data on the number of infected after a number of generation, initial
@@ -34,4 +36,7 @@ set.seed(234)
 mydata <- rchainbinom(n = 15, s0 = 5, sar = 0.2, i0 = 1, generations = Inf)
 res <- estimate_sar(infected = mydata, s0 = 5, i0 = 1, generations = Inf)
 
+}
+\seealso{
+\code{\link[=confint.sar]{confint.sar()}} for calculating confidence intervals.
 }

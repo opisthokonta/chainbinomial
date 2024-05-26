@@ -73,7 +73,30 @@ initial_params <- function(y, s0, x, link){
 #' @details
 #' The following link functions are available: `identity`, `log`, `logit`, and `cloglog`.
 #'
-#' @returns A list of class `cbmod`.
+#' @returns A list of class `cbmod` with the following components:
+#' * `parameters` The point estimate of the regression coefficients.
+#' * `se` Standard error of the regression coefficient estimates.
+#' * `vcov` Variance-Covariance matrix of the regression coefficient estimates.
+#' * `p_values` P-values of the null hypothesis that the regression regression coefficient estimate is 0.
+#' * `loglikelihood` the log likelihood value at the point estimate.
+#' * `npar` Number of parameters.
+#' * `sar_hat` Vector of fitted secondary attack rates.
+#' * `fitted_values` Vector of expected outbreak size (final attack rate).
+#' * `link` Link function used by the regression model.
+#' * `null_model` = Null model, fitted with [estimate_sar()]. This is equivalent to an intercept only model.
+#' * `warnings` Warning_messages,
+#' * `est_time`: Time used to fit the model.
+#' * `omitted_values` Vector indicating data points that were ignored during estimation because of missing values.
+#'
+#' @seealso
+#' Methods for `cbmod` objects:
+#' * [summary.cbmod()]
+#' * [predict.cbmod()]
+#' * [coef.cbmod()]
+#' * [confint.cbmod()]
+#' * [vcov.cbmod()]
+#' * [tidy.cbmod()]
+#' * [glance.cbmod()]
 #'
 #' @examples
 #' set.seed(234)
@@ -216,7 +239,13 @@ cbmod_lr_test <- function(object){
 }
 
 
-
+#' Summary of cbmod Object.
+#'
+#' @param object a cbmod object.
+#' @param ... other arguments. Ignored.
+#'
+#' @returns Returns nothing, but displays a summary of the model fit.
+#'
 #' @export
 summary.cbmod <- function(object, ...){
 
@@ -250,6 +279,16 @@ summary.cbmod <- function(object, ...){
 
 }
 
+#' Confidence intervals for cbmod Object.
+#'
+#' @param object a cbmod object.
+#' @param parm Character or number of which coefficient ot compute confidence
+#' intervals for. By default intervals are computed for all coefficients.
+#' @param level Default is 0.95, for 95% confidence intervals.
+#' @param ... other arguments. Ignored.
+#'
+#' @returns A two-column matrix with the lower and upper end of the confidence intervals.
+#'
 #' @export
 confint.cbmod <- function(object, parm = NULL, level = 0.95, ...){
 
@@ -295,11 +334,27 @@ confint.cbmod <- function(object, parm = NULL, level = 0.95, ...){
 
 }
 
+
+#' Variance-Covariance Matrix of cbmod Object.
+#'
+#' @param object a cbmod object.
+#' @param ... other arguments. Ignored.
+#'
+#' @returns A variance-covariance matrix.
+#'
 #' @export
 vcov.cbmod <- function(object, ...){
   object$vcov
 }
 
+#' Extract Model Coefficient for cbmod Fits
+#'
+#'
+#' @param object a cbmod object.
+#' @param ... other arguments. Ignored.
+#'
+#' @returns Coefficients extracted from the cbmod object.
+#'
 #' @export
 coef.cbmod <- function(object, ...){
   object$parameters

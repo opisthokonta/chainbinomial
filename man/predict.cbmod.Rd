@@ -13,7 +13,7 @@
 
 \item{type}{the type of prediction, either 'link' (default) or 'sar'. The default is on the scale
 of the linear predictors. 'sar' gives the predicted secondary attack rate, by transforming the linear
- predictors by the inverse link function used in the model fit.}
+predictors by the inverse link function used in the model fit.}
 
 \item{...}{additional arguments.}
 }

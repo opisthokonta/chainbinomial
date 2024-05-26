@@ -30,13 +30,28 @@ cbmod(
 \item{optim_method}{Optimization method used by optim.}
 }
 \value{
-A list of class `cbmod`.
+A list of class \code{cbmod} with the following components:
+\itemize{
+\item \code{parameters} The point estimate of the regression coefficients.
+\item \code{se} Standard error of the regression coefficient estimates.
+\item \code{vcov} Variance-Covariance matrix of the regression coefficient estimates.
+\item \code{p_values} P-values of the null hypothesis that the regression regression coefficient estimate is 0.
+\item \code{loglikelihood} the log likelihood value at the point estimate.
+\item \code{npar} Number of parameters.
+\item \code{sar_hat} Vector of fitted secondary attack rates.
+\item \code{fitted_values} Vector of expected outbreak size (final attack rate).
+\item \code{link} Link function used by the regression model.
+\item \code{null_model} = Null model, fitted with \code{\link[=estimate_sar]{estimate_sar()}}. This is equivalent to an intercept only model.
+\item \code{warnings} Warning_messages,
+\item \code{est_time}: Time used to fit the model.
+\item \code{omitted_values} Vector indicating data points that were ignored during estimation because of missing values.
+}
 }
 \description{
 Fitting models for Secondary Attack Rate with Chain Binomial response
 }
 \details{
-The following link functions are available: `identity`, `log`, `logit`, and `cloglog`.
+The following link functions are available: \code{identity}, \code{log}, \code{logit}, and \code{cloglog}.
 }
 \examples{
 set.seed(234)
@@ -49,4 +64,16 @@ res <- cbmod(y = mydata$infected, s0 = mydata$s0, x = xmat, i0 = mydata$i0,
 summary(res)
 
 
+}
+\seealso{
+Methods for \code{cbmod} objects:
+\itemize{
+\item \code{\link[=summary.cbmod]{summary.cbmod()}}
+\item \code{\link[=predict.cbmod]{predict.cbmod()}}
+\item \code{\link[=coef.cbmod]{coef.cbmod()}}
+\item \code{\link[=confint.cbmod]{confint.cbmod()}}
+\item \code{\link[=vcov.cbmod]{vcov.cbmod()}}
+\item \code{\link[=tidy.cbmod]{tidy.cbmod()}}
+\item \code{\link[=glance.cbmod]{glance.cbmod()}}
+}
 }

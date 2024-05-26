@@ -45,8 +45,11 @@ negloglok_cb <- function(sar, infected, s0, i0 , generations, transform_inv_logi
 #' @returns A list of class `sar` with the following components:
 #' * `sar_hat` The point estimate of the secondary attack rate.
 #' * `se` Standard error of the estimate (if se = TRUE).
-#' * `loglikelihood` the log likelihood value at the point estimate.
-#' * `data` the input data.
+#' * `loglikelihood` The log likelihood value at the point estimate.
+#' * `data` The input data.
+#'
+#' @seealso
+#' [confint.sar()] for calculating confidence intervals.
 #'
 #' @examples
 #' set.seed(234)
@@ -154,16 +157,19 @@ find_intervall_lwr <- function(sh){
 
 
 
+#' Confidence intervals for sar Object.
+#'
+#' @param object a cbmod object.
+#' @param parm Character or number of which coefficient ot compute confidence
+#' intervals for. By default intervals are computed for all coefficients.
+#' @param level Default is 0.95, for 95% confidence intervals.
+#' @param method Either 'chisq'(default) or 'normal'.
+#' @param ... other arguments. Ignored.
+#'
+#' @returns A numeric of length 2 with the lower and upper end of the confidence interval.
+#'
 #'@export
-confint.sar <- function(object, parm = NULL, level = 0.95, ...){
-
-  dots <- list(...)
-
-  if (is.null(dots$method)){
-    method <- 'chisq'
-  } else {
-    method <- dots$method
-  }
+confint.sar <- function(object, parm = NULL, level = 0.95, method = 'chisq', ...){
 
   stopifnot(method %in% c('chisq', 'normal'))
 

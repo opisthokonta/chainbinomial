@@ -26,8 +26,8 @@ echainbinom(s0, sar, i0 = 1, generations = Inf)
 \item{n}{number of observations. If length(n) > 1, the length is taken to be the number required.}
 }
 \value{
-`dchainbinom` gives the probability of x infected, given s0, i0, sar and generations. `echainbinom` gives the expected value.
-`rchainbinom` generates random data.
+\code{dchainbinom} gives the probability of x infected, given s0, i0, sar and generations. \code{echainbinom} gives the expected value.
+\code{rchainbinom} generates random data.
 }
 \description{
 Probability mass function, expected value, and random generation, for the chain binomial distribution,

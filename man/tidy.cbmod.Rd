@@ -7,7 +7,7 @@
 \method{tidy}{cbmod}(x, conf.int = FALSE, conf.level = 0.95, ...)
 }
 \arguments{
-\item{x}{A `cbmod` object.}
+\item{x}{A \code{cbmod} object.}
 
 \item{conf.int}{Logical indicating whether or not to include a confidence interval in the tidied output. Defaults to FALSE.}
 
@@ -15,6 +15,17 @@
 95 percent confidence interval.}
 
 \item{...}{Unused.}
+}
+\value{
+Returns a tibble with the following columns:
+\itemize{
+\item \code{term} The coefficients name.
+\item \code{estimate} The point estimates of the coefficients.
+\item \code{std.error} Standard error of the regression coefficient estimates.
+\item \code{p.value} P-values of the null hypothesis that the regression regression coefficient estimate is 0.
+\item \code{conf.low} If \code{conf.int = TRUE}, the lower end of the confidence interval.
+\item \code{conf.high}If \code{conf.int = TRUE}, the upper end of the confidence interval.
+}
 }
 \description{
 Tidy a cbmod object

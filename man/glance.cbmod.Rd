@@ -7,9 +7,16 @@
 \method{glance}{cbmod}(x, ...)
 }
 \arguments{
-\item{x}{A `cbmod` object.}
+\item{x}{A \code{cbmod} object.}
 
 \item{...}{Unused.}
+}
+\value{
+Returns a tibble with the following columns:
+\itemize{
+\item \code{logLik} The model's log-likelihood.
+\item \code{npar} Numnber of parameters in the model.
+}
 }
 \description{
 Glance at a cbmod object
