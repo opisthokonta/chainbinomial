@@ -2,14 +2,23 @@ Package: chainbinomial
 Type: Package
 Title: Chain Binomial Models for Analysis of Infectious Disease Data
 Version: 0.1.5
-Author: Jonas Christoffer Lindstrøm
+Authors@R: person(given = "Jonas Christoffer",
+           family = "Lindstrøm",
+           role = c("aut", "cre"),
+           email = "jonaslindstrom88@gmail.com")
 Maintainer: Jonas Christoffer Lindstrøm <jonaslindstrom88@gmail.com>
-Description: Implements the chain binomial model for analysis of infectious disease data
-    Contains functions for calculating probabilities and estimation of secondary attack rates.
+Description: Implements the chain binomial model for analysis of infectious disease data.
+    Contains functions for calculating probabilities of the final size of infectious
+    disease outbreaks using the method from D. Ludwig (1975) 
+    <doi:10.1016/0025-5564(75)90119-4> and for outbreaks that are not 
+    concluded, from Lindstrøm et al. (2024) <arXiv:2403.03948>. The package
+    also contains methods for estimation and regression analysis of 
+    secondary attack rates.   
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.3.1
+Roxygen: list(markdown = TRUE)
 Suggests: 
     testthat (>= 3.0.0),
     numDeriv (>= 2016.8-1.1),
