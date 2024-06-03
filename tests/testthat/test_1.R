@@ -1271,6 +1271,84 @@ test_that("echainbinom NA", {
 
 
 
+# Hyper chainbinom ----
+
+dcbhyper_1_ob1 <- dcbhyper(x = 0:5, s0 = 5, sar = 0.11, s0_obs = 1)
+dcbhyper_1_ob2 <- dcbhyper(x = 0:5, s0 = 5, sar = 0.11, s0_obs = 2)
+dcbhyper_1_ob3 <- dcbhyper(x = 0:5, s0 = 5, sar = 0.11, s0_obs = 3)
+dcbhyper_1_ob4 <- dcbhyper(x = 0:5, s0 = 5, sar = 0.11, s0_obs = 4)
+dcbhyper_1_ob5 <- dcbhyper(x = 0:5, s0 = 5, sar = 0.11, s0_obs = 5)
+
+tol_sum_to_1 <- 2e-15
+
+
+dcbhyper(x = 6, s0 = 5, sar = 0.11, s0_obs = 5)
+
+
+test_that("CBhyper PMF is ok", {
+
+  expect_true(abs(sum(dcbhyper_1_ob1) - 1) < tol_sum_to_1)
+  expect_true(abs(sum(dcbhyper_1_ob2) - 1) < tol_sum_to_1)
+  expect_true(abs(sum(dcbhyper_1_ob3) - 1) < tol_sum_to_1)
+  expect_true(abs(sum(dcbhyper_1_ob4) - 1) < tol_sum_to_1)
+  expect_true(abs(sum(dcbhyper_1_ob5) - 1) < tol_sum_to_1)
+
+
+  expect_true(all(dcbhyper_1_ob1 >= 0))
+  expect_true(all(dcbhyper_1_ob2 >= 0))
+  expect_true(all(dcbhyper_1_ob3 >= 0))
+  expect_true(all(dcbhyper_1_ob4 >= 0))
+  expect_true(all(dcbhyper_1_ob5 >= 0))
+
+
+  # Probability of more infected than s0 should be 0
+  expect_true(dcbhyper(x = 6, s0 = 5, sar = 0.11, s0_obs = 1) == 0)
+  expect_true(dcbhyper(x = 6, s0 = 5, sar = 0.11, s0_obs = 2) == 0)
+  expect_true(dcbhyper(x = 6, s0 = 5, sar = 0.11, s0_obs = 3) == 0)
+  expect_true(dcbhyper(x = 6, s0 = 5, sar = 0.11, s0_obs = 4) == 0)
+  expect_true(dcbhyper(x = 6, s0 = 5, sar = 0.11, s0_obs = 5) == 0)
+
+})
+
+
+check_sum_to_1_dcbhyper <- function(s0, sar, s0_obs, i0 = 1){
+
+  ss <- sum(dcbhyper(x = 0:s0, s0 = s0, i0=i0, sar= sar, s0_obs))
+
+  if (ss == 1){
+    return(TRUE)
+  } else {
+    abs(ss-1) < 1e-15
+  }
+}
+
+
+test_that("PMF sum to 1", {
+
+  expect_true(check_sum_to_1_dcbhyper(s0 = 5, sar=0.25, s0_obs = 1))
+  expect_true(check_sum_to_1_dcbhyper(s0 = 5, sar=0.25, s0_obs = 2))
+  expect_true(check_sum_to_1_dcbhyper(s0 = 5, sar=0.25, s0_obs = 3))
+  expect_true(check_sum_to_1_dcbhyper(s0 = 5, sar=0.25, s0_obs = 4))
+  expect_true(check_sum_to_1_dcbhyper(s0 = 5, sar=0.25, s0_obs = 5))
+
+  expect_true(check_sum_to_1_dcbhyper(s0 = 5, sar=0.1, s0_obs = 1))
+  expect_true(check_sum_to_1_dcbhyper(s0 = 5, sar=0.1, s0_obs = 2))
+  expect_true(check_sum_to_1_dcbhyper(s0 = 5, sar=0.1, s0_obs = 3))
+  expect_true(check_sum_to_1_dcbhyper(s0 = 5, sar=0.1, s0_obs = 4))
+  expect_true(check_sum_to_1_dcbhyper(s0 = 5, sar=0.1, s0_obs = 5))
+
+  expect_true(check_sum_to_1_dcbhyper(s0 = 4, sar=0.85, s0_obs = 1))
+  expect_true(check_sum_to_1_dcbhyper(s0 = 4, sar=0.85, s0_obs = 2))
+  expect_true(check_sum_to_1_dcbhyper(s0 = 4, sar=0.85, s0_obs = 3))
+  expect_true(check_sum_to_1_dcbhyper(s0 = 4, sar=0.85, s0_obs = 4))
+
+  expect_true(check_sum_to_1_dcbhyper(s0 = 2, sar=0.25, s0_obs = 1))
+  expect_true(check_sum_to_1_dcbhyper(s0 = 2, sar=0.25, s0_obs = 2))
+
+
+})
+
+
 
 
 

@@ -10,6 +10,18 @@ infected household member infects a susceptible household member.
 
 ## Installation
 
+On this package you will find the repository for the development version
+of the package. It is recommended that you install and use the version
+that is available from CRAN.
+([link](https://cran.r-project.org/package=chainbinomial)). You can
+install with this command:
+
+``` r
+install.packages("chainbinomial")
+```
+
+To install the latest development version:
+
 ``` r
 install.packages("devtools")
 devtools::install_github("opisthokonta/chainbinomial")
@@ -228,6 +240,34 @@ predictor(s) are numerical rather than categorical. In that case you
 should use `link='logit'`.
 
 `tidy` and `glance` methods are also available for `cbmod` objects.
+
+## Unobserved individuals
+
+*This methodology is still under development so the function interface,
+implementations, and underlying methodology might change.*
+
+Sometimes there are individuals in the household whose infection status
+is not known. This could be because they did not get tested, did not
+consent to participate in the study or were excluded for some other
+reason. These individuals will still contribute to the outbreak dynamics
+within the household and their presence ought to be modelled and not
+ignored, even if their infection status is unknown.
+
+One way to deal with this is to assume an underlying chain binomial
+model of the outbreak, and have a hypergeometric observational model on
+top of that. The probability of observing x infected in a household of 5
+initial susceptible individuals, where only 4 of them are observed
+(i.e. 1 individual is not observed) can be calculated with the
+`dcbhyper` function, using the `s0_obs` argument.
+
+``` r
+dcbhyper(x=0:4, s0 = 5, sar=0.25, s0_obs = 4)
+```
+
+    ## [1] 0.2623329 0.1470408 0.1563287 0.2069753 0.2273222
+
+There is also a function `ecbhyper` for calculating the expected value
+and `estimate_sar_cbhyper` for estimating the sar parameter.
 
 ## Litterature
 
