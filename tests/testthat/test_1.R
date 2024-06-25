@@ -260,6 +260,72 @@ test_that("P(x=0)", {
 
 
 
+# Vector recycling ----
+
+
+vr1_a <- dchainbinom(x = rep(0:4, 3), s0 = 4, sar = 0.1, i0 = 1, generations = Inf)
+vr1_b <- rep(dchainbinom(x = 0:4, s0 = 4, sar = 0.1, i0 = 1, generations = Inf), 3)
+
+vr2_a <- dchainbinom(x = rep(0:4, 3), s0 = 4, sar = 0.1, i0 = 2, generations = Inf)
+vr2_b <- rep(dchainbinom(x = 0:4, s0 = 4, sar = 0.1, i0 = 2, generations = Inf), 3)
+
+vr3_a <- dchainbinom(x = rep(0:4, 3), s0 = 4, sar = 0.1, i0 = 2, generations = 2)
+vr3_b <- rep(dchainbinom(x = 0:4, s0 = 4, sar = 0.1, i0 = 2, generations = 2), 3)
+
+vr4_a <- dchainbinom(x = 0, s0 = 4, sar = 0.1, i0 = 1, generations = 1:4)
+vr4_b <- rep(dchainbinom(x = 0, s0 = 4, sar = 0.1, i0 = 1, generations = 1), 4)
+
+vr5_a <- dchainbinom(x = 0, s0 = 4, sar = 0.1, i0 = 2, generations = 1:4)
+vr5_b <- rep(dchainbinom(x = 0, s0 = 4, sar = 0.1, i0 = 2, generations = 1), 4)
+
+vr6_a <- dchainbinom(x = rep(0, 9), s0 = 4, sar = c(0.1, 0.2, 0.3), i0 = 1, generations = Inf)
+vr6_b <- rep(dchainbinom(x = 0, s0 = 4, sar = c(0.1, 0.2, 0.3), i0 = 1, generations = Inf), 3)
+
+vr7_a <- dchainbinom(x = rep(1, 9), s0 = 4, sar = c(0.1, 0.2, 0.3), i0 = 1, generations = Inf)
+vr7_b <- rep(dchainbinom(x = 1, s0 = 4, sar = c(0.1, 0.2, 0.3), i0 = 1, generations = Inf), 3)
+
+vr8_a <- dchainbinom(x = 0:4, s0 = 4, sar = rep(c(0.1, 0.2, 0.3), each = 5), i0 = 1, generations = Inf)
+
+vr8_b <- c(dchainbinom(x = 0:4, s0 = 4, sar = 0.1, i0 = 1, generations = Inf),
+           dchainbinom(x = 0:4, s0 = 4, sar = 0.2, i0 = 1, generations = Inf),
+           dchainbinom(x = 0:4, s0 = 4, sar = 0.3, i0 = 1, generations = Inf))
+
+vr9_a <- dchainbinom(x = 0:4, s0 = 4, sar = rep(c(0.1, 0.2, 0.3), each = 5), i0 = 1, generations = 2)
+
+vr9_b <- c(dchainbinom(x = 0:4, s0 = 4, sar = 0.1, i0 = 1, generations = 2),
+           dchainbinom(x = 0:4, s0 = 4, sar = 0.2, i0 = 1, generations = 2),
+           dchainbinom(x = 0:4, s0 = 4, sar = 0.3, i0 = 1, generations = 2))
+
+
+vr10_a <- dchainbinom(x = 0:3, s0 = 3, sar = 0.25, i0 = 1, generations = Inf)
+vr10_b <- dchainbinom(x = 0:3, s0 = rep(3, 4), sar = 0.25, i0 = 1, generations = Inf)
+
+vr11_a <- dchainbinom(x = 0:3, s0 = rep(3, 12), sar = 0.25, i0 = 1, generations = Inf)
+vr11_b <- rep(dchainbinom(x = 0:3, s0 = 3, sar = 0.25, i0 = 1, generations = Inf), 3)
+
+vr12_a <- dchainbinom(x = 0:3, s0 = rep(0:3, 3), sar = 0.25, i0 = 1, generations = Inf)
+vr12_b <- rep(c(dchainbinom(x = 0:3, s0 = 0:3, sar = 0.25, i0 = 1, generations = Inf)), 3)
+
+
+test_that("Correct vector recycling", {
+
+  expect_true(all(vr1_a == vr1_b))
+  expect_true(all(vr2_a == vr2_b))
+  expect_true(all(vr3_a == vr3_b))
+  expect_true(all(vr4_a == vr4_b))
+  expect_true(all(vr5_a == vr5_b))
+  expect_true(all(vr6_a == vr6_b))
+  expect_true(all(vr7_a == vr7_b))
+  expect_true(all(vr8_a == vr8_b))
+  expect_true(all(vr9_a == vr9_b))
+  expect_true(all(vr10_a == vr10_b))
+  expect_true(all(vr11_a == vr11_b))
+  expect_true(all(vr12_a == vr12_b))
+
+})
+
+
+
 
 # Compare PMF with simulation ----
 
