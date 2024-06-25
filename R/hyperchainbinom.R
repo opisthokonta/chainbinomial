@@ -33,7 +33,7 @@ dcbhyper <- function(x, s0, sar, s0_obs, i0 = 1){
     # m: I
     # n = S0 - I
     # k: S0_obs
-    res[ii] <- sum(dhyper(x = inp[ii, 'x'], m = 0:inp[ii, 's0'], n = true_escaped, k = inp[ii, 's0_obs']) * dd)
+    res[ii] <- sum(stats::dhyper(x = inp[ii, 'x'], m = 0:inp[ii, 's0'], n = true_escaped, k = inp[ii, 's0_obs']) * dd)
 
   }
 
@@ -150,7 +150,7 @@ estimate_sar_cbhyper <- function(infected, s0, s0_obs, i0 = 1, se = TRUE){
 
 
   sar_init <- 0.5
-  optim_res <- optim(par = sar_init,
+  optim_res <- stats::optim(par = sar_init,
                      fn = negloglok_cbhyper, method = 'L-BFGS-B',
                      hessian = FALSE,
                      infected = infected,
@@ -269,20 +269,20 @@ confint.sar2 <- function(object, method = 'chisq', level = 0.95){
     pupr <- 1 - plwr
 
 
-    critical_value_lower <- qchisq(plwr, df = 1, lower.tail = FALSE)
+    critical_value_lower <- stats::qchisq(plwr, df = 1, lower.tail = FALSE)
 
-    uniroot_res_lwr <- uniroot(f = obj_ci_wilks2, interval = find_intervall_lwr(object$sar_hat),
-                               infected = object$data$infected, s0 = object$data$s0,
-                               i0 = object$data$i0,
-                               s0_obs = object$data$s0_obs,
-                               #generations = object$data$generations,
-                               max_loglik = object$loglikelihood,
-                               critical_value = critical_value_lower,
-                               tol = 0.0000001)
+    uniroot_res_lwr <- stats::uniroot(f = obj_ci_wilks2, interval = find_intervall_lwr(object$sar_hat),
+                                     infected = object$data$infected, s0 = object$data$s0,
+                                     i0 = object$data$i0,
+                                     s0_obs = object$data$s0_obs,
+                                     #generations = object$data$generations,
+                                     max_loglik = object$loglikelihood,
+                                     critical_value = critical_value_lower,
+                                     tol = 0.0000001)
 
-    critical_value_upper <- qchisq(pupr, df = 1, lower.tail = TRUE)
+    critical_value_upper <- stats::qchisq(pupr, df = 1, lower.tail = TRUE)
 
-    uniroot_res_upr <- uniroot(f = obj_ci_wilks2, interval = find_intervall_upr(object$sar_hat),
+    uniroot_res_upr <- stats::uniroot(f = obj_ci_wilks2, interval = find_intervall_upr(object$sar_hat),
                                infected = object$data$infected, s0 = object$data$s0,
                                i0 = object$data$i0,
                                s0_obs = object$data$s0_obs,
