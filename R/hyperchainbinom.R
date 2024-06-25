@@ -7,7 +7,6 @@
 #' cases in a population of size s0 with s0_obs observed individuals.
 #'
 #' @param x numeric vector of the number of infected.
-#' @param n number of observations. If length(n) > 1, the length is taken to be the number required.
 #' @param s0 the number of initial susceptibles.
 #' @param sar the secondary attack rate, or the per person risk of infection by an infected.
 #' @param s0_obs The number of observed individuals.
@@ -235,7 +234,17 @@ find_intervall_lwr <- function(sh){
 }
 
 
-
+#' Confidence intervals for sar2 Object.
+#'
+#' @param object a sar2 object.
+#' @param parm Character or number of which coefficient ot compute confidence
+#' intervals for. By default intervals are computed for all coefficients.
+#' @param level Default is 0.95, for 95% confidence intervals.
+#' @param method Either 'chisq'(default) or 'normal'.
+#' @param ... other arguments. Ignored.
+#'
+#' @returns A numeric of length 2 with the lower and upper end of the confidence interval.
+#'
 #'@export
 confint.sar2 <- function(object, method = 'chisq', level = 0.95){
 
@@ -260,8 +269,8 @@ confint.sar2 <- function(object, method = 'chisq', level = 0.95){
     }
 
     # compute CI using normal approximation.
-    ci_lwr <- max(object$sar_hat + (sar_se * qnorm((1-level)/2, lower.tail = TRUE)), 0)
-    ci_upr <- min(object$sar_hat + (sar_se * qnorm((1-level)/2, lower.tail = FALSE)) , 1)
+    ci_lwr <- max(object$sar_hat + (sar_se * stats::qnorm((1-level)/2, lower.tail = TRUE)), 0)
+    ci_upr <- min(object$sar_hat + (sar_se * stats::qnorm((1-level)/2, lower.tail = FALSE)) , 1)
 
   } else if (method == 'chisq'){
 

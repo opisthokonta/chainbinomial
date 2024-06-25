@@ -7,7 +7,7 @@
 \method{confint}{sar}(object, parm = NULL, level = 0.95, method = "chisq", ...)
 }
 \arguments{
-\item{object}{a cbmod object.}
+\item{object}{a sar object.}
 
 \item{parm}{Character or number of which coefficient ot compute confidence
 intervals for. By default intervals are computed for all coefficients.}

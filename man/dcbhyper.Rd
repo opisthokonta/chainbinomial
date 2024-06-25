@@ -19,8 +19,6 @@ ecbhyper(s0, sar, s0_obs, i0 = 1)
 \item{s0_obs}{The number of observed individuals.}
 
 \item{i0}{the number of primary cases.}
-
-\item{n}{number of observations. If length(n) > 1, the length is taken to be the number required.}
 }
 \description{
 Probability mass function, expected value, and random generation, for the hyper chain binomial distribution,
