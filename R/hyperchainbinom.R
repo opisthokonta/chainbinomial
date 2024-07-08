@@ -237,8 +237,7 @@ find_intervall_lwr <- function(sh){
 #' Confidence intervals for sar2 Object.
 #'
 #' @param object a sar2 object.
-#' @param parm Character or number of which coefficient ot compute confidence
-#' intervals for. By default intervals are computed for all coefficients.
+#' @param parm Ignored.
 #' @param level Default is 0.95, for 95% confidence intervals.
 #' @param method Either 'chisq'(default) or 'normal'.
 #' @param ... other arguments. Ignored.
@@ -246,7 +245,7 @@ find_intervall_lwr <- function(sh){
 #' @returns A numeric of length 2 with the lower and upper end of the confidence interval.
 #'
 #'@export
-confint.sar2 <- function(object, method = 'chisq', level = 0.95){
+confint.sar2 <- function(object, parm = NULL, level = 0.95, method = 'chisq', ...){
 
   stopifnot(method %in% c('chisq', 'normal'))
 

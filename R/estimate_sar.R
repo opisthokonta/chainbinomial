@@ -160,8 +160,7 @@ find_intervall_lwr <- function(sh){
 #' Confidence intervals for sar Object.
 #'
 #' @param object a sar object.
-#' @param parm Character or number of which coefficient ot compute confidence
-#' intervals for. By default intervals are computed for all coefficients.
+#' @param parm Ignored.
 #' @param level Default is 0.95, for 95% confidence intervals.
 #' @param method Either 'chisq'(default) or 'normal'.
 #' @param ... other arguments. Ignored.

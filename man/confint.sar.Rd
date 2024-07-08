@@ -9,8 +9,7 @@
 \arguments{
 \item{object}{a sar object.}
 
-\item{parm}{Character or number of which coefficient ot compute confidence
-intervals for. By default intervals are computed for all coefficients.}
+\item{parm}{Ignored.}
 
 \item{level}{Default is 0.95, for 95\% confidence intervals.}
 

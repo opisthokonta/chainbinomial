@@ -4,17 +4,16 @@
 \alias{confint.sar2}
 \title{Confidence intervals for sar2 Object.}
 \usage{
-\method{confint}{sar2}(object, method = "chisq", level = 0.95)
+\method{confint}{sar2}(object, parm = NULL, level = 0.95, method = "chisq", ...)
 }
 \arguments{
 \item{object}{a sar2 object.}
 
-\item{method}{Either 'chisq'(default) or 'normal'.}
+\item{parm}{Ignored.}
 
 \item{level}{Default is 0.95, for 95\% confidence intervals.}
 
-\item{parm}{Character or number of which coefficient ot compute confidence
-intervals for. By default intervals are computed for all coefficients.}
+\item{method}{Either 'chisq'(default) or 'normal'.}
 
 \item{...}{other arguments. Ignored.}
 }
