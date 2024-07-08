@@ -233,6 +233,13 @@ dchainbinom <- function(x, s0, sar, i0 = 1, generations = Inf){
   # Combine input to matrix, to expand/recycle input data.
   inp <- as.matrix(cbind(x, s0, sar, i0, generations))
 
+  # Find out which rows in inp are duplicates, and which rows the duplicated correspond to
+  # Make id string for each row in matrix
+  id_string <- apply(inp, MARGIN = 1, FUN = function(x){paste0(x, collapse= '')})
+
+  # Check for duplicates, get index for first occurrence.
+  res_idx <- match(id_string, id_string)
+
   # Set to Inf where the final size distribution should be computed.
   inp[,'generations'][inp[,'generations'] >= inp[,'s0']] <- Inf
 
@@ -240,6 +247,12 @@ dchainbinom <- function(x, s0, sar, i0 = 1, generations = Inf){
   res <- numeric(n)
 
   for (ii in 1:n){
+
+    # Check if result already computed
+    if (ii > res_idx[ii]){
+      res[ii] <- res[res_idx[ii]]
+      next
+    }
 
     if (any(is.na(inp[ii,]))){
 
