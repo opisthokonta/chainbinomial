@@ -345,7 +345,7 @@ simulate_distribution <- function(s0, sar, g, i0 = 1){
 
 
 # Compares the PMF with simulated data.
-compare_pmf_vs_simulation <- function(s0, sar, g, i0 = 1, tol = 0.001, maxtries = 3){
+compare_pmf_vs_simulation <- function(s0, sar, g, i0 = 1, tol = 0.001, maxtries = 4){
 
   for (ii in 1:maxtries){
 
@@ -414,7 +414,7 @@ if (FALSE){
 
 # Expected value ----
 
-# Expeced value should be same as for ordinary binomial when g=1.
+# Expected value should be same as for ordinary binomial when g=1.
 ecb_vs_eb_g1 <- function(s0, sar){
   ecb <- echainbinom(s0 = s0, i0 = 1, sar = sar, generations = 1)
   eb <- s0*sar #sum(0:s0 * dbinom(x=0:s0, size=s0, prob = sar))
