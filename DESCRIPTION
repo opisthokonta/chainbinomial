@@ -1,7 +1,7 @@
 Package: chainbinomial
 Type: Package
 Title: Chain Binomial Models for Analysis of Infectious Disease Data
-Version: 0.1.6
+Version: 0.1.7
 Authors@R: person(given = "Jonas Christoffer",
            family = "Lindstrøm",
            role = c("aut", "cre"),
