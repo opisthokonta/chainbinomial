@@ -444,14 +444,14 @@ residuals.cbmod <- function(object, type = 'response', ...){
 
   stopifnot(type %in% c('response', 'far', 'pearson'))
 
-  response_resid <- object$data$infected - object$fitted_values
+  response_resid <- object$null_model$data$infected - object$fitted_values
 
   if (type == 'response'){
     res <- response_resid
   } else if (type == 'far'){
-    res <- (object$data$infected / object$data$s0) - (object$fitted_values / object$data$s0)
+    res <- (object$null_model$data$infected / object$null_model$data$s0) - (object$fitted_values / object$null_model$data$s0)
   } else if (type == 'pearson'){
-    vv <- varchainbinom(s0 = object$data$s0, sar = object$sar_hat, i0 = object$data$i0, generation = object$data$generations)
+    vv <- varchainbinom(s0 = object$null_model$data$s0, sar = object$sar_hat, i0 = object$null_model$data$i0, generation = object$null_model$data$generations)
     res <- response_resid / sqrt(vv)
   }
 

@@ -550,7 +550,7 @@ test_that("Variance g=1", {
 
 })
 
-# Cumulative distribution funciton ----
+# Cumulative distribution function ----
 
 test_that("CDF", {
 
@@ -577,8 +577,6 @@ test_that("CDF", {
   expect_true(pchainbinom(0, s0 = 3, sar = 0.2, generations = Inf) == pchainbinom(0.9, s0 = 3, sar = 0.2, generations = Inf))
   expect_true(pchainbinom(1, s0 = 3, sar = 0.2, generations = 2) == pchainbinom(1.9, s0 = 3, sar = 0.2, generations = 2))
   expect_true(pchainbinom(1, s0 = 3, sar = 0.2, generations = Inf) == pchainbinom(1.9, s0 = 3, sar = 0.2, generations = Inf))
-
-
 
 })
 
@@ -1318,6 +1316,55 @@ test_that("making predictions", {
 })
 
 
+# Residuals ----
+
+test_that("Residuals", {
+
+  # Identity link
+  expect_true(length(residuals(cb_mod_res_id, type = 'response')) == nrow(mod_dat1))
+  expect_true(length(residuals(cb_mod_res_id, type = 'far'))  == nrow(mod_dat1))
+  expect_true(length(residuals(cb_mod_res_id, type = 'pearson')) == nrow(mod_dat1))
+
+  expect_true(any(!is.na(residuals(cb_mod_res_id, type = 'response'))))
+  expect_true(any(!is.na(residuals(cb_mod_res_id, type = 'far'))))
+  expect_true(any(!is.na(residuals(cb_mod_res_id, type = 'pearson'))))
+
+
+  # Log link
+  expect_true(length(residuals(cb_mod_res_log, type = 'response')) == nrow(mod_dat1))
+  expect_true(length(residuals(cb_mod_res_log, type = 'far'))  == nrow(mod_dat1))
+  expect_true(length(residuals(cb_mod_res_log, type = 'pearson')) == nrow(mod_dat1))
+
+  expect_true(any(!is.na(residuals(cb_mod_res_log, type = 'response'))))
+  expect_true(any(!is.na(residuals(cb_mod_res_log, type = 'far'))))
+  expect_true(any(!is.na(residuals(cb_mod_res_log, type = 'pearson'))))
+
+
+  # Logit link
+  expect_true(length(residuals(cb_mod_res_logit, type = 'response')) == nrow(mod_dat1))
+  expect_true(length(residuals(cb_mod_res_logit, type = 'far'))  == nrow(mod_dat1))
+  expect_true(length(residuals(cb_mod_res_logit, type = 'pearson')) == nrow(mod_dat1))
+
+  expect_true(any(!is.na(residuals(cb_mod_res_logit, type = 'response'))))
+  expect_true(any(!is.na(residuals(cb_mod_res_logit, type = 'far'))))
+  expect_true(any(!is.na(residuals(cb_mod_res_logit, type = 'pearson'))))
+
+
+  # Cloglog link
+  expect_true(length(residuals(cb_mod_res_cloglog, type = 'response')) == nrow(mod_dat1))
+  expect_true(length(residuals(cb_mod_res_cloglog, type = 'far'))  == nrow(mod_dat1))
+  expect_true(length(residuals(cb_mod_res_cloglog, type = 'pearson')) == nrow(mod_dat1))
+
+  expect_true(any(!is.na(residuals(cb_mod_res_cloglog, type = 'response'))))
+  expect_true(any(!is.na(residuals(cb_mod_res_cloglog, type = 'far'))))
+  expect_true(any(!is.na(residuals(cb_mod_res_cloglog, type = 'pearson'))))
+
+})
+
+
+
+
+
 # Missing values ----
 
 x_input_na <- c(NA, 0, 2, 3, NA, NA)
@@ -1469,10 +1516,6 @@ test_that("PMF sum to 1", {
 
 
 })
-
-
-
-
 
 
 
