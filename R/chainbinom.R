@@ -184,14 +184,14 @@ compute_factors <- function(maxi, sar, i0){
 
 
 
-# Probability mass function for the Chain Binomial distribution.
 #' The Chain Binomial distribution
 #'
-#' Probability mass function, expected value, variance function, and random generation, for the chain binomial distribution,
+#' Probability mass function, cumulative, expected value, variance function, and random generation, for the chain binomial distribution,
 #' with parameters s0, sar, i0, and number of generations, for the number of infected
 #' cases in a population of size s0 after a given number of generations.
 #'
 #' @param x numeric vector of the number of infected.
+#' @param q numeric vector of the number of infected.
 #' @param n number of observations. If length(n) > 1, the length is taken to be the number required.
 #' @param s0 the number of initial susceptibles.
 #' @param sar the secondary attack rate, or the per person risk of infection by an infected.
@@ -361,6 +361,53 @@ rchainbinom <- function(n, s0, sar, i0 = 1, generations = Inf){
     res[ii] <- i_cum
 
 
+  }
+
+  return(res)
+
+}
+
+
+#' @rdname dchainbinom
+#' @export
+pchainbinom <- function(q, s0, sar, i0 = 1, generations = Inf){
+
+  # Check input.
+  stopifnot(is.numeric(q) | is.logical(q),
+            is.numeric(s0) | is.logical(s0),
+            is.numeric(sar) | is.logical(sar),
+            is.numeric(i0) | is.logical(i0),
+            is.numeric(generations) | is.logical(generations),
+            all(sar >= 0, na.rm = TRUE),
+            all(sar <= 1, na.rm = TRUE),
+            all(q >= 0, na.rm = TRUE),
+            all(s0 >= 0, na.rm = TRUE),
+            all(i0 >= 1, na.rm = TRUE),
+            all(generations >= 1, na.rm = TRUE))
+
+  # Coerce to numericals, in case of logicals being provided.
+  q <- as.numeric(q)
+  s0 <- as.numeric(s0)
+  sar <- as.numeric(sar)
+  i0 <- as.numeric(i0)
+  generations <- as.numeric(generations)
+
+  # Combine input to matrix, to expand/recycle input data.
+  inp <- as.matrix(cbind(q, s0, sar, i0, generations))
+
+  n <- nrow(inp)
+  res <- numeric(n)
+
+  for (ii in 1:n){
+
+    if (any(is.na(inp[ii,]))){
+      res[ii] <- NA
+      next
+    }
+
+    xx <- 0:floor(inp[ii, 'q'])
+    pp <- dchainbinom(x  = xx, s0 = inp[ii, 's0'], i0 = inp[ii, 'i0'], sar = inp[ii, 'sar'], generations = inp[ii, 'generations'])
+    res[ii] <- sum(pp)
   }
 
   return(res)

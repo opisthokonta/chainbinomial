@@ -525,8 +525,8 @@ test_that("Expected value == s0", {
   expect_true(ecb_eq_s0_sar_eq_1(s0  = 9, i0 = 2, g = Inf))
 })
 
-# Variance ----
 
+# Variance ----
 
 # Variance should be same as for ordinary binomial when g=1.
 varcb_vs_varb_g1 <- function(s0, sar){
@@ -550,8 +550,37 @@ test_that("Variance g=1", {
 
 })
 
+# Cumulative distribution funciton ----
+
+test_that("CDF", {
+
+  # Check that the result is as expected.
+  expect_true(pchainbinom(2, s0 = 6, sar = 0.12, generations = 2) == sum(dchainbinom(0:2, s0 = 6, sar = 0.12, generations = 2)))
+  expect_true(pchainbinom(2, s0 = 6, sar = 0.12, generations = Inf) == sum(dchainbinom(0:2, s0 = 6, sar = 0.12, generations = Inf)))
+
+  # Same as ordinary binomial when g=1
+  expect_true(all(pchainbinom(0:3, s0 = 3, sar = 0.2, generations = 1) - pbinom(q  = 0:3, size= 3, prob = 0.2) < 0.00001))
+  expect_true(all(pchainbinom(0:5, s0 = 3, sar = 0.2, generations = 1) - pbinom(q  = 0:5, size= 3, prob = 0.2) < 0.00001))
+
+  # Should be 1 when q = s0.
+  expect_true(pchainbinom(3, s0 = 3, sar = 0.2, generations = 1) == 1)
+  expect_true(pchainbinom(3, s0 = 3, sar = 0.2, generations = Inf) == 1)
+  expect_true(pchainbinom(3, s0 = 3, sar = 0.2, generations = 2) == 1)
+
+  # Should be 1 when q > s0.
+  expect_true(pchainbinom(5, s0 = 3, sar = 0.2, generations = 1) == 1)
+  expect_true(pchainbinom(5, s0 = 3, sar = 0.2, generations = Inf) == 1)
+  expect_true(pchainbinom(5, s0 = 3, sar = 0.2, generations = 2) == 1)
+
+  # Check the floor.
+  expect_true(pchainbinom(0, s0 = 3, sar = 0.2, generations = 2) == pchainbinom(0.9, s0 = 3, sar = 0.2, generations = 2))
+  expect_true(pchainbinom(0, s0 = 3, sar = 0.2, generations = Inf) == pchainbinom(0.9, s0 = 3, sar = 0.2, generations = Inf))
+  expect_true(pchainbinom(1, s0 = 3, sar = 0.2, generations = 2) == pchainbinom(1.9, s0 = 3, sar = 0.2, generations = 2))
+  expect_true(pchainbinom(1, s0 = 3, sar = 0.2, generations = Inf) == pchainbinom(1.9, s0 = 3, sar = 0.2, generations = Inf))
 
 
+
+})
 
 # Estimation and modelling ----
 
