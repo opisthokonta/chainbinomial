@@ -525,6 +525,33 @@ test_that("Expected value == s0", {
   expect_true(ecb_eq_s0_sar_eq_1(s0  = 9, i0 = 2, g = Inf))
 })
 
+# Variance ----
+
+
+# Variance should be same as for ordinary binomial when g=1.
+varcb_vs_varb_g1 <- function(s0, sar){
+  varcb <- varchainbinom(s0 = s0, i0 = 1, sar = sar, generations = 1)
+  varb <- s0*sar*(1- sar) # binomial variance.
+
+  abs(varcb - varb) < 0.00000001
+}
+
+
+test_that("Variance g=1", {
+
+  expect_true(varcb_vs_varb_g1(s0 = 3, sar=0.1))
+  expect_true(varcb_vs_varb_g1(s0 = 3, sar=0.6))
+
+  expect_true(varcb_vs_varb_g1(s0 = 2, sar=0.1))
+  expect_true(varcb_vs_varb_g1(s0 = 2, sar=0.6))
+
+  expect_true(varcb_vs_varb_g1(s0 = 9, sar=0.1))
+  expect_true(varcb_vs_varb_g1(s0 = 9, sar=0.6))
+
+})
+
+
+
 
 # Estimation and modelling ----
 

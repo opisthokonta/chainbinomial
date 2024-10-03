@@ -4,6 +4,7 @@
 \alias{dchainbinom}
 \alias{rchainbinom}
 \alias{echainbinom}
+\alias{varchainbinom}
 \title{The Chain Binomial distribution}
 \usage{
 dchainbinom(x, s0, sar, i0 = 1, generations = Inf)
@@ -11,6 +12,8 @@ dchainbinom(x, s0, sar, i0 = 1, generations = Inf)
 rchainbinom(n, s0, sar, i0 = 1, generations = Inf)
 
 echainbinom(s0, sar, i0 = 1, generations = Inf)
+
+varchainbinom(s0, sar, i0 = 1, generations = Inf)
 }
 \arguments{
 \item{x}{numeric vector of the number of infected.}
@@ -30,7 +33,7 @@ echainbinom(s0, sar, i0 = 1, generations = Inf)
 \code{rchainbinom} generates random data.
 }
 \description{
-Probability mass function, expected value, and random generation, for the chain binomial distribution,
+Probability mass function, expected value, variance function, and random generation, for the chain binomial distribution,
 with parameters s0, sar, i0, and number of generations, for the number of infected
 cases in a population of size s0 after a given number of generations.
 }
@@ -38,5 +41,6 @@ cases in a population of size s0 after a given number of generations.
 dchainbinom(x = 0:5, s0 = 5, sar = 0.2, i0 = 1, generations = Inf)
 rchainbinom(n = 10, s0 = 5, sar = 0.2, i0 = 1, generations = Inf)
 echainbinom(s0 = 5, sar = 0.2, i0 = 1, generations = Inf)
+varchainbinom(s0 = 5, sar = 0.2, i0 = 1, generations = Inf)
 
 }
