@@ -385,29 +385,23 @@ coef.cbmod <- function(object, ...){
 #' predict(res, x = xmat, type = 'sar')
 #'
 #' @export
-predict.cbmod <- function(object, x, type = 'identity', ...){
+predict.cbmod <- function(object, x, type = 'link', ...){
 
-  # dots <- list(...)
-  #
-  # if (is.null(dots$x)){
-  #   stop('predict.cbmod needs an x argument.')
-  # } else {
-  #   x <- dots$x
-  # }
+  stopifnot(is.data.frame(x) | is.matrix(x))
+
+  # Add intercept if needed.
+  if ((!'(Intercept)' %in% colnames(x))  & '(Intercept)' %in% names(object$parameters)){
+    x <- cbind(`(Intercept)` = 1, x)
+  }
+
+  # Sort the input columns to match the order of the parameter vector.
+  x <- x[,match(colnames(x), names(object$parameters))]
 
 
   if(!identical(colnames(x), names(object$parameters))){
     stop('The column names and order in newdata must match those of names(object$parameters).')
   }
 
-  # if (is.null(dots$type)){
-  #   type <- 'link'
-  # } else {
-  #   type <- dots$type
-  # }
-
-  #stopifnot(length(dots$type) == 1)
-  #stopifnot(dots$type %in% c('link', 'response', 'sar'))
   stopifnot(length(type) == 1)
   stopifnot(type %in% c('link', 'response', 'sar'))
 
