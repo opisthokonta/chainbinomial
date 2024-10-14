@@ -394,8 +394,9 @@ predict.cbmod <- function(object, x, type = 'link', ...){
     x <- cbind(`(Intercept)` = 1, x)
   }
 
+
   # Sort the input columns to match the order of the parameter vector.
-  x <- x[,match(colnames(x), names(object$parameters))]
+  x <- x[,match(colnames(x), names(object$parameters)), drop=FALSE]
 
 
   if(!identical(colnames(x), names(object$parameters))){

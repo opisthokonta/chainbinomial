@@ -4,7 +4,7 @@
 \alias{predict.cbmod}
 \title{Predict Method for cbmod Fits}
 \usage{
-\method{predict}{cbmod}(object, x, type = "identity", ...)
+\method{predict}{cbmod}(object, x, type = "link", ...)
 }
 \arguments{
 \item{object}{a fitted object of class inheriting from "cbmod".}
