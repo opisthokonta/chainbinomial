@@ -387,7 +387,7 @@ coef.cbmod <- function(object, ...){
 #' @export
 predict.cbmod <- function(object, x, type = 'link', ...){
 
-  stopifnot(is.data.frame(x) | is.matrix(x))
+  stopifnot(is.matrix(x))
 
   # Add intercept if needed.
   if ((!'(Intercept)' %in% colnames(x))  & '(Intercept)' %in% names(object$parameters)){
@@ -425,6 +425,8 @@ predict.cbmod <- function(object, x, type = 'link', ...){
   }
 
 }
+
+
 
 #' Extract Model Residuals for cbmod Fits
 #'
