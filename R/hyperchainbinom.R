@@ -209,7 +209,7 @@ obj_ci_wilks2 <- function(x, infected, s0, i0, s0_obs, max_loglik, critical_valu
 
 
 # Find the search interval for use with uniroot.
-find_intervall_upr <- function(sh){
+find_intervall_upr_hcb <- function(sh){
 
   if (sh >= 0.99){
     search_int <- c(0, 1)
@@ -221,7 +221,7 @@ find_intervall_upr <- function(sh){
 
 }
 
-find_intervall_lwr <- function(sh){
+find_intervall_lwr_hcb <- function(sh){
 
   if (sh <= 0.01){
     search_int <- c(0, 1)
@@ -279,7 +279,7 @@ confint.sar2 <- function(object, parm = NULL, level = 0.95, method = 'chisq', ..
 
     critical_value_lower <- stats::qchisq(plwr, df = 1, lower.tail = FALSE)
 
-    uniroot_res_lwr <- stats::uniroot(f = obj_ci_wilks2, interval = find_intervall_lwr(object$sar_hat),
+    uniroot_res_lwr <- stats::uniroot(f = obj_ci_wilks2, interval = find_intervall_lwr_hcb(object$sar_hat),
                                      infected = object$data$infected, s0 = object$data$s0,
                                      i0 = object$data$i0,
                                      s0_obs = object$data$s0_obs,
@@ -290,7 +290,7 @@ confint.sar2 <- function(object, parm = NULL, level = 0.95, method = 'chisq', ..
 
     critical_value_upper <- stats::qchisq(pupr, df = 1, lower.tail = TRUE)
 
-    uniroot_res_upr <- stats::uniroot(f = obj_ci_wilks2, interval = find_intervall_upr(object$sar_hat),
+    uniroot_res_upr <- stats::uniroot(f = obj_ci_wilks2, interval = find_intervall_upr_hcb(object$sar_hat),
                                infected = object$data$infected, s0 = object$data$s0,
                                i0 = object$data$i0,
                                s0_obs = object$data$s0_obs,
