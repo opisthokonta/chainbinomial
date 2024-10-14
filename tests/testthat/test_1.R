@@ -611,6 +611,16 @@ mod_dat2 <- data.frame(infected = c(2, 1, 2, 5, 2, 2, 2, 1, 3, 2),
            generations = 1)
 
 
+# Example data set where, which caused problems with CI (chisq) when assuming g = 1.
+mod_dat3 <- data.frame(infected = c(2, 5, 2, 3, 1, 2, 2, 2, 3, 1, 1, 2, 2, 2, 1, 2, 2,
+                                    3, 2, 3, 2, 1, 1, 2, 2, 3, 3, 3, 1, 5, 3, 3, 3, 2,
+                                    2, 1, 2, 2, 4, 2, 2, 5, 2, 2, 2, 2, 2, 2, 1, 1),
+                       s0 = c(2L, 5L, 2L, 3L, 1L, 2L, 2L, 2L, 3L, 1L, 1L, 2L, 2L, 2L,
+                              1L, 2L, 2L, 3L, 2L, 3L, 2L, 1L, 1L, 2L, 2L, 3L, 3L, 3L,
+                              1L, 5L, 3L, 3L, 3L, 2L, 2L, 1L, 2L, 2L, 4L, 2L, 2L, 5L,
+                              2L, 2L, 2L, 2L, 2L, 2L, 1L, 2L))
+
+
 # modified data sets with missing values.
 mod_dat1_na <- mod_dat1
 mod_dat1_na$infected[c(5)] <- NA
@@ -641,6 +651,14 @@ test_that("simple estimation works", {
     sar_est_2_g1 <- estimate_sar(infected = mod_dat2$infected, s0 = mod_dat2$s0, generations = 1)
   )
 
+  expect_no_condition(
+    sar_est_3_g1 <- estimate_sar(infected = mod_dat3$infected, s0 = mod_dat3$s0, generations = 1)
+  )
+
+  expect_no_condition(
+    sar_est_3_ginf <- estimate_sar(infected = mod_dat3$infected, s0 = mod_dat3$s0, generations = Inf)
+  )
+
   expect_true('sar' %in% class(sar_est_1_ginf))
 
   # The reasonableness of results.
@@ -663,6 +681,16 @@ test_that("simple estimation works", {
   expect_true(is.numeric(sar_est_2_g1$sar_hat))
   expect_true(sar_est_2_g1$sar_hat <= 1)
   expect_true(sar_est_2_g1$sar_hat >= 0)
+
+  expect_true(!is.na(sar_est_3_g1$sar_hat))
+  expect_true(is.numeric(sar_est_3_g1$sar_hat))
+  expect_true(sar_est_3_g1$sar_hat <= 1)
+  expect_true(sar_est_3_g1$sar_hat >= 0)
+
+  expect_true(!is.na(sar_est_3_ginf$sar_hat))
+  expect_true(is.numeric(sar_est_3_ginf$sar_hat))
+  expect_true(sar_est_3_ginf$sar_hat <= 1)
+  expect_true(sar_est_3_ginf$sar_hat >= 0)
 
   # Estimates should not be the same.
   expect_false(sar_est_1_g2$sar_hat == sar_est_1_g1$sar_hat)
@@ -893,6 +921,33 @@ test_that("simple estimation works", {
   expect_true(sar_est_2_g1_ci_99_chisq[1] < sar_est_2_g1_ci_95_chisq[1])
   expect_true(sar_est_2_g1_ci_99_chisq[2] > sar_est_2_g1_ci_95_chisq[2])
 
+  # Ci for mod_dat3.
+
+  expect_no_condition(
+    sar_est_3_g1_ci_95_chisq <- confint(sar_est_3_g1, method = 'chisq', level = 0.95)
+  )
+
+  expect_no_condition(
+    sar_est_3_g1_ci_99_chisq <- confint(sar_est_3_g1, method = 'chisq', level = 0.99)
+  )
+
+  expect_no_condition(
+    sar_est_3_ginf_ci_95_chisq <- confint(sar_est_3_ginf, method = 'chisq', level = 0.95)
+  )
+
+  expect_no_condition(
+    sar_est_3_ginf_ci_99_chisq <- confint(sar_est_3_ginf, method = 'chisq', level = 0.99)
+  )
+
+  expect_true(sar_est_3_g1_ci_95_chisq[1] < sar_est_3_g1_ci_95_chisq[2])
+  expect_true(sar_est_3_g1_ci_99_chisq[1] < sar_est_3_g1_ci_99_chisq[2])
+  expect_true(sar_est_3_ginf_ci_95_chisq[1] < sar_est_3_ginf_ci_95_chisq[2])
+  expect_true(sar_est_3_ginf_ci_99_chisq[1] < sar_est_3_ginf_ci_99_chisq[2])
+
+  expect_true(sar_est_3_g1_ci_95_chisq[1] < sar_est_3_g1$sar_hat)
+  expect_true(sar_est_3_g1_ci_99_chisq[1] < sar_est_3_g1$sar_hat)
+  expect_true(sar_est_3_ginf_ci_95_chisq[1] < sar_est_3_ginf$sar_hat)
+  expect_true(sar_est_3_ginf_ci_99_chisq[1] < sar_est_3_ginf$sar_hat)
 
 
   # Missing values.
@@ -1236,6 +1291,10 @@ cb_mod_res_cloglog <- cbmod(y = mod_dat1$infected, s0 = mod_dat1$s0, generations
 my_new_data <- data.frame(x=c(-50, -2, -1, 0, 1, 2))
 newx <- model.matrix(~ x, data = my_new_data)
 
+# new x matrix without intercept.
+newx_noint <- model.matrix(~ x - 1, data = my_new_data)
+
+
 
 test_that("making predictions", {
 
@@ -1271,32 +1330,46 @@ test_that("making predictions", {
     cb_mod_pred_sar_cloglog <- predict(cb_mod_res_cloglog, x = newx, type = 'sar')
   )
 
+  # Predictions without intercept.
+  expect_no_condition(
+    cb_mod_pred_link_id_noint <- predict(cb_mod_res_id, x = newx_noint, type = 'link')
+  )
 
 
   expect_true(length(cb_mod_pred_link_id) == nrow(newx))
   expect_true(length(cb_mod_pred_link_log) == nrow(newx))
   expect_true(length(cb_mod_pred_link_logit) == nrow(newx))
   expect_true(length(cb_mod_pred_link_cloglog) == nrow(newx))
+  expect_true(length(cb_mod_pred_link_id_noint) == nrow(newx_noint))
+
 
   expect_true(any(!is.na(cb_mod_pred_link_id)))
   expect_true(any(!is.na(cb_mod_pred_link_log)))
   expect_true(any(!is.na(cb_mod_pred_link_logit)))
   expect_true(any(!is.na(cb_mod_pred_link_cloglog)))
+  expect_true(any(!is.na(cb_mod_pred_link_id_noint)))
+
 
   expect_true(length(cb_mod_pred_sar_id) == nrow(newx))
   expect_true(length(cb_mod_pred_sar_log) == nrow(newx))
   expect_true(length(cb_mod_pred_sar_logit) == nrow(newx))
   expect_true(length(cb_mod_pred_sar_cloglog) == nrow(newx))
+  expect_true(length(cb_mod_pred_link_id_noint) == nrow(newx))
+
 
   expect_true(any(!is.na(cb_mod_pred_sar_id)))
   expect_true(any(!is.na(cb_mod_pred_sar_log)))
   expect_true(any(!is.na(cb_mod_pred_sar_logit)))
   expect_true(any(!is.na(cb_mod_pred_sar_cloglog)))
+  expect_true(any(!is.na(cb_mod_pred_link_id_noint)))
 
   expect_true(identical(cb_mod_pred_link_id, cb_mod_pred_sar_id))
   expect_false(identical(cb_mod_pred_link_log, cb_mod_pred_sar_log))
   expect_false(identical(cb_mod_pred_link_logit, cb_mod_pred_sar_logit))
   expect_false(identical(cb_mod_pred_link_cloglog, cb_mod_pred_sar_cloglog))
+
+  expect_true(identical(cb_mod_pred_link_id, cb_mod_pred_link_id_noint))
+
 
   expect_true(all(cb_mod_pred_sar_log > 0))
   expect_true(all(cb_mod_pred_sar_logit > 0))
@@ -1311,7 +1384,6 @@ test_that("making predictions", {
   expect_true(all(predict(cb_mod_res_log, x = xmat, type = 'sar') == cb_mod_res_log$sar_hat))
   expect_true(all(predict(cb_mod_res_logit, x = xmat, type = 'sar') == cb_mod_res_logit$sar_hat))
   expect_true(all(predict(cb_mod_res_cloglog, x = xmat, type = 'sar') == cb_mod_res_cloglog$sar_hat))
-
 
 })
 
