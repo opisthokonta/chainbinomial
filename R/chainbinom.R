@@ -3,22 +3,22 @@
 # Scenario (or chain) probabilities.
 #
 # @param x chain, including the initial number of infections
-# @param s0 Initial number of suceptibles.
-# @param sar secondary attack rate.
+# @param s0 Initial number of susceptibles.
+# @param prob transmission probability.
 #
 # @example
-# chain_prob(x = c(1, 2, 1, 0), s0 = 4, sar=0.1)
-chain_prob <- function(x, s0, sar){
+# chain_prob(x = c(1, 2, 1, 0), s0 = 4, prob=0.1)
+chain_prob <- function(x, s0, prob){
 
 
-  # Remaining number of suceptibles per generation.
+  # Remaining number of susceptibles per generation.
   st <- c(s0, s0 - cumsum(x[-1]))
 
   probs <- numeric(length(x)-1)
   for (gg in 1:(length(x)-1)){
 
     # Per-person probability of infection.
-    pi_g <- 1 - ((1 - sar)^x[gg])
+    pi_g <- 1 - ((1 - prob)^x[gg])
     probs[gg] <- stats::dbinom(x = x[gg+1], size = st[gg], prob = pi_g)
 
   }
@@ -134,16 +134,16 @@ all_scenarios <- function(target, steps){
 
 
 # For the final size distribution.
-# Compute the p(I,I) factors from 0 to maxi, for a given sar and i0.
-compute_factors <- function(maxi, sar, i0){
+# Compute the p(I,I) factors from 0 to maxi, for a given prob and i0.
+compute_factors <- function(maxi, prob, i0){
 
   stopifnot(length(maxi) == 1,
             maxi >= 0,
             length(i0) == 1,
-            length(sar) == 1)
+            length(prob) == 1)
 
 
-  q0 <- (1-sar)^i0 # Mentioned in the line right before Eq. 1.6 in Ludwig (1975).
+  q0 <- (1-prob)^i0 # Mentioned in the line right before Eq. 1.6 in Ludwig (1975).
 
   # The p(i,i) factors
   pii <- numeric(maxi+1)
@@ -154,7 +154,7 @@ compute_factors <- function(maxi, sar, i0){
     return(pii)
   }
 
-  pii[2] <- 1 - ((1-sar)^i0) # p(1,1)
+  pii[2] <- 1 - ((1-prob)^i0) # p(1,1)
 
   if (maxi == 1){
     return(pii)
@@ -165,12 +165,12 @@ compute_factors <- function(maxi, sar, i0){
 
     pvec <- numeric(ss+1)
 
-    pvec[1] <- ((1-sar)^i0)^ss  #(Q0^ss) # prob of 0 infected.
+    pvec[1] <- ((1-prob)^i0)^ss  #(Q0^ss) # prob of 0 infected.
 
     # Loop over all number of infected, from 1 to ss-1.
     for (ii in 1:(ss-1)){
       idx <- ii+1
-      pvec[idx] <- choose(ss, ii) * pii[ii+1] * q0^(ss-ii) * (1-sar)^(ii*(ss-ii))
+      pvec[idx] <- choose(ss, ii) * pii[ii+1] * q0^(ss-ii) * (1-prob)^(ii*(ss-ii))
     }
 
     # Eq. 1.14 in Ludwig (1975)
@@ -187,52 +187,61 @@ compute_factors <- function(maxi, sar, i0){
 #' The Chain Binomial distribution
 #'
 #' Probability mass function, cumulative, expected value, variance function, and random generation, for the chain binomial distribution,
-#' with parameters s0, sar, i0, and number of generations, for the number of infected
+#' with parameters s0, prob, i0, and number of generations, for the number of infected
 #' cases in a population of size s0 after a given number of generations.
 #'
 #' @param x numeric vector of the number of infected.
 #' @param q numeric vector of the number of infected.
 #' @param n number of observations. If length(n) > 1, the length is taken to be the number required.
 #' @param s0 the number of initial susceptibles.
-#' @param sar the secondary attack rate, or the per person risk of infection by an infected.
+#' @param prob the transmission probability.
+#' @param sar Deprecated. Please use the argument 'prob' instead.
 #' @param i0 the number of primary cases.
 #' @param generations the number of generations. Default is Inf, which represents the entire epidemic.
 #'
-#' @returns `dchainbinom` gives the probability of x infected, given s0, i0, sar and generations. `echainbinom` gives the expected value.
-#' `rchainbinom` generates random data.
+#' @returns `dchainbinom` gives the probability of x infected, given s0, i0, prob and generations. `echainbinom` gives the expected value,
+#' `varchainbinom` gives the variance, `rchainbinom` generates random data.
 #'
 #' @examples
-#' dchainbinom(x = 0:5, s0 = 5, sar = 0.2, i0 = 1, generations = Inf)
-#' rchainbinom(n = 10, s0 = 5, sar = 0.2, i0 = 1, generations = Inf)
-#' echainbinom(s0 = 5, sar = 0.2, i0 = 1, generations = Inf)
-#' varchainbinom(s0 = 5, sar = 0.2, i0 = 1, generations = Inf)
+#' dchainbinom(x = 0:5, s0 = 5, prob = 0.2, i0 = 1, generations = Inf)
+#' rchainbinom(n = 10, s0 = 5, prob = 0.2, i0 = 1, generations = Inf)
+#' echainbinom(s0 = 5, prob = 0.2, i0 = 1, generations = Inf)
+#' varchainbinom(s0 = 5, prob = 0.2, i0 = 1, generations = Inf)
 #'
 #' @export
-dchainbinom <- function(x, s0, sar, i0 = 1, generations = Inf){
+dchainbinom <- function(x, s0, prob, i0 = 1, generations = Inf, sar = lifecycle::deprecated()){
+
 
   # Check input.
   stopifnot(is.numeric(x) | is.logical(x),
             is.numeric(s0) | is.logical(s0),
-            is.numeric(sar) | is.logical(sar),
             is.numeric(i0) | is.logical(i0),
             is.numeric(generations) | is.logical(generations),
-            all(sar >= 0, na.rm = TRUE),
-            all(sar <= 1, na.rm = TRUE),
             all(x >= 0, na.rm = TRUE),
             all(s0 >= 0, na.rm = TRUE),
             all(i0 >= 1, na.rm = TRUE),
             all(generations >= 1, na.rm = TRUE))
 
+  if (lifecycle::is_present(sar)) {
+    lifecycle::deprecate_warn("0.2.0", "dchainbinom(sar)", "dchainbinom(prob)")
+    prob <- sar
+  }
+
+  stopifnot(is.numeric(prob) | is.logical(prob),
+            all(prob >= 0, na.rm = TRUE),
+            all(prob <= 1, na.rm = TRUE))
+
+
   # Coerce to numericals, in case of logicals being provided.
   x <- as.numeric(x)
   s0 <- as.numeric(s0)
-  sar <- as.numeric(sar)
+  prob <- as.numeric(prob)
   i0 <- as.numeric(i0)
   generations <- as.numeric(generations)
 
 
   # Combine input to matrix, to expand/recycle input data.
-  inp <- as.matrix(cbind(x, s0, sar, i0, generations))
+  inp <- as.matrix(cbind(x, s0, prob, i0, generations))
 
   # Find out which rows in inp are duplicates, and which rows the duplicated correspond to
   # Make id string for each row in matrix
@@ -262,17 +271,17 @@ dchainbinom <- function(x, s0, sar, i0 = 1, generations = Inf){
     } else if (inp[ii, 'x'] == 0){
 
       # Explicit formula for x=0, that applies for both final and incomplete outbreaks.
-      res[ii] <- (1-inp[ii, 'sar'])^(inp[ii, 'i0']*inp[ii, 's0'])
+      res[ii] <- (1-inp[ii, 'prob'])^(inp[ii, 'i0']*inp[ii, 's0'])
 
     } else if (is.infinite(inp[ii, 'generations'])){
 
-      pii <- compute_factors(maxi = inp[ii, 'x'], i0 = inp[ii, 'i0'], sar = inp[ii, 'sar'])
+      pii <- compute_factors(maxi = inp[ii, 'x'], i0 = inp[ii, 'i0'], prob = inp[ii, 'prob'])
 
       # Probability of not being infected by initial infected.
       # Mentioned in the line right before Eq. 1.6 in Ludwig (1975).
-      q0 <- (1 - inp[ii, 'sar'])^inp[ii, 'i0']
+      q0 <- (1 - inp[ii, 'prob'])^inp[ii, 'i0']
 
-      res[ii] <- choose(inp[ii, 's0'], inp[ii, 'x']) * pii[length(pii)] * q0^(inp[ii, 's0'] - inp[ii, 'x']) * (1 - inp[ii, 'sar'])^(inp[ii, 'x'] * (inp[ii, 's0'] - inp[ii, 'x']))
+      res[ii] <- choose(inp[ii, 's0'], inp[ii, 'x']) * pii[length(pii)] * q0^(inp[ii, 's0'] - inp[ii, 'x']) * (1 - inp[ii, 'prob'])^(inp[ii, 'x'] * (inp[ii, 's0'] - inp[ii, 'x']))
 
     } else {
 
@@ -288,7 +297,7 @@ dchainbinom <- function(x, s0, sar, i0 = 1, generations = Inf){
 
       pp <- 0
       for (jj in 1:ncol(ss)){
-        pp <- pp + chain_prob(x = ss[,jj], s0 = inp[ii, 's0'], sar = inp[ii, 'sar'])
+        pp <- pp + chain_prob(x = ss[,jj], s0 = inp[ii, 's0'], prob = inp[ii, 'prob'])
       }
 
       res[ii] <- pp
@@ -307,7 +316,7 @@ dchainbinom <- function(x, s0, sar, i0 = 1, generations = Inf){
 
 #' @rdname dchainbinom
 #' @export
-rchainbinom <- function(n, s0, sar, i0 = 1, generations = Inf){
+rchainbinom <- function(n, s0, prob, i0 = 1, generations = Inf, sar = lifecycle::deprecated()){
 
   if (length(n) > 1){
     n <- length(n)
@@ -315,10 +324,15 @@ rchainbinom <- function(n, s0, sar, i0 = 1, generations = Inf){
 
   stopifnot(n >= 1)
 
+  if (lifecycle::is_present(sar)) {
+    lifecycle::deprecate_warn("0.2.0", "dchainbinom(sar)", "dchainbinom(prob)")
+    prob <- sar
+  }
+
   res <- numeric(n)
 
   # Combine input to matrix, to expand/recycle input data.
-  inp <- as.matrix(cbind(s0, sar, i0, generations))
+  inp <- as.matrix(cbind(s0, prob, i0, generations))
 
   maxg <- pmin(inp[,'s0'], inp[,'generations'])
 
@@ -343,7 +357,7 @@ rchainbinom <- function(n, s0, sar, i0 = 1, generations = Inf){
       }
 
       # Per-person probability of infection.
-      pi_g <- 1 - (1 - inp[inp_idx,'sar'])^ig
+      pi_g <- 1 - (1 - inp[inp_idx,'prob'])^ig
 
       # Simulate the number of new infected in next generation.
       i_new <- stats::rbinom(n = 1, size = sg, prob = pi_g)
@@ -370,30 +384,37 @@ rchainbinom <- function(n, s0, sar, i0 = 1, generations = Inf){
 
 #' @rdname dchainbinom
 #' @export
-pchainbinom <- function(q, s0, sar, i0 = 1, generations = Inf){
+pchainbinom <- function(q, s0, prob, i0 = 1, generations = Inf, sar = lifecycle::deprecated()){
 
   # Check input.
   stopifnot(is.numeric(q) | is.logical(q),
             is.numeric(s0) | is.logical(s0),
-            is.numeric(sar) | is.logical(sar),
             is.numeric(i0) | is.logical(i0),
             is.numeric(generations) | is.logical(generations),
-            all(sar >= 0, na.rm = TRUE),
-            all(sar <= 1, na.rm = TRUE),
             all(q >= 0, na.rm = TRUE),
             all(s0 >= 0, na.rm = TRUE),
             all(i0 >= 1, na.rm = TRUE),
             all(generations >= 1, na.rm = TRUE))
 
+  if (lifecycle::is_present(sar)) {
+    lifecycle::deprecate_warn("0.2.0", "rchainbinom(sar)", "rchainbinom(prob)")
+    prob <- sar
+  }
+
+  stopifnot(is.numeric(prob) | is.logical(prob),
+            all(prob >= 0, na.rm = TRUE),
+            all(prob <= 1, na.rm = TRUE))
+
+
   # Coerce to numericals, in case of logicals being provided.
   q <- as.numeric(q)
   s0 <- as.numeric(s0)
-  sar <- as.numeric(sar)
+  prob <- as.numeric(prob)
   i0 <- as.numeric(i0)
   generations <- as.numeric(generations)
 
   # Combine input to matrix, to expand/recycle input data.
-  inp <- as.matrix(cbind(q, s0, sar, i0, generations))
+  inp <- as.matrix(cbind(q, s0, prob, i0, generations))
 
   n <- nrow(inp)
   res <- numeric(n)
@@ -406,7 +427,7 @@ pchainbinom <- function(q, s0, sar, i0 = 1, generations = Inf){
     }
 
     xx <- 0:floor(inp[ii, 'q'])
-    pp <- dchainbinom(x  = xx, s0 = inp[ii, 's0'], i0 = inp[ii, 'i0'], sar = inp[ii, 'sar'], generations = inp[ii, 'generations'])
+    pp <- dchainbinom(x  = xx, s0 = inp[ii, 's0'], i0 = inp[ii, 'i0'], prob = inp[ii, 'prob'], generations = inp[ii, 'generations'])
     res[ii] <- sum(pp)
   }
 
@@ -417,26 +438,33 @@ pchainbinom <- function(q, s0, sar, i0 = 1, generations = Inf){
 
 #' @rdname dchainbinom
 #' @export
-echainbinom <- function(s0, sar, i0 = 1, generations = Inf){
+echainbinom <- function(s0, prob, i0 = 1, generations = Inf, sar = lifecycle::deprecated()){
 
   stopifnot(is.numeric(s0) | is.logical(s0),
-            is.numeric(sar) | is.logical(sar),
             is.numeric(i0) | is.logical(i0),
             is.numeric(generations) | is.logical(generations),
-            all(sar >= 0, na.rm = TRUE),
-            all(sar <= 1, na.rm = TRUE),
             all(s0 >= 0, na.rm = TRUE),
             all(i0 >= 1, na.rm = TRUE),
             all(generations >= 1, na.rm = TRUE))
 
+  if (lifecycle::is_present(sar)) {
+    lifecycle::deprecate_warn("0.2.0", "echainbinom(sar)", "echainbinom(prob)")
+    prob <- sar
+  }
+
+  stopifnot(is.numeric(prob) | is.logical(prob),
+            all(prob >= 0, na.rm = TRUE),
+            all(prob <= 1, na.rm = TRUE))
+
+
   # Coerce to numericals, in case of logicals being provided.
   s0 <- as.numeric(s0)
-  sar <- as.numeric(sar)
+  prob <- as.numeric(prob)
   i0 <- as.numeric(i0)
   generations <- as.numeric(generations)
 
   # Combine input to matrix, to expand/recycle input data.
-  inp <- as.matrix(cbind(s0, sar, i0, generations))
+  inp <- as.matrix(cbind(s0, prob, i0, generations))
 
   n <- nrow(inp)
   res <- numeric(n)
@@ -448,7 +476,7 @@ echainbinom <- function(s0, sar, i0 = 1, generations = Inf){
       next
     }
     xx <- 0:inp[ii, 's0']
-    pp <- dchainbinom(x  = xx, s0 = inp[ii, 's0'], i0 = inp[ii, 'i0'], sar = inp[ii, 'sar'], generations = inp[ii, 'generations'])
+    pp <- dchainbinom(x  = xx, s0 = inp[ii, 's0'], i0 = inp[ii, 'i0'], prob = inp[ii, 'prob'], generations = inp[ii, 'generations'])
     res[ii] <- sum(xx * pp)
   }
 
@@ -460,26 +488,33 @@ echainbinom <- function(s0, sar, i0 = 1, generations = Inf){
 
 #' @rdname dchainbinom
 #' @export
-varchainbinom <- function(s0, sar, i0 = 1, generations = Inf){
+varchainbinom <- function(s0, prob, i0 = 1, generations = Inf, sar = lifecycle::deprecated()){
 
   stopifnot(is.numeric(s0) | is.logical(s0),
-            is.numeric(sar) | is.logical(sar),
             is.numeric(i0) | is.logical(i0),
             is.numeric(generations) | is.logical(generations),
-            all(sar >= 0, na.rm = TRUE),
-            all(sar <= 1, na.rm = TRUE),
             all(s0 >= 0, na.rm = TRUE),
             all(i0 >= 1, na.rm = TRUE),
             all(generations >= 1, na.rm = TRUE))
 
+  if (lifecycle::is_present(sar)) {
+    lifecycle::deprecate_warn("0.2.0", "varchainbinom(sar)", "varchainbinom(prob)")
+    prob <- sar
+  }
+
+  stopifnot(is.numeric(prob) | is.logical(prob),
+            all(prob >= 0, na.rm = TRUE),
+            all(prob <= 1, na.rm = TRUE))
+
+
   # Coerce to numericals, in case of logicals being provided.
   s0 <- as.numeric(s0)
-  sar <- as.numeric(sar)
+  prob <- as.numeric(prob)
   i0 <- as.numeric(i0)
   generations <- as.numeric(generations)
 
   # Combine input to matrix, to expand/recycle input data.
-  inp <- as.matrix(cbind(s0, sar, i0, generations))
+  inp <- as.matrix(cbind(s0, prob, i0, generations))
 
   n <- nrow(inp)
   ex <- numeric(n)
@@ -492,7 +527,7 @@ varchainbinom <- function(s0, sar, i0 = 1, generations = Inf){
       next
     }
     xx <- 0:inp[ii, 's0']
-    pp <- dchainbinom(x  = xx, s0 = inp[ii, 's0'], i0 = inp[ii, 'i0'], sar = inp[ii, 'sar'], generations = inp[ii, 'generations'])
+    pp <- dchainbinom(x  = xx, s0 = inp[ii, 's0'], i0 = inp[ii, 'i0'], prob = inp[ii, 'prob'], generations = inp[ii, 'generations'])
     ex[ii] <- sum(xx * pp)
     ex2[ii] <- sum(xx^2 * pp)
   }

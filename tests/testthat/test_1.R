@@ -3,20 +3,20 @@
 # Chain probabilities ----
 
 # These should work, and return a single number (a probability).
-cp_1 <- chain_prob(x = c(1,2,3), s0 = 6, sar = 0.1)
-cp_2 <- chain_prob(x = c(2,1,0), s0 = 4, sar = 0.1)
+cp_1 <- chain_prob(x = c(1,2,3), s0 = 6, prob = 0.1)
+cp_2 <- chain_prob(x = c(2,1,0), s0 = 4, prob = 0.1)
 
-cp_1b <- chain_prob(x = c(1,2,3), s0 = 6, sar = 0.8)
-cp_2b <- chain_prob(x = c(2,1,0), s0 = 4, sar = 0.8)
+cp_1b <- chain_prob(x = c(1,2,3), s0 = 6, prob = 0.8)
+cp_2b <- chain_prob(x = c(2,1,0), s0 = 4, prob = 0.8)
 
 # Impossible chain, Should return probability 0.
-cp_0a <- chain_prob(x = c(0,1,0), s0 = 4, sar = 0.8)
-cp_0b <- chain_prob(x = c(1,0,1), s0 = 4, sar = 0.8)
+cp_0a <- chain_prob(x = c(0,1,0), s0 = 4, prob = 0.8)
+cp_0b <- chain_prob(x = c(1,0,1), s0 = 4, prob = 0.8)
 
 
 # Chain of length 1 (index case only) is not defined. Should give NA.
-cp_na1 <- chain_prob(x = c(0), s0 = 4, sar = 0.8)
-cp_na2 <- chain_prob(x = c(1), s0 = 4, sar = 0.8)
+cp_na1 <- chain_prob(x = c(0), s0 = 4, prob = 0.8)
+cp_na2 <- chain_prob(x = c(1), s0 = 4, prob = 0.8)
 
 
 test_that("Chain probabilities", {
@@ -81,15 +81,15 @@ test_that("All scenarions", {
 
 # Chain binomial PMF. ----
 
-dcb_1_g1 <- dchainbinom(x = 0:5, s0 = 5, sar = 0.11, generations = 1)
-dcb_1_g2 <- dchainbinom(x = 0:5, s0 = 5, sar = 0.11, generations = 2)
-dcb_1_g3 <- dchainbinom(x = 0:5, s0 = 5, sar = 0.11, generations = 3)
-dcb_1_g4 <- dchainbinom(x = 0:5, s0 = 5, sar = 0.11, generations = 4)
-dcb_1_g5 <- dchainbinom(x = 0:5, s0 = 5, sar = 0.11, generations = 5)
-dcb_1_g6 <- dchainbinom(x = 0:5, s0 = 5, sar = 0.11, generations = 6)
-dcb_1_ginf <- dchainbinom(x = 0:5, s0 = 5, sar = 0.11, generations = Inf)
+dcb_1_g1 <- dchainbinom(x = 0:5, s0 = 5, prob = 0.11, generations = 1)
+dcb_1_g2 <- dchainbinom(x = 0:5, s0 = 5, prob = 0.11, generations = 2)
+dcb_1_g3 <- dchainbinom(x = 0:5, s0 = 5, prob = 0.11, generations = 3)
+dcb_1_g4 <- dchainbinom(x = 0:5, s0 = 5, prob = 0.11, generations = 4)
+dcb_1_g5 <- dchainbinom(x = 0:5, s0 = 5, prob = 0.11, generations = 5)
+dcb_1_g6 <- dchainbinom(x = 0:5, s0 = 5, prob = 0.11, generations = 6)
+dcb_1_ginf <- dchainbinom(x = 0:5, s0 = 5, prob = 0.11, generations = Inf)
 
-dcb_2_ginf <- dchainbinom(x = 0:5, s0 = 5, sar = 0.00014, i0 = 1, generations = Inf)
+dcb_2_ginf <- dchainbinom(x = 0:5, s0 = 5, prob = 0.00014, i0 = 1, generations = Inf)
 
 
 tol_sum_to_1 <- 2e-15
@@ -120,10 +120,10 @@ test_that("PMF is ok", {
   expect_true(all(dcb_1_g5 == dcb_1_ginf))
 
   # Probability of more infected than s0 should be 0
-  expect_true(dchainbinom(x = 0:6, s0 = 5, sar = 0.11, generations = 1)[7] == 0)
-  expect_true(dchainbinom(x = 0:6, s0 = 5, sar = 0.11, generations = 3)[7] == 0)
-  expect_true(dchainbinom(x = 0:6, s0 = 5, sar = 0.11, generations = Inf)[7] == 0)
-  expect_true(dchainbinom(x = 0:6, s0 = 5, sar = 0.11, generations = Inf)[2] != 0)
+  expect_true(dchainbinom(x = 0:6, s0 = 5, prob = 0.11, generations = 1)[7] == 0)
+  expect_true(dchainbinom(x = 0:6, s0 = 5, prob = 0.11, generations = 3)[7] == 0)
+  expect_true(dchainbinom(x = 0:6, s0 = 5, prob = 0.11, generations = Inf)[7] == 0)
+  expect_true(dchainbinom(x = 0:6, s0 = 5, prob = 0.11, generations = Inf)[2] != 0)
 
 })
 
@@ -131,9 +131,9 @@ test_that("PMF is ok", {
 # Additional check of sum to 1
 
 
-check_sum_to_1 <- function(s0, sar, g, i0 = 1){
+check_sum_to_1 <- function(s0, prob, g, i0 = 1){
 
-  ss <- sum(dchainbinom(x = 0:s0, s0 = s0, i0=i0, sar= sar, g = g))
+  ss <- sum(dchainbinom(x = 0:s0, s0 = s0, i0=i0, prob = prob, g = g))
 
   if (ss == 1){
     return(TRUE)
@@ -145,45 +145,45 @@ check_sum_to_1 <- function(s0, sar, g, i0 = 1){
 
 test_that("PMF sum to 1", {
 
-  expect_true(check_sum_to_1(s0 = 3, sar= 0.1, g = 1))
-  expect_true(check_sum_to_1(s0 = 8, sar= 0.3, g = 1))
-  expect_true(check_sum_to_1(s0 = 2, sar= 0.1, g = 1))
-  expect_true(check_sum_to_1(s0 = 1, sar= 0.2, g = 1))
-  expect_true(check_sum_to_1(s0 = 0, sar= 0.1, g = 1))
+  expect_true(check_sum_to_1(s0 = 3, prob = 0.1, g = 1))
+  expect_true(check_sum_to_1(s0 = 8, prob = 0.3, g = 1))
+  expect_true(check_sum_to_1(s0 = 2, prob = 0.1, g = 1))
+  expect_true(check_sum_to_1(s0 = 1, prob = 0.2, g = 1))
+  expect_true(check_sum_to_1(s0 = 0, prob = 0.1, g = 1))
 
-  expect_true(check_sum_to_1(s0 = 3, sar = 0.1, g = 3))
-  expect_true(check_sum_to_1(s0 = 8, sar= 0.3, g = 3))
-  expect_true(check_sum_to_1(s0 = 2, sar= 0.1, g = 3))
-  expect_true(check_sum_to_1(s0 = 1, sar= 0.2, g = 3))
-  expect_true(check_sum_to_1(s0 = 0, sar= 0.1, g = 3))
+  expect_true(check_sum_to_1(s0 = 3, prob = 0.1, g = 3))
+  expect_true(check_sum_to_1(s0 = 8, prob = 0.3, g = 3))
+  expect_true(check_sum_to_1(s0 = 2, prob = 0.1, g = 3))
+  expect_true(check_sum_to_1(s0 = 1, prob = 0.2, g = 3))
+  expect_true(check_sum_to_1(s0 = 0, prob = 0.1, g = 3))
 
-  expect_true(check_sum_to_1(s0 = 3, sar = 0.1, g = 8))
-  expect_true(check_sum_to_1(s0 = 8, sar= 0.3, g = 8))
-  expect_true(check_sum_to_1(s0 = 2, sar= 0.1, g = 8))
-  expect_true(check_sum_to_1(s0 = 1, sar= 0.2, g = 8))
-  expect_true(check_sum_to_1(s0 = 0, sar= 0.1, g = 8))
+  expect_true(check_sum_to_1(s0 = 3, prob = 0.1, g = 8))
+  expect_true(check_sum_to_1(s0 = 8, prob = 0.3, g = 8))
+  expect_true(check_sum_to_1(s0 = 2, prob = 0.1, g = 8))
+  expect_true(check_sum_to_1(s0 = 1, prob = 0.2, g = 8))
+  expect_true(check_sum_to_1(s0 = 0, prob = 0.1, g = 8))
 
 
   expect_true(abs(sum(dcb_2_ginf) - 1) < 1e-15)
 
   # with i0 = 2.
-  expect_true(check_sum_to_1(s0 = 3, sar= 0.1, g = 1, i0=2))
-  expect_true(check_sum_to_1(s0 = 8, sar= 0.3, g = 1, i0=2))
-  expect_true(check_sum_to_1(s0 = 2, sar= 0.1, g = 1, i0=2))
-  expect_true(check_sum_to_1(s0 = 1, sar= 0.2, g = 1, i0=2))
-  expect_true(check_sum_to_1(s0 = 0, sar= 0.1, g = 1, i0=2))
+  expect_true(check_sum_to_1(s0 = 3, prob = 0.1, g = 1, i0=2))
+  expect_true(check_sum_to_1(s0 = 8, prob = 0.3, g = 1, i0=2))
+  expect_true(check_sum_to_1(s0 = 2, prob = 0.1, g = 1, i0=2))
+  expect_true(check_sum_to_1(s0 = 1, prob = 0.2, g = 1, i0=2))
+  expect_true(check_sum_to_1(s0 = 0, prob = 0.1, g = 1, i0=2))
 
-  expect_true(check_sum_to_1(s0 = 3, sar = 0.1, g = 3, i0=2))
-  expect_true(check_sum_to_1(s0 = 8, sar= 0.3, g = 3, i0=2))
-  expect_true(check_sum_to_1(s0 = 2, sar= 0.1, g = 3, i0=2))
-  expect_true(check_sum_to_1(s0 = 1, sar= 0.2, g = 3, i0=2))
-  expect_true(check_sum_to_1(s0 = 0, sar= 0.1, g = 3, i0=2))
+  expect_true(check_sum_to_1(s0 = 3, prob = 0.1, g = 3, i0=2))
+  expect_true(check_sum_to_1(s0 = 8, prob = 0.3, g = 3, i0=2))
+  expect_true(check_sum_to_1(s0 = 2, prob = 0.1, g = 3, i0=2))
+  expect_true(check_sum_to_1(s0 = 1, prob = 0.2, g = 3, i0=2))
+  expect_true(check_sum_to_1(s0 = 0, prob = 0.1, g = 3, i0=2))
 
-  expect_true(check_sum_to_1(s0 = 3, sar = 0.1, g = 8, i0=2))
-  expect_true(check_sum_to_1(s0 = 8, sar= 0.3, g = 8, i0=2))
-  expect_true(check_sum_to_1(s0 = 2, sar= 0.1, g = 8, i0=2))
-  expect_true(check_sum_to_1(s0 = 1, sar= 0.2, g = 8, i0=2))
-  expect_true(check_sum_to_1(s0 = 0, sar= 0.1, g = 8, i0=2))
+  expect_true(check_sum_to_1(s0 = 3, prob = 0.1, g = 8, i0=2))
+  expect_true(check_sum_to_1(s0 = 8, prob = 0.3, g = 8, i0=2))
+  expect_true(check_sum_to_1(s0 = 2, prob = 0.1, g = 8, i0=2))
+  expect_true(check_sum_to_1(s0 = 1, prob = 0.2, g = 8, i0=2))
+  expect_true(check_sum_to_1(s0 = 0, prob = 0.1, g = 8, i0=2))
 
 })
 
@@ -192,10 +192,10 @@ test_that("PMF sum to 1", {
 
 # Function to test that when the numbers of genereations = 1,
 # it should be the same as the ordinary binomial model.
-compare_g1_binom <- function(s0, sar, tol = 0.0000001){
+compare_g1_binom <- function(s0, prob, tol = 0.0000001){
 
-  probvec1 <- dchainbinom(x = 0:s0, s0 = s0, sar = sar, generations = 1)
-  probvec1_binom <- dbinom(x = 0:s0, size = s0, prob = sar)
+  probvec1 <- dchainbinom(x = 0:s0, s0 = s0, prob = prob, generations = 1)
+  probvec1_binom <- dbinom(x = 0:s0, size = s0, prob = prob)
 
   all((probvec1 - probvec1_binom < tol))
 
@@ -204,13 +204,13 @@ compare_g1_binom <- function(s0, sar, tol = 0.0000001){
 
 test_that("PMF when g = 1", {
 
-  expect_true(compare_g1_binom(s0 = 3, sar = 0.1))
-  expect_true(compare_g1_binom(s0 = 8, sar = 0.3))
-  expect_true(compare_g1_binom(s0 = 2, sar = 0.1))
-  expect_true(compare_g1_binom(s0 = 1, sar = 0.2))
-  expect_true(compare_g1_binom(s0 = 0, sar = 0.1))
+  expect_true(compare_g1_binom(s0 = 3, prob = 0.1))
+  expect_true(compare_g1_binom(s0 = 8, prob = 0.3))
+  expect_true(compare_g1_binom(s0 = 2, prob = 0.1))
+  expect_true(compare_g1_binom(s0 = 1, prob = 0.2))
+  expect_true(compare_g1_binom(s0 = 0, prob = 0.1))
 
-  expect_true(dchainbinom(x = 1, s0 = 0, sar = 0.1, generations = 1) == 0)
+  expect_true(dchainbinom(x = 1, s0 = 0, prob = 0.1, generations = 1) == 0)
 
 })
 
@@ -221,39 +221,39 @@ test_that("PMF when g = 1", {
 # but not necessarily if i0 > 1.
 
 # Explicit formula for x=0, also implemented in the dchainbinom function.
-prob0 <- function(sar, s0, i0){
-  (1 - sar)^(i0*s0)
+prob0 <- function(prob, s0, i0){
+  (1 - prob)^(i0*s0)
 }
 
 prob0_tol <- 1e-06
 
 test_that("P(x=0)", {
 
-  expect_true(abs(prob0(sar = 0.1, s0=1, i0 = 1) - dbinom(x = 0, size = 1, prob = 0.1)) < prob0_tol)
-  expect_true(abs(prob0(sar = 0.5, s0=1, i0 = 1) - dbinom(x = 0, size = 1, prob = 0.5)) < prob0_tol)
+  expect_true(abs(prob0(prob = 0.1, s0=1, i0 = 1) - dbinom(x = 0, size = 1, prob = 0.1)) < prob0_tol)
+  expect_true(abs(prob0(prob = 0.5, s0=1, i0 = 1) - dbinom(x = 0, size = 1, prob = 0.5)) < prob0_tol)
 
-  expect_true(abs(prob0(sar = 0.1, s0=2, i0 = 1) - dbinom(x = 0, size = 2, prob = 0.1)) < prob0_tol)
-  expect_true(abs(prob0(sar = 0.5, s0=2, i0 = 1) - dbinom(x = 0, size = 2, prob = 0.5)) < prob0_tol)
+  expect_true(abs(prob0(prob = 0.1, s0=2, i0 = 1) - dbinom(x = 0, size = 2, prob = 0.1)) < prob0_tol)
+  expect_true(abs(prob0(prob = 0.5, s0=2, i0 = 1) - dbinom(x = 0, size = 2, prob = 0.5)) < prob0_tol)
 
-  expect_true(abs(prob0(sar = 0.1, s0=4, i0 = 1) - dbinom(x = 0, size = 4, prob = 0.1)) < prob0_tol)
-  expect_true(abs(prob0(sar = 0.5, s0=4, i0 = 1) - dbinom(x = 0, size = 4, prob = 0.5)) < prob0_tol)
+  expect_true(abs(prob0(prob = 0.1, s0=4, i0 = 1) - dbinom(x = 0, size = 4, prob = 0.1)) < prob0_tol)
+  expect_true(abs(prob0(prob = 0.5, s0=4, i0 = 1) - dbinom(x = 0, size = 4, prob = 0.5)) < prob0_tol)
 
-  expect_true(prob0(sar = 0.1, s0=2, i0 = 1) == dchainbinom(x = 0, s0 = 2, sar = 0.1, i0 = 1, generations = Inf))
-  expect_true(prob0(sar = 0.1, s0=2, i0 = 1) == dchainbinom(x = 0, s0 = 2, sar = 0.1, i0 = 1, generations = 1))
+  expect_true(prob0(prob = 0.1, s0=2, i0 = 1) == dchainbinom(x = 0, s0 = 2, prob = 0.1, i0 = 1, generations = Inf))
+  expect_true(prob0(prob = 0.1, s0=2, i0 = 1) == dchainbinom(x = 0, s0 = 2, prob = 0.1, i0 = 1, generations = 1))
 
-  expect_true(prob0(sar = 0.1, s0=4, i0 = 1) == dchainbinom(x = 0, s0 = 4, sar = 0.1, i0 = 1, generations=Inf))
-  expect_true(prob0(sar = 0.1, s0=4, i0 = 1) == dchainbinom(x = 0, s0 = 4, sar = 0.1, i0 = 1, generations=2))
+  expect_true(prob0(prob = 0.1, s0=4, i0 = 1) == dchainbinom(x = 0, s0 = 4, prob = 0.1, i0 = 1, generations=Inf))
+  expect_true(prob0(prob = 0.1, s0=4, i0 = 1) == dchainbinom(x = 0, s0 = 4, prob = 0.1, i0 = 1, generations=2))
 
-  expect_true(dchainbinom(x = 0, s0 = 4, sar = 0.1, i0 = 1, generations = 2) == dchainbinom(x = 0, s0 = 4, sar = 0.1, i0=  1, generations = Inf))
+  expect_true(dchainbinom(x = 0, s0 = 4, prob = 0.1, i0 = 1, generations = 2) == dchainbinom(x = 0, s0 = 4, prob = 0.1, i0=  1, generations = Inf))
 
 
-  expect_false(prob0(sar = 0.1, s0=1, i0 = 2) == dbinom(x = 0, size = 1, prob = 0.1))
-  expect_false(prob0(sar = 0.5, s0=1, i0 = 2) == dbinom(x = 0, size = 1, prob = 0.5))
+  expect_false(prob0(prob = 0.1, s0=1, i0 = 2) == dbinom(x = 0, size = 1, prob = 0.1))
+  expect_false(prob0(prob = 0.5, s0=1, i0 = 2) == dbinom(x = 0, size = 1, prob = 0.5))
 
-  expect_false(prob0(sar = 0.1, s0=3, i0 = 2) == dbinom(x = 0, size = 3, prob = 0.1))
-  expect_false(prob0(sar = 0.5, s0=3, i0 = 2) == dbinom(x = 0, size = 3, prob = 0.5))
+  expect_false(prob0(prob = 0.1, s0=3, i0 = 2) == dbinom(x = 0, size = 3, prob = 0.1))
+  expect_false(prob0(prob = 0.5, s0=3, i0 = 2) == dbinom(x = 0, size = 3, prob = 0.5))
 
-  expect_false(dchainbinom(x = 0, s0 = 4, sar = 0.1, i0 = 2, generations = 2) == dchainbinom(x = 0, s0 = 4, sar = 0.1, i0=  1, generations = Inf))
+  expect_false(dchainbinom(x = 0, s0 = 4, prob = 0.1, i0 = 2, generations = 2) == dchainbinom(x = 0, s0 = 4, prob = 0.1, i0=  1, generations = Inf))
 
 
 })
@@ -263,48 +263,48 @@ test_that("P(x=0)", {
 # Vector recycling ----
 
 
-vr1_a <- dchainbinom(x = rep(0:4, 3), s0 = 4, sar = 0.1, i0 = 1, generations = Inf)
-vr1_b <- rep(dchainbinom(x = 0:4, s0 = 4, sar = 0.1, i0 = 1, generations = Inf), 3)
+vr1_a <- dchainbinom(x = rep(0:4, 3), s0 = 4, prob = 0.1, i0 = 1, generations = Inf)
+vr1_b <- rep(dchainbinom(x = 0:4, s0 = 4, prob = 0.1, i0 = 1, generations = Inf), 3)
 
-vr2_a <- dchainbinom(x = rep(0:4, 3), s0 = 4, sar = 0.1, i0 = 2, generations = Inf)
-vr2_b <- rep(dchainbinom(x = 0:4, s0 = 4, sar = 0.1, i0 = 2, generations = Inf), 3)
+vr2_a <- dchainbinom(x = rep(0:4, 3), s0 = 4, prob = 0.1, i0 = 2, generations = Inf)
+vr2_b <- rep(dchainbinom(x = 0:4, s0 = 4, prob = 0.1, i0 = 2, generations = Inf), 3)
 
-vr3_a <- dchainbinom(x = rep(0:4, 3), s0 = 4, sar = 0.1, i0 = 2, generations = 2)
-vr3_b <- rep(dchainbinom(x = 0:4, s0 = 4, sar = 0.1, i0 = 2, generations = 2), 3)
+vr3_a <- dchainbinom(x = rep(0:4, 3), s0 = 4, prob = 0.1, i0 = 2, generations = 2)
+vr3_b <- rep(dchainbinom(x = 0:4, s0 = 4, prob = 0.1, i0 = 2, generations = 2), 3)
 
-vr4_a <- dchainbinom(x = 0, s0 = 4, sar = 0.1, i0 = 1, generations = 1:4)
-vr4_b <- rep(dchainbinom(x = 0, s0 = 4, sar = 0.1, i0 = 1, generations = 1), 4)
+vr4_a <- dchainbinom(x = 0, s0 = 4, prob = 0.1, i0 = 1, generations = 1:4)
+vr4_b <- rep(dchainbinom(x = 0, s0 = 4, prob = 0.1, i0 = 1, generations = 1), 4)
 
-vr5_a <- dchainbinom(x = 0, s0 = 4, sar = 0.1, i0 = 2, generations = 1:4)
-vr5_b <- rep(dchainbinom(x = 0, s0 = 4, sar = 0.1, i0 = 2, generations = 1), 4)
+vr5_a <- dchainbinom(x = 0, s0 = 4, prob = 0.1, i0 = 2, generations = 1:4)
+vr5_b <- rep(dchainbinom(x = 0, s0 = 4, prob = 0.1, i0 = 2, generations = 1), 4)
 
-vr6_a <- dchainbinom(x = rep(0, 9), s0 = 4, sar = c(0.1, 0.2, 0.3), i0 = 1, generations = Inf)
-vr6_b <- rep(dchainbinom(x = 0, s0 = 4, sar = c(0.1, 0.2, 0.3), i0 = 1, generations = Inf), 3)
+vr6_a <- dchainbinom(x = rep(0, 9), s0 = 4, prob = c(0.1, 0.2, 0.3), i0 = 1, generations = Inf)
+vr6_b <- rep(dchainbinom(x = 0, s0 = 4, prob = c(0.1, 0.2, 0.3), i0 = 1, generations = Inf), 3)
 
-vr7_a <- dchainbinom(x = rep(1, 9), s0 = 4, sar = c(0.1, 0.2, 0.3), i0 = 1, generations = Inf)
-vr7_b <- rep(dchainbinom(x = 1, s0 = 4, sar = c(0.1, 0.2, 0.3), i0 = 1, generations = Inf), 3)
+vr7_a <- dchainbinom(x = rep(1, 9), s0 = 4, prob = c(0.1, 0.2, 0.3), i0 = 1, generations = Inf)
+vr7_b <- rep(dchainbinom(x = 1, s0 = 4, prob = c(0.1, 0.2, 0.3), i0 = 1, generations = Inf), 3)
 
-vr8_a <- dchainbinom(x = 0:4, s0 = 4, sar = rep(c(0.1, 0.2, 0.3), each = 5), i0 = 1, generations = Inf)
+vr8_a <- dchainbinom(x = 0:4, s0 = 4, prob = rep(c(0.1, 0.2, 0.3), each = 5), i0 = 1, generations = Inf)
 
-vr8_b <- c(dchainbinom(x = 0:4, s0 = 4, sar = 0.1, i0 = 1, generations = Inf),
-           dchainbinom(x = 0:4, s0 = 4, sar = 0.2, i0 = 1, generations = Inf),
-           dchainbinom(x = 0:4, s0 = 4, sar = 0.3, i0 = 1, generations = Inf))
+vr8_b <- c(dchainbinom(x = 0:4, s0 = 4, prob = 0.1, i0 = 1, generations = Inf),
+           dchainbinom(x = 0:4, s0 = 4, prob = 0.2, i0 = 1, generations = Inf),
+           dchainbinom(x = 0:4, s0 = 4, prob = 0.3, i0 = 1, generations = Inf))
 
-vr9_a <- dchainbinom(x = 0:4, s0 = 4, sar = rep(c(0.1, 0.2, 0.3), each = 5), i0 = 1, generations = 2)
+vr9_a <- dchainbinom(x = 0:4, s0 = 4, prob = rep(c(0.1, 0.2, 0.3), each = 5), i0 = 1, generations = 2)
 
-vr9_b <- c(dchainbinom(x = 0:4, s0 = 4, sar = 0.1, i0 = 1, generations = 2),
-           dchainbinom(x = 0:4, s0 = 4, sar = 0.2, i0 = 1, generations = 2),
-           dchainbinom(x = 0:4, s0 = 4, sar = 0.3, i0 = 1, generations = 2))
+vr9_b <- c(dchainbinom(x = 0:4, s0 = 4, prob = 0.1, i0 = 1, generations = 2),
+           dchainbinom(x = 0:4, s0 = 4, prob = 0.2, i0 = 1, generations = 2),
+           dchainbinom(x = 0:4, s0 = 4, prob = 0.3, i0 = 1, generations = 2))
 
 
-vr10_a <- dchainbinom(x = 0:3, s0 = 3, sar = 0.25, i0 = 1, generations = Inf)
-vr10_b <- dchainbinom(x = 0:3, s0 = rep(3, 4), sar = 0.25, i0 = 1, generations = Inf)
+vr10_a <- dchainbinom(x = 0:3, s0 = 3, prob = 0.25, i0 = 1, generations = Inf)
+vr10_b <- dchainbinom(x = 0:3, s0 = rep(3, 4), prob = 0.25, i0 = 1, generations = Inf)
 
-vr11_a <- dchainbinom(x = 0:3, s0 = rep(3, 12), sar = 0.25, i0 = 1, generations = Inf)
-vr11_b <- rep(dchainbinom(x = 0:3, s0 = 3, sar = 0.25, i0 = 1, generations = Inf), 3)
+vr11_a <- dchainbinom(x = 0:3, s0 = rep(3, 12), prob = 0.25, i0 = 1, generations = Inf)
+vr11_b <- rep(dchainbinom(x = 0:3, s0 = 3, prob = 0.25, i0 = 1, generations = Inf), 3)
 
-vr12_a <- dchainbinom(x = 0:3, s0 = rep(0:3, 3), sar = 0.25, i0 = 1, generations = Inf)
-vr12_b <- rep(c(dchainbinom(x = 0:3, s0 = 0:3, sar = 0.25, i0 = 1, generations = Inf)), 3)
+vr12_a <- dchainbinom(x = 0:3, s0 = rep(0:3, 3), prob = 0.25, i0 = 1, generations = Inf)
+vr12_b <- rep(c(dchainbinom(x = 0:3, s0 = 0:3, prob = 0.25, i0 = 1, generations = Inf)), 3)
 
 
 test_that("Correct vector recycling", {
@@ -333,11 +333,11 @@ test_that("Correct vector recycling", {
 # using simulations.
 #
 # example:
-# simulate_distribution(s0 = 5, sar = 0.1, g=3)
-simulate_distribution <- function(s0, sar, g, i0 = 1){
+# simulate_distribution(s0 = 5, prob = 0.1, g=3)
+simulate_distribution <- function(s0, prob, g, i0 = 1){
 
   probs <- numeric(s0+1)
-  simulated_cb <- rchainbinom(500000, s0 = s0, sar = sar, i0 = i0, g = g)
+  simulated_cb <- rchainbinom(500000, s0 = s0, prob = prob, i0 = i0, g = g)
   sim_prop <- table(simulated_cb) / length(simulated_cb)
   probs[as.numeric(names(sim_prop)) + 1 ] <- sim_prop
   return(probs)
@@ -345,12 +345,12 @@ simulate_distribution <- function(s0, sar, g, i0 = 1){
 
 
 # Compares the PMF with simulated data.
-compare_pmf_vs_simulation <- function(s0, sar, g, i0 = 1, tol = 0.001, maxtries = 4){
+compare_pmf_vs_simulation <- function(s0, prob, g, i0 = 1, tol = 0.001, maxtries = 4){
 
   for (ii in 1:maxtries){
 
-    probvec <- dchainbinom(x = 0:s0, s0 = s0, sar = sar, i0 = i0, generations = g)
-    probvec_sim <- simulate_distribution(s0 = s0, sar = sar, i0 = i0, g = g)
+    probvec <- dchainbinom(x = 0:s0, s0 = s0, prob = prob, i0 = i0, generations = g)
+    probvec_sim <- simulate_distribution(s0 = s0, prob = prob, i0 = i0, g = g)
 
     if (all((probvec - probvec_sim < tol))){
       return(TRUE)
@@ -368,43 +368,43 @@ compare_pmf_vs_simulation <- function(s0, sar, g, i0 = 1, tol = 0.001, maxtries 
 if (FALSE){
   test_that("PMF vs simulation", {
 
-    expect_true(compare_pmf_vs_simulation(s0 = 3, sar = 0.1, g = 1))
-    expect_true(compare_pmf_vs_simulation(s0 = 8, sar = 0.3, g = 1))
-    expect_true(compare_pmf_vs_simulation(s0 = 2, sar = 0.1, g = 1))
-    expect_true(compare_pmf_vs_simulation(s0 = 1, sar = 0.2, g = 1))
-    expect_true(compare_pmf_vs_simulation(s0 = 0, sar = 0.1, g = 1))
+    expect_true(compare_pmf_vs_simulation(s0 = 3, prob = 0.1, g = 1))
+    expect_true(compare_pmf_vs_simulation(s0 = 8, prob = 0.3, g = 1))
+    expect_true(compare_pmf_vs_simulation(s0 = 2, prob = 0.1, g = 1))
+    expect_true(compare_pmf_vs_simulation(s0 = 1, prob = 0.2, g = 1))
+    expect_true(compare_pmf_vs_simulation(s0 = 0, prob = 0.1, g = 1))
 
-    expect_true(compare_pmf_vs_simulation(s0 = 3, sar = 0.1, g = 3))
-    expect_true(compare_pmf_vs_simulation(s0 = 8, sar = 0.3, g = 3))
-    expect_true(compare_pmf_vs_simulation(s0 = 2, sar = 0.1, g = 3))
-    expect_true(compare_pmf_vs_simulation(s0 = 1, sar = 0.2, g = 3))
-    expect_true(compare_pmf_vs_simulation(s0 = 0, sar = 0.1, g = 3))
+    expect_true(compare_pmf_vs_simulation(s0 = 3, prob = 0.1, g = 3))
+    expect_true(compare_pmf_vs_simulation(s0 = 8, prob = 0.3, g = 3))
+    expect_true(compare_pmf_vs_simulation(s0 = 2, prob = 0.1, g = 3))
+    expect_true(compare_pmf_vs_simulation(s0 = 1, prob = 0.2, g = 3))
+    expect_true(compare_pmf_vs_simulation(s0 = 0, prob = 0.1, g = 3))
 
-    expect_true(compare_pmf_vs_simulation(s0 = 3, sar = 0.1, g = 8))
-    expect_true(compare_pmf_vs_simulation(s0 = 8, sar = 0.3, g = 8))
-    expect_true(compare_pmf_vs_simulation(s0 = 2, sar = 0.1, g = 8))
-    expect_true(compare_pmf_vs_simulation(s0 = 1, sar = 0.2, g = 8))
-    expect_true(compare_pmf_vs_simulation(s0 = 0, sar = 0.1, g = 8))
+    expect_true(compare_pmf_vs_simulation(s0 = 3, prob = 0.1, g = 8))
+    expect_true(compare_pmf_vs_simulation(s0 = 8, prob = 0.3, g = 8))
+    expect_true(compare_pmf_vs_simulation(s0 = 2, prob = 0.1, g = 8))
+    expect_true(compare_pmf_vs_simulation(s0 = 1, prob = 0.2, g = 8))
+    expect_true(compare_pmf_vs_simulation(s0 = 0, prob = 0.1, g = 8))
 
 
     # with i0 = 2
-    expect_true(compare_pmf_vs_simulation(s0 = 3, sar = 0.1, i0 = 2, g = 1))
-    expect_true(compare_pmf_vs_simulation(s0 = 8, sar = 0.3, i0 = 2, g = 1))
-    expect_true(compare_pmf_vs_simulation(s0 = 2, sar = 0.1, i0 = 2, g = 1))
-    expect_true(compare_pmf_vs_simulation(s0 = 1, sar = 0.2, i0 = 2, g = 1))
-    expect_true(compare_pmf_vs_simulation(s0 = 0, sar = 0.1, i0 = 2, g = 1))
+    expect_true(compare_pmf_vs_simulation(s0 = 3, prob = 0.1, i0 = 2, g = 1))
+    expect_true(compare_pmf_vs_simulation(s0 = 8, prob = 0.3, i0 = 2, g = 1))
+    expect_true(compare_pmf_vs_simulation(s0 = 2, prob = 0.1, i0 = 2, g = 1))
+    expect_true(compare_pmf_vs_simulation(s0 = 1, prob = 0.2, i0 = 2, g = 1))
+    expect_true(compare_pmf_vs_simulation(s0 = 0, prob = 0.1, i0 = 2, g = 1))
 
-    expect_true(compare_pmf_vs_simulation(s0 = 3, sar = 0.1, i0 = 2, g = 3))
-    expect_true(compare_pmf_vs_simulation(s0 = 8, sar = 0.3, i0 = 2, g = 3))
-    expect_true(compare_pmf_vs_simulation(s0 = 2, sar = 0.1, i0 = 2, g = 3))
-    expect_true(compare_pmf_vs_simulation(s0 = 1, sar = 0.2, i0 = 2, g = 3))
-    expect_true(compare_pmf_vs_simulation(s0 = 0, sar = 0.1, i0 = 2, g = 3))
+    expect_true(compare_pmf_vs_simulation(s0 = 3, prob = 0.1, i0 = 2, g = 3))
+    expect_true(compare_pmf_vs_simulation(s0 = 8, prob = 0.3, i0 = 2, g = 3))
+    expect_true(compare_pmf_vs_simulation(s0 = 2, prob = 0.1, i0 = 2, g = 3))
+    expect_true(compare_pmf_vs_simulation(s0 = 1, prob = 0.2, i0 = 2, g = 3))
+    expect_true(compare_pmf_vs_simulation(s0 = 0, prob = 0.1, i0 = 2, g = 3))
 
-    expect_true(compare_pmf_vs_simulation(s0 = 3, sar = 0.1, i0 = 2, g = 1))
-    expect_true(compare_pmf_vs_simulation(s0 = 8, sar = 0.3, i0 = 2, g = 1))
-    expect_true(compare_pmf_vs_simulation(s0 = 2, sar = 0.1, i0 = 2, g = 1))
-    expect_true(compare_pmf_vs_simulation(s0 = 1, sar = 0.2, i0 = 2, g = 1))
-    expect_true(compare_pmf_vs_simulation(s0 = 0, sar = 0.1, i0 = 2, g = 1))
+    expect_true(compare_pmf_vs_simulation(s0 = 3, prob = 0.1, i0 = 2, g = 1))
+    expect_true(compare_pmf_vs_simulation(s0 = 8, prob = 0.3, i0 = 2, g = 1))
+    expect_true(compare_pmf_vs_simulation(s0 = 2, prob = 0.1, i0 = 2, g = 1))
+    expect_true(compare_pmf_vs_simulation(s0 = 1, prob = 0.2, i0 = 2, g = 1))
+    expect_true(compare_pmf_vs_simulation(s0 = 0, prob = 0.1, i0 = 2, g = 1))
 
   } )
 
@@ -415,32 +415,32 @@ if (FALSE){
 # Expected value ----
 
 # Expected value should be same as for ordinary binomial when g=1.
-ecb_vs_eb_g1 <- function(s0, sar){
-  ecb <- echainbinom(s0 = s0, i0 = 1, sar = sar, generations = 1)
-  eb <- s0*sar #sum(0:s0 * dbinom(x=0:s0, size=s0, prob = sar))
+ecb_vs_eb_g1 <- function(s0, prob){
+  ecb <- echainbinom(s0 = s0, i0 = 1, prob = prob, generations = 1)
+  eb <- s0*prob #sum(0:s0 * dbinom(x=0:s0, size=s0, prob = sar))
 
   abs(ecb - eb) < 0.00000001
 }
 
 test_that("Expected value g=1", {
 
-  expect_true(ecb_vs_eb_g1(s0 = 3, sar=0.1))
-  expect_true(ecb_vs_eb_g1(s0 = 3, sar=0.6))
+  expect_true(ecb_vs_eb_g1(s0 = 3, prob = 0.1))
+  expect_true(ecb_vs_eb_g1(s0 = 3, prob = 0.6))
 
-  expect_true(ecb_vs_eb_g1(s0 = 2, sar=0.1))
-  expect_true(ecb_vs_eb_g1(s0 = 2, sar=0.6))
+  expect_true(ecb_vs_eb_g1(s0 = 2, prob = 0.1))
+  expect_true(ecb_vs_eb_g1(s0 = 2, prob = 0.6))
 
-  expect_true(ecb_vs_eb_g1(s0 = 9, sar=0.1))
-  expect_true(ecb_vs_eb_g1(s0 = 9, sar=0.6))
+  expect_true(ecb_vs_eb_g1(s0 = 9, prob = 0.1))
+  expect_true(ecb_vs_eb_g1(s0 = 9, prob = 0.6))
 
 })
 
 # chain binomial expected value should be greater than ordinary binomial
 # when g > 1.
 
-ecb_vs_eb <- function(s0, sar, g){
-  ecb <- echainbinom(s0 = s0, i0 = 1, sar = sar, generations = g)
-  eb <- s0*sar
+ecb_vs_eb <- function(s0, prob, g){
+  ecb <- echainbinom(s0 = s0, i0 = 1, prob = prob, generations = g)
+  eb <- s0*prob
 
   ecb > eb
 }
@@ -448,61 +448,61 @@ ecb_vs_eb <- function(s0, sar, g){
 
 test_that("Expected value g>1", {
 
-  expect_true(ecb_vs_eb(s0 = 3, sar=0.1, g=2))
-  expect_true(ecb_vs_eb(s0 = 3, sar=0.6, g=2))
-  expect_true(ecb_vs_eb(s0 = 2, sar=0.1, g=2))
-  expect_true(ecb_vs_eb(s0 = 2, sar=0.6, g=2))
-  expect_true(ecb_vs_eb(s0 = 9, sar=0.1, g=2))
-  expect_true(ecb_vs_eb(s0 = 9, sar=0.6, g=2))
+  expect_true(ecb_vs_eb(s0 = 3, prob = 0.1, g=2))
+  expect_true(ecb_vs_eb(s0 = 3, prob = 0.6, g=2))
+  expect_true(ecb_vs_eb(s0 = 2, prob = 0.1, g=2))
+  expect_true(ecb_vs_eb(s0 = 2, prob = 0.6, g=2))
+  expect_true(ecb_vs_eb(s0 = 9, prob = 0.1, g=2))
+  expect_true(ecb_vs_eb(s0 = 9, prob = 0.6, g=2))
 
-  expect_true(ecb_vs_eb(s0 = 3, sar=0.1, g=5))
-  expect_true(ecb_vs_eb(s0 = 3, sar=0.6, g=5))
-  expect_true(ecb_vs_eb(s0 = 2, sar=0.1, g=5))
-  expect_true(ecb_vs_eb(s0 = 2, sar=0.6, g=5))
-  expect_true(ecb_vs_eb(s0 = 9, sar=0.1, g=5))
-  expect_true(ecb_vs_eb(s0 = 9, sar=0.6, g=5))
+  expect_true(ecb_vs_eb(s0 = 3, prob = 0.1, g=5))
+  expect_true(ecb_vs_eb(s0 = 3, prob = 0.6, g=5))
+  expect_true(ecb_vs_eb(s0 = 2, prob = 0.1, g=5))
+  expect_true(ecb_vs_eb(s0 = 2, prob = 0.6, g=5))
+  expect_true(ecb_vs_eb(s0 = 9, prob = 0.1, g=5))
+  expect_true(ecb_vs_eb(s0 = 9, prob = 0.6, g=5))
 
-  expect_true(ecb_vs_eb(s0 = 3, sar=0.1, g=Inf))
-  expect_true(ecb_vs_eb(s0 = 3, sar=0.6, g=Inf))
-  expect_true(ecb_vs_eb(s0 = 2, sar=0.1, g=Inf))
-  expect_true(ecb_vs_eb(s0 = 2, sar=0.6, g=Inf))
-  expect_true(ecb_vs_eb(s0 = 9, sar=0.1, g=Inf))
-  expect_true(ecb_vs_eb(s0 = 9, sar=0.6, g=Inf))
+  expect_true(ecb_vs_eb(s0 = 3, prob = 0.1, g=Inf))
+  expect_true(ecb_vs_eb(s0 = 3, prob = 0.6, g=Inf))
+  expect_true(ecb_vs_eb(s0 = 2, prob = 0.1, g=Inf))
+  expect_true(ecb_vs_eb(s0 = 2, prob = 0.6, g=Inf))
+  expect_true(ecb_vs_eb(s0 = 9, prob = 0.1, g=Inf))
+  expect_true(ecb_vs_eb(s0 = 9, prob = 0.6, g=Inf))
 
 })
 
 # The expected value should never be greater than s0.
-ecb_le_s0 <- function(s0, sar, g){
-  ecb <- echainbinom(s0 = s0, i0 = 1, sar = sar, generations = g)
+ecb_le_s0 <- function(s0, prob, g){
+  ecb <- echainbinom(s0 = s0, i0 = 1, prob = prob, generations = g)
   ecb < s0
 }
 
 test_that("Expected value < s0", {
-  expect_true(ecb_le_s0(s0 = 3, sar=0.1, g=2))
-  expect_true(ecb_le_s0(s0 = 3, sar=0.6, g=2))
-  expect_true(ecb_le_s0(s0 = 2, sar=0.1, g=2))
-  expect_true(ecb_le_s0(s0 = 2, sar=0.6, g=2))
-  expect_true(ecb_le_s0(s0 = 9, sar=0.1, g=2))
-  expect_true(ecb_le_s0(s0 = 9, sar=0.6, g=2))
+  expect_true(ecb_le_s0(s0 = 3, prob = 0.1, g=2))
+  expect_true(ecb_le_s0(s0 = 3, prob = 0.6, g=2))
+  expect_true(ecb_le_s0(s0 = 2, prob = 0.1, g=2))
+  expect_true(ecb_le_s0(s0 = 2, prob = 0.6, g=2))
+  expect_true(ecb_le_s0(s0 = 9, prob = 0.1, g=2))
+  expect_true(ecb_le_s0(s0 = 9, prob = 0.6, g=2))
 
-  expect_true(ecb_le_s0(s0 = 3, sar=0.1, g=5))
-  expect_true(ecb_le_s0(s0 = 3, sar=0.6, g=5))
-  expect_true(ecb_le_s0(s0 = 2, sar=0.1, g=5))
-  expect_true(ecb_le_s0(s0 = 2, sar=0.6, g=5))
-  expect_true(ecb_le_s0(s0 = 9, sar=0.1, g=5))
-  expect_true(ecb_le_s0(s0 = 9, sar=0.6, g=5))
+  expect_true(ecb_le_s0(s0 = 3, prob = 0.1, g=5))
+  expect_true(ecb_le_s0(s0 = 3, prob = 0.6, g=5))
+  expect_true(ecb_le_s0(s0 = 2, prob = 0.1, g=5))
+  expect_true(ecb_le_s0(s0 = 2, prob = 0.6, g=5))
+  expect_true(ecb_le_s0(s0 = 9, prob = 0.1, g=5))
+  expect_true(ecb_le_s0(s0 = 9, prob = 0.6, g=5))
 
-  expect_true(ecb_le_s0(s0 = 3, sar=0.1, g=Inf))
-  expect_true(ecb_le_s0(s0 = 3, sar=0.6, g=Inf))
-  expect_true(ecb_le_s0(s0 = 2, sar=0.1, g=Inf))
-  expect_true(ecb_le_s0(s0 = 2, sar=0.6, g=Inf))
-  expect_true(ecb_le_s0(s0 = 9, sar=0.1, g=Inf))
-  expect_true(ecb_le_s0(s0 = 9, sar=0.6, g=Inf))
+  expect_true(ecb_le_s0(s0 = 3, prob = 0.1, g=Inf))
+  expect_true(ecb_le_s0(s0 = 3, prob = 0.6, g=Inf))
+  expect_true(ecb_le_s0(s0 = 2, prob = 0.1, g=Inf))
+  expect_true(ecb_le_s0(s0 = 2, prob = 0.6, g=Inf))
+  expect_true(ecb_le_s0(s0 = 9, prob = 0.1, g=Inf))
+  expect_true(ecb_le_s0(s0 = 9, prob = 0.6, g=Inf))
 })
 
 # The expected value should equal s0 when sar = 1.
 ecb_eq_s0_sar_eq_1 <- function(s0, i0, g){
-  ecb <- echainbinom(s0 = s0, i0 = i0, sar = 1, generations = g)
+  ecb <- echainbinom(s0 = s0, i0 = i0, prob = 1, generations = g)
   ecb == s0
 }
 
@@ -529,9 +529,9 @@ test_that("Expected value == s0", {
 # Variance ----
 
 # Variance should be same as for ordinary binomial when g=1.
-varcb_vs_varb_g1 <- function(s0, sar){
-  varcb <- varchainbinom(s0 = s0, i0 = 1, sar = sar, generations = 1)
-  varb <- s0*sar*(1- sar) # binomial variance.
+varcb_vs_varb_g1 <- function(s0, prob){
+  varcb <- varchainbinom(s0 = s0, i0 = 1, prob = prob, generations = 1)
+  varb <- s0*prob*(1- prob) # binomial variance.
 
   abs(varcb - varb) < 0.00000001
 }
@@ -539,14 +539,14 @@ varcb_vs_varb_g1 <- function(s0, sar){
 
 test_that("Variance g=1", {
 
-  expect_true(varcb_vs_varb_g1(s0 = 3, sar=0.1))
-  expect_true(varcb_vs_varb_g1(s0 = 3, sar=0.6))
+  expect_true(varcb_vs_varb_g1(s0 = 3, prob = 0.1))
+  expect_true(varcb_vs_varb_g1(s0 = 3, prob = 0.6))
 
-  expect_true(varcb_vs_varb_g1(s0 = 2, sar=0.1))
-  expect_true(varcb_vs_varb_g1(s0 = 2, sar=0.6))
+  expect_true(varcb_vs_varb_g1(s0 = 2, prob = 0.1))
+  expect_true(varcb_vs_varb_g1(s0 = 2, prob = 0.6))
 
-  expect_true(varcb_vs_varb_g1(s0 = 9, sar=0.1))
-  expect_true(varcb_vs_varb_g1(s0 = 9, sar=0.6))
+  expect_true(varcb_vs_varb_g1(s0 = 9, prob = 0.1))
+  expect_true(varcb_vs_varb_g1(s0 = 9, prob = 0.6))
 
 })
 
@@ -555,28 +555,28 @@ test_that("Variance g=1", {
 test_that("CDF", {
 
   # Check that the result is as expected.
-  expect_true(pchainbinom(2, s0 = 6, sar = 0.12, generations = 2) == sum(dchainbinom(0:2, s0 = 6, sar = 0.12, generations = 2)))
-  expect_true(pchainbinom(2, s0 = 6, sar = 0.12, generations = Inf) == sum(dchainbinom(0:2, s0 = 6, sar = 0.12, generations = Inf)))
+  expect_true(pchainbinom(2, s0 = 6, prob = 0.12, generations = 2) == sum(dchainbinom(0:2, s0 = 6, prob = 0.12, generations = 2)))
+  expect_true(pchainbinom(2, s0 = 6, prob = 0.12, generations = Inf) == sum(dchainbinom(0:2, s0 = 6, prob = 0.12, generations = Inf)))
 
   # Same as ordinary binomial when g=1
-  expect_true(all(pchainbinom(0:3, s0 = 3, sar = 0.2, generations = 1) - pbinom(q  = 0:3, size= 3, prob = 0.2) < 0.00001))
-  expect_true(all(pchainbinom(0:5, s0 = 3, sar = 0.2, generations = 1) - pbinom(q  = 0:5, size= 3, prob = 0.2) < 0.00001))
+  expect_true(all(pchainbinom(0:3, s0 = 3, prob = 0.2, generations = 1) - pbinom(q  = 0:3, size= 3, prob = 0.2) < 0.00001))
+  expect_true(all(pchainbinom(0:5, s0 = 3, prob = 0.2, generations = 1) - pbinom(q  = 0:5, size= 3, prob = 0.2) < 0.00001))
 
   # Should be 1 when q = s0.
-  expect_true(pchainbinom(3, s0 = 3, sar = 0.2, generations = 1) == 1)
-  expect_true(pchainbinom(3, s0 = 3, sar = 0.2, generations = Inf) == 1)
-  expect_true(pchainbinom(3, s0 = 3, sar = 0.2, generations = 2) == 1)
+  expect_true(pchainbinom(3, s0 = 3, prob = 0.2, generations = 1) == 1)
+  expect_true(pchainbinom(3, s0 = 3, prob = 0.2, generations = Inf) == 1)
+  expect_true(pchainbinom(3, s0 = 3, prob = 0.2, generations = 2) == 1)
 
   # Should be 1 when q > s0.
-  expect_true(pchainbinom(5, s0 = 3, sar = 0.2, generations = 1) == 1)
-  expect_true(pchainbinom(5, s0 = 3, sar = 0.2, generations = Inf) == 1)
-  expect_true(pchainbinom(5, s0 = 3, sar = 0.2, generations = 2) == 1)
+  expect_true(pchainbinom(5, s0 = 3, prob = 0.2, generations = 1) == 1)
+  expect_true(pchainbinom(5, s0 = 3, prob = 0.2, generations = Inf) == 1)
+  expect_true(pchainbinom(5, s0 = 3, prob = 0.2, generations = 2) == 1)
 
   # Check the floor.
-  expect_true(pchainbinom(0, s0 = 3, sar = 0.2, generations = 2) == pchainbinom(0.9, s0 = 3, sar = 0.2, generations = 2))
-  expect_true(pchainbinom(0, s0 = 3, sar = 0.2, generations = Inf) == pchainbinom(0.9, s0 = 3, sar = 0.2, generations = Inf))
-  expect_true(pchainbinom(1, s0 = 3, sar = 0.2, generations = 2) == pchainbinom(1.9, s0 = 3, sar = 0.2, generations = 2))
-  expect_true(pchainbinom(1, s0 = 3, sar = 0.2, generations = Inf) == pchainbinom(1.9, s0 = 3, sar = 0.2, generations = Inf))
+  expect_true(pchainbinom(0, s0 = 3, prob = 0.2, generations = 2) == pchainbinom(0.9, s0 = 3, prob = 0.2, generations = 2))
+  expect_true(pchainbinom(0, s0 = 3, prob = 0.2, generations = Inf) == pchainbinom(0.9, s0 = 3, prob = 0.2, generations = Inf))
+  expect_true(pchainbinom(1, s0 = 3, prob = 0.2, generations = 2) == pchainbinom(1.9, s0 = 3, prob = 0.2, generations = 2))
+  expect_true(pchainbinom(1, s0 = 3, prob = 0.2, generations = Inf) == pchainbinom(1.9, s0 = 3, prob = 0.2, generations = Inf))
 
 })
 
@@ -662,40 +662,40 @@ test_that("simple estimation works", {
   expect_true('sar' %in% class(sar_est_1_ginf))
 
   # The reasonableness of results.
-  expect_true(!is.na(sar_est_1_ginf$sar_hat))
-  expect_true(is.numeric(sar_est_1_ginf$sar_hat))
-  expect_true(sar_est_1_ginf$sar_hat <= 1)
-  expect_true(sar_est_1_ginf$sar_hat >= 0)
+  expect_true(!is.na(sar_est_1_ginf$prob_hat))
+  expect_true(is.numeric(sar_est_1_ginf$prob_hat))
+  expect_true(sar_est_1_ginf$prob_hat <= 1)
+  expect_true(sar_est_1_ginf$prob_hat >= 0)
 
-  expect_true(!is.na(sar_est_1_g1$sar_hat))
-  expect_true(is.numeric(sar_est_1_g1$sar_hat))
-  expect_true(sar_est_1_g1$sar_hat <= 1)
-  expect_true(sar_est_1_g1$sar_hat >= 0)
+  expect_true(!is.na(sar_est_1_g1$prob_hat))
+  expect_true(is.numeric(sar_est_1_g1$prob_hat))
+  expect_true(sar_est_1_g1$prob_hat <= 1)
+  expect_true(sar_est_1_g1$prob_hat >= 0)
 
-  expect_true(!is.na(sar_est_1_g2$sar_hat))
-  expect_true(is.numeric(sar_est_1_g2$sar_hat))
-  expect_true(sar_est_1_g2$sar_hat <= 1)
-  expect_true(sar_est_1_g2$sar_hat >= 0)
+  expect_true(!is.na(sar_est_1_g2$prob_hat))
+  expect_true(is.numeric(sar_est_1_g2$prob_hat))
+  expect_true(sar_est_1_g2$prob_hat <= 1)
+  expect_true(sar_est_1_g2$prob_hat >= 0)
 
-  expect_true(!is.na(sar_est_2_g1$sar_hat))
-  expect_true(is.numeric(sar_est_2_g1$sar_hat))
-  expect_true(sar_est_2_g1$sar_hat <= 1)
-  expect_true(sar_est_2_g1$sar_hat >= 0)
+  expect_true(!is.na(sar_est_2_g1$prob_hat))
+  expect_true(is.numeric(sar_est_2_g1$prob_hat))
+  expect_true(sar_est_2_g1$prob_hat <= 1)
+  expect_true(sar_est_2_g1$prob_hat >= 0)
 
-  expect_true(!is.na(sar_est_3_g1$sar_hat))
-  expect_true(is.numeric(sar_est_3_g1$sar_hat))
-  expect_true(sar_est_3_g1$sar_hat <= 1)
-  expect_true(sar_est_3_g1$sar_hat >= 0)
+  expect_true(!is.na(sar_est_3_g1$prob_hat))
+  expect_true(is.numeric(sar_est_3_g1$prob_hat))
+  expect_true(sar_est_3_g1$prob_hat <= 1)
+  expect_true(sar_est_3_g1$prob_hat >= 0)
 
-  expect_true(!is.na(sar_est_3_ginf$sar_hat))
-  expect_true(is.numeric(sar_est_3_ginf$sar_hat))
-  expect_true(sar_est_3_ginf$sar_hat <= 1)
-  expect_true(sar_est_3_ginf$sar_hat >= 0)
+  expect_true(!is.na(sar_est_3_ginf$prob_hat))
+  expect_true(is.numeric(sar_est_3_ginf$prob_hat))
+  expect_true(sar_est_3_ginf$prob_hat <= 1)
+  expect_true(sar_est_3_ginf$prob_hat >= 0)
 
   # Estimates should not be the same.
-  expect_false(sar_est_1_g2$sar_hat == sar_est_1_g1$sar_hat)
-  expect_false(sar_est_1_g2$sar_hat == sar_est_1_ginf$sar_hat)
-  expect_false(sar_est_1_g1$sar_hat == sar_est_1_ginf$sar_hat)
+  expect_false(sar_est_1_g2$prob_hat == sar_est_1_g1$prob_hat)
+  expect_false(sar_est_1_g2$prob_hat == sar_est_1_ginf$prob_hat)
+  expect_false(sar_est_1_g1$prob_hat == sar_est_1_ginf$prob_hat)
 
 
   # Confidence intervals.
@@ -728,12 +728,12 @@ test_that("simple estimation works", {
   expect_true(sar_est_1_ginf_ci_default[2] == sar_est_1_ginf_ci_95_chisq[2])
 
 
-  expect_true(sar_est_1_ginf_ci_99_chisq[1] < sar_est_1_ginf$sar_hat)
-  expect_true(sar_est_1_ginf_ci_95_chisq[1] < sar_est_1_ginf$sar_hat)
-  expect_true(sar_est_1_ginf_ci_95_chisq[2] > sar_est_1_ginf$sar_hat)
-  expect_true(sar_est_1_ginf_ci_99_chisq[2] > sar_est_1_ginf$sar_hat)
-  expect_true(sar_est_1_ginf_ci_90_chisq[1] < sar_est_1_ginf$sar_hat)
-  expect_true(sar_est_1_ginf_ci_90_chisq[2] > sar_est_1_ginf$sar_hat)
+  expect_true(sar_est_1_ginf_ci_99_chisq[1] < sar_est_1_ginf$prob_hat)
+  expect_true(sar_est_1_ginf_ci_95_chisq[1] < sar_est_1_ginf$prob_hat)
+  expect_true(sar_est_1_ginf_ci_95_chisq[2] > sar_est_1_ginf$prob_hat)
+  expect_true(sar_est_1_ginf_ci_99_chisq[2] > sar_est_1_ginf$prob_hat)
+  expect_true(sar_est_1_ginf_ci_90_chisq[1] < sar_est_1_ginf$prob_hat)
+  expect_true(sar_est_1_ginf_ci_90_chisq[2] > sar_est_1_ginf$prob_hat)
 
 
   # Check that the 95% interval is wider than the 90% interval.
@@ -765,12 +765,12 @@ test_that("simple estimation works", {
   expect_true(sar_est_1_g1_ci_99_chisq[1] < sar_est_1_g1_ci_99_chisq[2])
   expect_true(sar_est_1_g1_ci_95_chisq[1] < sar_est_1_g1_ci_95_chisq[2])
   expect_true(sar_est_1_g1_ci_90_chisq[1] < sar_est_1_g1_ci_90_chisq[2])
-  expect_true(sar_est_1_g1_ci_99_chisq[1] < sar_est_1_ginf$sar_hat)
-  expect_true(sar_est_1_g1_ci_99_chisq[2] > sar_est_1_ginf$sar_hat)
-  expect_true(sar_est_1_g1_ci_95_chisq[1] < sar_est_1_ginf$sar_hat)
-  expect_true(sar_est_1_g1_ci_95_chisq[2] > sar_est_1_ginf$sar_hat)
-  expect_true(sar_est_1_g1_ci_90_chisq[1] < sar_est_1_ginf$sar_hat)
-  expect_true(sar_est_1_g1_ci_90_chisq[2] > sar_est_1_ginf$sar_hat)
+  expect_true(sar_est_1_g1_ci_99_chisq[1] < sar_est_1_ginf$prob_hat)
+  expect_true(sar_est_1_g1_ci_99_chisq[2] > sar_est_1_ginf$prob_hat)
+  expect_true(sar_est_1_g1_ci_95_chisq[1] < sar_est_1_ginf$prob_hat)
+  expect_true(sar_est_1_g1_ci_95_chisq[2] > sar_est_1_ginf$prob_hat)
+  expect_true(sar_est_1_g1_ci_90_chisq[1] < sar_est_1_ginf$prob_hat)
+  expect_true(sar_est_1_g1_ci_90_chisq[2] > sar_est_1_ginf$prob_hat)
   expect_true(sar_est_1_g1_ci_99_chisq[1] < sar_est_1_g1_ci_95_chisq[1])
   expect_true(sar_est_1_g1_ci_95_chisq[1] < sar_est_1_g1_ci_90_chisq[1])
   expect_true(sar_est_1_g1_ci_95_chisq[2] > sar_est_1_g1_ci_90_chisq[2])
@@ -795,11 +795,11 @@ test_that("simple estimation works", {
   expect_true(sar_est_1_ginf_ci_95_norm[1] < sar_est_1_ginf_ci_95_norm[2])
   expect_true(sar_est_1_ginf_ci_90_norm[1] < sar_est_1_ginf_ci_90_norm[2])
 
-  expect_true(sar_est_1_ginf_ci_95_norm[1] < sar_est_1_ginf$sar_hat)
-  expect_true(sar_est_1_ginf_ci_95_norm[2] > sar_est_1_ginf$sar_hat)
+  expect_true(sar_est_1_ginf_ci_95_norm[1] < sar_est_1_ginf$prob_hat)
+  expect_true(sar_est_1_ginf_ci_95_norm[2] > sar_est_1_ginf$prob_hat)
 
-  expect_true(sar_est_1_ginf_ci_90_norm[1] < sar_est_1_ginf$sar_hat)
-  expect_true(sar_est_1_ginf_ci_90_norm[2] > sar_est_1_ginf$sar_hat)
+  expect_true(sar_est_1_ginf_ci_90_norm[1] < sar_est_1_ginf$prob_hat)
+  expect_true(sar_est_1_ginf_ci_90_norm[2] > sar_est_1_ginf$prob_hat)
 
   # Check that the 95% interval is wider than the 90% interval.
   expect_true(sar_est_1_ginf_ci_95_norm[1] < sar_est_1_ginf_ci_90_norm[1])
@@ -823,17 +823,17 @@ test_that("simple estimation works", {
   )
 
   # The reasonableness of results.
-  expect_true(!is.na(sar_est_all_ginf$sar_hat))
-  expect_true(is.numeric(sar_est_all_ginf$sar_hat))
-  expect_true(sar_est_all_ginf$sar_hat <= 1)
-  expect_true(sar_est_all_ginf$sar_hat >= 0)
-  expect_true(sar_est_all_ginf$sar_hat >= 0.99) # Point estimate should be close to 1.
+  expect_true(!is.na(sar_est_all_ginf$prob_hat))
+  expect_true(is.numeric(sar_est_all_ginf$prob_hat))
+  expect_true(sar_est_all_ginf$prob_hat <= 1)
+  expect_true(sar_est_all_ginf$prob_hat >= 0)
+  expect_true(sar_est_all_ginf$prob_hat >= 0.99) # Point estimate should be close to 1.
 
-  expect_true(!is.na(sar_est_none_ginf$sar_hat))
-  expect_true(is.numeric(sar_est_none_ginf$sar_hat))
-  expect_true(sar_est_none_ginf$sar_hat <= 1)
-  expect_true(sar_est_none_ginf$sar_hat >= 0)
-  expect_true(sar_est_none_ginf$sar_hat <= 0.01) # Point estimate should be close to 0.
+  expect_true(!is.na(sar_est_none_ginf$prob_hat))
+  expect_true(is.numeric(sar_est_none_ginf$prob_hat))
+  expect_true(sar_est_none_ginf$prob_hat <= 1)
+  expect_true(sar_est_none_ginf$prob_hat >= 0)
+  expect_true(sar_est_none_ginf$prob_hat <= 0.01) # Point estimate should be close to 0.
 
 
 
@@ -856,10 +856,10 @@ test_that("simple estimation works", {
   expect_true(sar_est_all_ginf_ci_95_chisq[1] < sar_est_all_ginf_ci_95_chisq[2])
   expect_true(sar_est_all_ginf_ci_90_chisq[1] < sar_est_all_ginf_ci_90_chisq[2])
 
-  expect_true(sar_est_all_ginf_ci_95_chisq[1] < sar_est_all_ginf$sar_hat)
-  expect_true(sar_est_all_ginf_ci_95_chisq[2] >= sar_est_all_ginf$sar_hat)
-  expect_true(sar_est_all_ginf_ci_90_chisq[1] < sar_est_all_ginf$sar_hat)
-  expect_true(sar_est_all_ginf_ci_90_chisq[2] >= sar_est_all_ginf$sar_hat)
+  expect_true(sar_est_all_ginf_ci_95_chisq[1] < sar_est_all_ginf$prob_hat)
+  expect_true(sar_est_all_ginf_ci_95_chisq[2] >= sar_est_all_ginf$prob_hat)
+  expect_true(sar_est_all_ginf_ci_90_chisq[1] < sar_est_all_ginf$prob_hat)
+  expect_true(sar_est_all_ginf_ci_90_chisq[2] >= sar_est_all_ginf$prob_hat)
 
   expect_true(sar_est_all_ginf_ci_99_chisq[1] < sar_est_all_ginf_ci_95_chisq[1])
   expect_true(sar_est_all_ginf_ci_95_chisq[1] < sar_est_all_ginf_ci_90_chisq[1])
@@ -886,13 +886,13 @@ test_that("simple estimation works", {
   expect_true(sar_est_none_ginf_ci_95_chisq[1] < sar_est_none_ginf_ci_95_chisq[2])
   expect_true(sar_est_none_ginf_ci_90_chisq[1] < sar_est_none_ginf_ci_90_chisq[2])
 
-  expect_true(sar_est_none_ginf_ci_99_chisq[1] <= sar_est_none_ginf$sar_hat)
-  expect_true(sar_est_none_ginf_ci_99_chisq[2] > sar_est_none_ginf$sar_hat)
+  expect_true(sar_est_none_ginf_ci_99_chisq[1] <= sar_est_none_ginf$prob_hat)
+  expect_true(sar_est_none_ginf_ci_99_chisq[2] > sar_est_none_ginf$prob_hat)
 
-  expect_true(sar_est_none_ginf_ci_95_chisq[1] <= sar_est_none_ginf$sar_hat)
-  expect_true(sar_est_none_ginf_ci_95_chisq[2] > sar_est_none_ginf$sar_hat)
-  expect_true(sar_est_none_ginf_ci_90_chisq[1] <= sar_est_none_ginf$sar_hat)
-  expect_true(sar_est_none_ginf_ci_90_chisq[2] > sar_est_none_ginf$sar_hat)
+  expect_true(sar_est_none_ginf_ci_95_chisq[1] <= sar_est_none_ginf$prob_hat)
+  expect_true(sar_est_none_ginf_ci_95_chisq[2] > sar_est_none_ginf$prob_hat)
+  expect_true(sar_est_none_ginf_ci_90_chisq[1] <= sar_est_none_ginf$prob_hat)
+  expect_true(sar_est_none_ginf_ci_90_chisq[2] > sar_est_none_ginf$prob_hat)
 
   expect_true(sar_est_none_ginf_ci_99_chisq[1] <= sar_est_none_ginf_ci_95_chisq[1])
   expect_true(sar_est_none_ginf_ci_95_chisq[1] <= sar_est_none_ginf_ci_90_chisq[1])
@@ -913,10 +913,10 @@ test_that("simple estimation works", {
   expect_true(sar_est_2_g1_ci_99_chisq[1] < sar_est_2_g1_ci_99_chisq[2])
   expect_true(sar_est_2_g1_ci_95_chisq[1] < sar_est_2_g1_ci_95_chisq[2])
 
-  expect_true(sar_est_2_g1_ci_99_chisq[1] < sar_est_2_g1$sar_hat)
-  expect_true(sar_est_2_g1_ci_99_chisq[2] > sar_est_2_g1$sar_hat)
-  expect_true(sar_est_2_g1_ci_95_chisq[1] < sar_est_2_g1$sar_hat)
-  expect_true(sar_est_2_g1_ci_95_chisq[2] > sar_est_2_g1$sar_hat)
+  expect_true(sar_est_2_g1_ci_99_chisq[1] < sar_est_2_g1$prob_hat)
+  expect_true(sar_est_2_g1_ci_99_chisq[2] > sar_est_2_g1$prob_hat)
+  expect_true(sar_est_2_g1_ci_95_chisq[1] < sar_est_2_g1$prob_hat)
+  expect_true(sar_est_2_g1_ci_95_chisq[2] > sar_est_2_g1$prob_hat)
 
   expect_true(sar_est_2_g1_ci_99_chisq[1] < sar_est_2_g1_ci_95_chisq[1])
   expect_true(sar_est_2_g1_ci_99_chisq[2] > sar_est_2_g1_ci_95_chisq[2])
@@ -944,10 +944,10 @@ test_that("simple estimation works", {
   expect_true(sar_est_3_ginf_ci_95_chisq[1] < sar_est_3_ginf_ci_95_chisq[2])
   expect_true(sar_est_3_ginf_ci_99_chisq[1] < sar_est_3_ginf_ci_99_chisq[2])
 
-  expect_true(sar_est_3_g1_ci_95_chisq[1] < sar_est_3_g1$sar_hat)
-  expect_true(sar_est_3_g1_ci_99_chisq[1] < sar_est_3_g1$sar_hat)
-  expect_true(sar_est_3_ginf_ci_95_chisq[1] < sar_est_3_ginf$sar_hat)
-  expect_true(sar_est_3_ginf_ci_99_chisq[1] < sar_est_3_ginf$sar_hat)
+  expect_true(sar_est_3_g1_ci_95_chisq[1] < sar_est_3_g1$prob_hat)
+  expect_true(sar_est_3_g1_ci_99_chisq[1] < sar_est_3_g1$prob_hat)
+  expect_true(sar_est_3_ginf_ci_95_chisq[1] < sar_est_3_ginf$prob_hat)
+  expect_true(sar_est_3_ginf_ci_99_chisq[1] < sar_est_3_ginf$prob_hat)
 
 
   # Missing values.
@@ -980,13 +980,13 @@ test_that("simple estimation works", {
   )
 
   # Check that the estimates are not identical.
-  expect_true(sar_est_1_ginf_na$sar_hat != sar_est_1_ginf$sar_hat)
-  expect_true(sar_est_1_g1_na$sar_hat != sar_est_1_g1$sar_hat)
-  expect_true(sar_est_1_g2_na$sar_hat != sar_est_1_g2$sar_hat)
+  expect_true(sar_est_1_ginf_na$prob_hat != sar_est_1_ginf$prob_hat)
+  expect_true(sar_est_1_g1_na$prob_hat != sar_est_1_g1$prob_hat)
+  expect_true(sar_est_1_g2_na$prob_hat != sar_est_1_g2$prob_hat)
 
-  expect_true(sar_est_1_ginf_na2$sar_hat != sar_est_1_ginf$sar_hat)
-  expect_true(sar_est_1_g1_na2$sar_hat != sar_est_1_g1$sar_hat)
-  expect_true(sar_est_1_g2_na2$sar_hat != sar_est_1_g2$sar_hat)
+  expect_true(sar_est_1_ginf_na2$prob_hat != sar_est_1_ginf$prob_hat)
+  expect_true(sar_est_1_g1_na2$prob_hat != sar_est_1_g1$prob_hat)
+  expect_true(sar_est_1_g2_na2$prob_hat != sar_est_1_g2$prob_hat)
 
   # missing values CI
   expect_no_condition(
@@ -1001,10 +1001,10 @@ test_that("simple estimation works", {
   expect_true(sar_est_1_ginf_ci_95_norm_na[1] < sar_est_1_ginf_ci_95_norm_na[2])
 
   # Reasonableness when there are missing values
-  expect_true(!is.na(sar_est_1_ginf_na$sar_hat))
-  expect_true(is.numeric(sar_est_1_ginf_na$sar_hat))
-  expect_true(sar_est_1_ginf_na$sar_hat <= 1)
-  expect_true(sar_est_1_ginf_na$sar_hat >= 0)
+  expect_true(!is.na(sar_est_1_ginf_na$prob_hat))
+  expect_true(is.numeric(sar_est_1_ginf_na$prob_hat))
+  expect_true(sar_est_1_ginf_na$prob_hat <= 1)
+  expect_true(sar_est_1_ginf_na$prob_hat >= 0)
 
 
 })
@@ -1135,15 +1135,15 @@ test_that("modelling works", {
   expect_true(all(!is.na(cb_mod_res_id_na4$fitted_values)))
   expect_true(all(!is.na(cb_mod_res_id_na5$fitted_values)))
 
-  expect_true(length(cb_mod_res_id$sar_hat) == nrow(mod_dat1))
-  expect_true(length(cb_mod_res_log$sar_hat) == nrow(mod_dat1))
-  expect_true(length(cb_mod_res_logit$sar_hat) == nrow(mod_dat1))
-  expect_true(length(cb_mod_res_cloglog$sar_hat) == nrow(mod_dat1))
-  expect_true(length(cb_mod_res_id_na$sar_hat) == nrow(mod_dat1) - 1) # minus 1 because of one missing value.
-  expect_true(length(cb_mod_res_id_na2$sar_hat) == nrow(mod_dat1) - 1) # minus 1 because of one missing value.
-  expect_true(length(cb_mod_res_id_na3$sar_hat) == nrow(mod_dat1) - 2) # minus 2 because of two missing values.
-  expect_true(length(cb_mod_res_id_na4$sar_hat) == nrow(mod_dat1) - 1) # minus 1 because of one missing value.
-  expect_true(length(cb_mod_res_id_na5$sar_hat) == nrow(mod_dat1) - 3) # minus 3 because of three missing value.
+  expect_true(length(cb_mod_res_id$prob_hat) == nrow(mod_dat1))
+  expect_true(length(cb_mod_res_log$prob_hat) == nrow(mod_dat1))
+  expect_true(length(cb_mod_res_logit$prob_hat) == nrow(mod_dat1))
+  expect_true(length(cb_mod_res_cloglog$prob_hat) == nrow(mod_dat1))
+  expect_true(length(cb_mod_res_id_na$prob_hat) == nrow(mod_dat1) - 1) # minus 1 because of one missing value.
+  expect_true(length(cb_mod_res_id_na2$prob_hat) == nrow(mod_dat1) - 1) # minus 1 because of one missing value.
+  expect_true(length(cb_mod_res_id_na3$prob_hat) == nrow(mod_dat1) - 2) # minus 2 because of two missing values.
+  expect_true(length(cb_mod_res_id_na4$prob_hat) == nrow(mod_dat1) - 1) # minus 1 because of one missing value.
+  expect_true(length(cb_mod_res_id_na5$prob_hat) == nrow(mod_dat1) - 3) # minus 3 because of three missing value.
 
   expect_true(nrow(cb_mod_res_id$vcov) == length(cb_mod_res_id$parameters))
   expect_true(nrow(cb_mod_res_log$vcov) == length(cb_mod_res_log$parameters))
@@ -1315,19 +1315,19 @@ test_that("making predictions", {
   )
 
   expect_warning(
-    cb_mod_pred_sar_id <- predict(cb_mod_res_id, x = newx, type = 'sar') # gives a warning.
+    cb_mod_pred_sar_id <- predict(cb_mod_res_id, x = newx, type = 'prob') # gives a warning.
   )
 
   expect_no_condition(
-    cb_mod_pred_sar_log <- predict(cb_mod_res_log, x = newx, type = 'sar')
+    cb_mod_pred_sar_log <- predict(cb_mod_res_log, x = newx, type = 'prob')
   )
 
   expect_no_condition(
-    cb_mod_pred_sar_logit <- predict(cb_mod_res_logit, x = newx, type = 'sar')
+    cb_mod_pred_sar_logit <- predict(cb_mod_res_logit, x = newx, type = 'prob')
   )
 
   expect_no_condition(
-    cb_mod_pred_sar_cloglog <- predict(cb_mod_res_cloglog, x = newx, type = 'sar')
+    cb_mod_pred_sar_cloglog <- predict(cb_mod_res_cloglog, x = newx, type = 'prob')
   )
 
   # Predictions without intercept.
@@ -1379,11 +1379,11 @@ test_that("making predictions", {
   expect_true(all(cb_mod_pred_sar_logit < 1))
   expect_true(all(cb_mod_pred_sar_cloglog < 1))
 
-  # Check that predict gives the same sar hat as the fitted model object.
-  expect_true(all(predict(cb_mod_res_id, x = xmat, type = 'sar') == cb_mod_res_id$sar_hat))
-  expect_true(all(predict(cb_mod_res_log, x = xmat, type = 'sar') == cb_mod_res_log$sar_hat))
-  expect_true(all(predict(cb_mod_res_logit, x = xmat, type = 'sar') == cb_mod_res_logit$sar_hat))
-  expect_true(all(predict(cb_mod_res_cloglog, x = xmat, type = 'sar') == cb_mod_res_cloglog$sar_hat))
+  # Check that predict gives the same prob hat as the fitted model object.
+  expect_true(all(predict(cb_mod_res_id, x = xmat, type = 'prob') == cb_mod_res_id$sar_hat))
+  expect_true(all(predict(cb_mod_res_log, x = xmat, type = 'prob') == cb_mod_res_log$sar_hat))
+  expect_true(all(predict(cb_mod_res_logit, x = xmat, type = 'prob') == cb_mod_res_logit$sar_hat))
+  expect_true(all(predict(cb_mod_res_cloglog, x = xmat, type = 'prob') == cb_mod_res_cloglog$sar_hat))
 
 })
 
@@ -1440,22 +1440,22 @@ test_that("Residuals", {
 # Missing values ----
 
 x_input_na <- c(NA, 0, 2, 3, NA, NA)
-dcb_na1 <- dchainbinom(x = x_input_na, s0 = 5, sar = 0.11, generations = 1)
+dcb_na1 <- dchainbinom(x = x_input_na, s0 = 5, prob = 0.11, generations = 1)
 
 s0_input_na <- c(3, 3, 4, 5, 6, NA)
-dcb_na2 <- dchainbinom(x = 0:5, s0 = s0_input_na, sar = 0.11, generations = 1)
+dcb_na2 <- dchainbinom(x = 0:5, s0 = s0_input_na, prob = 0.11, generations = 1)
 
 sar_input_na <- c(NA, 0.2, 0.1, 0.5, 0.21, NA)
-dcb_na3 <- dchainbinom(x = 0:5, s0 = 3, sar = sar_input_na, generations = Inf)
+dcb_na3 <- dchainbinom(x = 0:5, s0 = 3, prob = sar_input_na, generations = Inf)
 
 generations_input_na <- c(1, 2, 3, NA, Inf, NA)
-dcb_na4 <- dchainbinom(x = 0:5, s0 = 5, sar = 0.11, generations = generations_input_na)
+dcb_na4 <- dchainbinom(x = 0:5, s0 = 5, prob = 0.11, generations = generations_input_na)
 
 # One NA that causes all values to be NA because of recycling.
-dcb_na5 <- dchainbinom(x = NA, s0 = 5, sar = 0.11, generations = 2)
-dcb_na6 <- dchainbinom(x = 0:5, s0 = NA, sar = 0.11, generations = 2)
-dcb_na7 <- dchainbinom(x = NA, s0 = 5, sar = NA, generations = Inf)
-dcb_na8 <- dchainbinom(x = NA, s0 = 5, sar = 0.11, generations = NA)
+dcb_na5 <- dchainbinom(x = NA, s0 = 5, prob = 0.11, generations = 2)
+dcb_na6 <- dchainbinom(x = 0:5, s0 = NA, prob = 0.11, generations = 2)
+dcb_na7 <- dchainbinom(x = NA, s0 = 5, prob = NA, generations = Inf)
+dcb_na8 <- dchainbinom(x = NA, s0 = 5, prob = 0.11, generations = NA)
 
 
 test_that("dchainbinom NA", {
@@ -1474,9 +1474,9 @@ test_that("dchainbinom NA", {
 
 
 
-rcb_na2 <- rchainbinom(n = 6, s0 = s0_input_na, sar = 0.11, generations = 2)
-rcb_na3 <- rchainbinom(n = 6, s0 = 5, sar = sar_input_na, generations = Inf)
-rcb_na4 <- rchainbinom(n = 6, s0 = 5, sar = 0.34, generations = generations_input_na)
+rcb_na2 <- rchainbinom(n = 6, s0 = s0_input_na, prob = 0.11, generations = 2)
+rcb_na3 <- rchainbinom(n = 6, s0 = 5, prob = sar_input_na, generations = Inf)
+rcb_na4 <- rchainbinom(n = 6, s0 = 5, prob = 0.34, generations = generations_input_na)
 
 
 test_that("rchainbinom NA", {
@@ -1488,14 +1488,14 @@ test_that("rchainbinom NA", {
 })
 
 
-ecb_na2 <- echainbinom(s0 = s0_input_na, sar = 0.11, generations = 2)
-ecb_na3 <- echainbinom(s0 = 5, sar = sar_input_na, generations = Inf)
-ecb_na4 <- echainbinom(s0 = 5, sar = 0.34, generations = generations_input_na)
+ecb_na2 <- echainbinom(s0 = s0_input_na, prob = 0.11, generations = 2)
+ecb_na3 <- echainbinom(s0 = 5, prob = sar_input_na, generations = Inf)
+ecb_na4 <- echainbinom(s0 = 5, prob = 0.34, generations = generations_input_na)
 
 # One NA that causes all values to be NA because of recycling.
-ecb_na6 <- echainbinom(s0 = NA, sar = 0.41, generations = 1:4)
-ecb_na7 <- echainbinom(s0 = 5, sar = NA, generations = 1:4)
-ecb_na8 <- echainbinom(s0 = 1:4, sar = 0.41, generations = NA)
+ecb_na6 <- echainbinom(s0 = NA, prob = 0.41, generations = 1:4)
+ecb_na7 <- echainbinom(s0 = 5, prob = NA, generations = 1:4)
+ecb_na8 <- echainbinom(s0 = 1:4, prob = 0.41, generations = NA)
 
 test_that("echainbinom NA", {
 
@@ -1514,16 +1514,16 @@ test_that("echainbinom NA", {
 
 # Hyper chainbinom ----
 
-dcbhyper_1_ob1 <- dcbhyper(x = 0:5, s0 = 5, sar = 0.11, s0_obs = 1)
-dcbhyper_1_ob2 <- dcbhyper(x = 0:5, s0 = 5, sar = 0.11, s0_obs = 2)
-dcbhyper_1_ob3 <- dcbhyper(x = 0:5, s0 = 5, sar = 0.11, s0_obs = 3)
-dcbhyper_1_ob4 <- dcbhyper(x = 0:5, s0 = 5, sar = 0.11, s0_obs = 4)
-dcbhyper_1_ob5 <- dcbhyper(x = 0:5, s0 = 5, sar = 0.11, s0_obs = 5)
+dcbhyper_1_ob1 <- dcbhyper(x = 0:5, s0 = 5, prob = 0.11, s0_obs = 1)
+dcbhyper_1_ob2 <- dcbhyper(x = 0:5, s0 = 5, prob = 0.11, s0_obs = 2)
+dcbhyper_1_ob3 <- dcbhyper(x = 0:5, s0 = 5, prob = 0.11, s0_obs = 3)
+dcbhyper_1_ob4 <- dcbhyper(x = 0:5, s0 = 5, prob = 0.11, s0_obs = 4)
+dcbhyper_1_ob5 <- dcbhyper(x = 0:5, s0 = 5, prob = 0.11, s0_obs = 5)
 
 tol_sum_to_1 <- 2e-15
 
 
-dcbhyper(x = 6, s0 = 5, sar = 0.11, s0_obs = 5)
+dcbhyper(x = 6, s0 = 5, prob = 0.11, s0_obs = 5)
 
 
 test_that("CBhyper PMF is ok", {
@@ -1543,18 +1543,18 @@ test_that("CBhyper PMF is ok", {
 
 
   # Probability of more infected than s0 should be 0
-  expect_true(dcbhyper(x = 6, s0 = 5, sar = 0.11, s0_obs = 1) == 0)
-  expect_true(dcbhyper(x = 6, s0 = 5, sar = 0.11, s0_obs = 2) == 0)
-  expect_true(dcbhyper(x = 6, s0 = 5, sar = 0.11, s0_obs = 3) == 0)
-  expect_true(dcbhyper(x = 6, s0 = 5, sar = 0.11, s0_obs = 4) == 0)
-  expect_true(dcbhyper(x = 6, s0 = 5, sar = 0.11, s0_obs = 5) == 0)
+  expect_true(dcbhyper(x = 6, s0 = 5, prob = 0.11, s0_obs = 1) == 0)
+  expect_true(dcbhyper(x = 6, s0 = 5, prob = 0.11, s0_obs = 2) == 0)
+  expect_true(dcbhyper(x = 6, s0 = 5, prob = 0.11, s0_obs = 3) == 0)
+  expect_true(dcbhyper(x = 6, s0 = 5, prob = 0.11, s0_obs = 4) == 0)
+  expect_true(dcbhyper(x = 6, s0 = 5, prob = 0.11, s0_obs = 5) == 0)
 
 })
 
 
-check_sum_to_1_dcbhyper <- function(s0, sar, s0_obs, i0 = 1){
+check_sum_to_1_dcbhyper <- function(s0, prob, s0_obs, i0 = 1){
 
-  ss <- sum(dcbhyper(x = 0:s0, s0 = s0, i0=i0, sar= sar, s0_obs))
+  ss <- sum(dcbhyper(x = 0:s0, s0 = s0, i0=i0, prob = prob, s0_obs))
 
   if (ss == 1){
     return(TRUE)
@@ -1566,25 +1566,25 @@ check_sum_to_1_dcbhyper <- function(s0, sar, s0_obs, i0 = 1){
 
 test_that("PMF sum to 1", {
 
-  expect_true(check_sum_to_1_dcbhyper(s0 = 5, sar=0.25, s0_obs = 1))
-  expect_true(check_sum_to_1_dcbhyper(s0 = 5, sar=0.25, s0_obs = 2))
-  expect_true(check_sum_to_1_dcbhyper(s0 = 5, sar=0.25, s0_obs = 3))
-  expect_true(check_sum_to_1_dcbhyper(s0 = 5, sar=0.25, s0_obs = 4))
-  expect_true(check_sum_to_1_dcbhyper(s0 = 5, sar=0.25, s0_obs = 5))
+  expect_true(check_sum_to_1_dcbhyper(s0 = 5, prob = 0.25, s0_obs = 1))
+  expect_true(check_sum_to_1_dcbhyper(s0 = 5, prob = 0.25, s0_obs = 2))
+  expect_true(check_sum_to_1_dcbhyper(s0 = 5, prob = 0.25, s0_obs = 3))
+  expect_true(check_sum_to_1_dcbhyper(s0 = 5, prob = 0.25, s0_obs = 4))
+  expect_true(check_sum_to_1_dcbhyper(s0 = 5, prob = 0.25, s0_obs = 5))
 
-  expect_true(check_sum_to_1_dcbhyper(s0 = 5, sar=0.1, s0_obs = 1))
-  expect_true(check_sum_to_1_dcbhyper(s0 = 5, sar=0.1, s0_obs = 2))
-  expect_true(check_sum_to_1_dcbhyper(s0 = 5, sar=0.1, s0_obs = 3))
-  expect_true(check_sum_to_1_dcbhyper(s0 = 5, sar=0.1, s0_obs = 4))
-  expect_true(check_sum_to_1_dcbhyper(s0 = 5, sar=0.1, s0_obs = 5))
+  expect_true(check_sum_to_1_dcbhyper(s0 = 5, prob = 0.1, s0_obs = 1))
+  expect_true(check_sum_to_1_dcbhyper(s0 = 5, prob = 0.1, s0_obs = 2))
+  expect_true(check_sum_to_1_dcbhyper(s0 = 5, prob = 0.1, s0_obs = 3))
+  expect_true(check_sum_to_1_dcbhyper(s0 = 5, prob = 0.1, s0_obs = 4))
+  expect_true(check_sum_to_1_dcbhyper(s0 = 5, prob = 0.1, s0_obs = 5))
 
-  expect_true(check_sum_to_1_dcbhyper(s0 = 4, sar=0.85, s0_obs = 1))
-  expect_true(check_sum_to_1_dcbhyper(s0 = 4, sar=0.85, s0_obs = 2))
-  expect_true(check_sum_to_1_dcbhyper(s0 = 4, sar=0.85, s0_obs = 3))
-  expect_true(check_sum_to_1_dcbhyper(s0 = 4, sar=0.85, s0_obs = 4))
+  expect_true(check_sum_to_1_dcbhyper(s0 = 4, prob = 0.85, s0_obs = 1))
+  expect_true(check_sum_to_1_dcbhyper(s0 = 4, prob = 0.85, s0_obs = 2))
+  expect_true(check_sum_to_1_dcbhyper(s0 = 4, prob = 0.85, s0_obs = 3))
+  expect_true(check_sum_to_1_dcbhyper(s0 = 4, prob = 0.85, s0_obs = 4))
 
-  expect_true(check_sum_to_1_dcbhyper(s0 = 2, sar=0.25, s0_obs = 1))
-  expect_true(check_sum_to_1_dcbhyper(s0 = 2, sar=0.25, s0_obs = 2))
+  expect_true(check_sum_to_1_dcbhyper(s0 = 2, prob = 0.25, s0_obs = 1))
+  expect_true(check_sum_to_1_dcbhyper(s0 = 2, prob = 0.25, s0_obs = 2))
 
 
 })

@@ -4,9 +4,12 @@ chainbinomial
 The Chain Binomial model for infectious disease spread is especially
 suitable for modelling of small outbreaks, such as outbreaks in
 households. This package contains tools for analyzing data using the
-Chain Binomial model and estimating the secondary attack rate (SAR). The
-household secondary attack rate is defined as the probability that an
+Chain Binomial model and estimating the transmission probability. The
+household transmission probability is defined as the probability that an
 infected household member infects a susceptible household member.
+
+Keywords: Infectious disease modelling, Chain Binomial model, Secondary
+attack rate, Final attack rate, Final size distribution.
 
 ## Installation
 
@@ -31,16 +34,17 @@ devtools::install_github("opisthokonta/chainbinomial")
 
 Consider a household with 4 persons. A single household member becomes
 infected by a contagious disease outside of the household, and the other
-3 household members are susceptible to the disease. Assuming a secondary
-attack rate of 0.23, we can compute the probability that 2 of the 3
-susceptible household members becomes infected using the `dchainbinom`
-function. The `dchainbinom` functions works similarly to other discrete
-probability mass functions in R, such as the `dbinom` and `dpois`.
+3 household members are susceptible to the disease. Assuming a
+transmission probability of 0.23, we can compute the probability that 2
+of the 3 susceptible household members becomes infected using the
+`dchainbinom` function. The `dchainbinom` functions works similarly to
+other discrete probability mass functions in R, such as the `dbinom` and
+`dpois`.
 
 ``` r
 library(chainbinomial)
 
-dchainbinom(x = 2, s0 = 3, i0 = 1, sar = 0.23)
+dchainbinom(x = 2, s0 = 3, i0 = 1, prob = 0.23)
 ```
 
     ## [1] 0.1840275
@@ -48,7 +52,7 @@ dchainbinom(x = 2, s0 = 3, i0 = 1, sar = 0.23)
 We can also compute the entire final size distribution
 
 ``` r
-dchainbinom(x = 0:3, s0 = 3, i0 = 1, sar = 0.23)
+dchainbinom(x = 0:3, s0 = 3, i0 = 1, prob = 0.23)
 ```
 
     ## [1] 0.4565330 0.2425560 0.1840275 0.1168835
@@ -59,7 +63,7 @@ can again compute the final size distribution. Note that the number of
 initial susceptible household members `s0` is now 2.
 
 ``` r
-dchainbinom(x = 0:2, s0 = 2, i0 = 2, sar = 0.23)
+dchainbinom(x = 0:2, s0 = 2, i0 = 2, prob = 0.23)
 ```
 
     ## [1] 0.3515304 0.3717092 0.2767604
@@ -71,7 +75,7 @@ the `generations` argument is Inf, meaning that the outbreak is assumed
 to be completely observed.
 
 ``` r
-dchainbinom(x = 0:3, s0 = 3, i0 = 1, sar = 0.23, generations = 1)
+dchainbinom(x = 0:3, s0 = 3, i0 = 1, prob = 0.23, generations = 1)
 ```
 
     ## [1] 0.456533 0.409101 0.122199 0.012167
@@ -80,23 +84,24 @@ dchainbinom(x = 0:3, s0 = 3, i0 = 1, sar = 0.23, generations = 1)
 
 The `rchainbinom` function can be used to simulate data. Suppose we want
 to simulate data on the number of infected household from 10 households,
-with SAR = 0.2 for the first 5, and SAR = 0.4 for the last 5, all with 4
-susceptible and one initial infected person. This can be done like this:
+with prob = 0.2 for the first 5, and prob = 0.4 for the last 5, all with
+4 susceptible and one initial infected person. This can be done like
+this:
 
 ``` r
 set.seed(1)
 
-rchainbinom(n = 10, sar = rep(c(0.2, 0.4), each = 5), s0 = 4, i0 = 1, generations = Inf)
+rchainbinom(n = 10, prob = rep(c(0.2, 0.4), each = 5), s0 = 4, i0 = 1, generations = Inf)
 ```
 
     ##  [1] 0 0 3 4 2 1 4 4 4 3
 
 The `rchainbinom` works similarly to the `rbinom` and `rpois` functions.
 
-## Estimating the secondary attack rate
+## Estimating the transmission probability
 
 Suppose we have data on how many become infected in 20 households and we
-want to estimate the secondary attack rate. The households may be of
+want to estimate the transmission probability. The households may be of
 different sizes and have different number of initial infectees. Lets
 simulate some data with a know SAR = 0.3:
 
@@ -107,7 +112,7 @@ my_simulated_data <- data.frame(s0 = c(2,3,4,2,1,5,4,4,4,1,1,3,4,1,1,2,3,1,3,6),
                                 i0 = c(1,1,1,1,2,1,1,1,1,1,2,1,1,1,1,1,1,1,1,1))
 
 my_simulated_data$infected <- rchainbinom(n = nrow(my_simulated_data),
-                                          sar = 0.3,
+                                          prob = 0.3,
                                           s0 = my_simulated_data$s0,
                                           i0 = my_simulated_data$i0,
                                           generations = Inf)
@@ -138,42 +143,42 @@ my_simulated_data
     ## 19  3  1        2
     ## 20  6  1        3
 
-Now lets estimate the secondary attack rate using the `estimate_sar`
+Now lets estimate the transmission probability using the `estimate_sar`
 function
 
 ``` r
-my_sar_estimate <- estimate_sar(infected = my_simulated_data$infected, 
+my_tp_estimate <- estimate_sar(infected = my_simulated_data$infected, 
                                  s0 = my_simulated_data$s0, 
                                  i0 = my_simulated_data$i0,
                                  generations = Inf)
 
-my_sar_estimate$sar_hat
+my_tp_estimate$sar_hat
 ```
 
-    ## [1] 0.334902
+    ## NULL
 
 We can also compute 95% confidence intervals
 
 ``` r
-confint(my_sar_estimate)
+confint(my_tp_estimate)
 ```
 
     ##     2.5 %    97.5 % 
     ## 0.2341291 0.4493579
 
-## Predictors of SAR, association analysis
+## Predictors of transmission, association analysis
 
 Suppose the households differ in some systematic way and we want to see
 if there are some factors that are associated with a larger of smaller
-SAR. We can let SAR depend on a set of predictors, similar to a
-Generalized Linear Model (GLM). The predictors in this model would
-operate on the household level, not on the level of individuals. One
-example of a predictor would be the strain or variant of the infectious
-agent.
+transmission probability. We can let the probability depend on a set of
+predictors, similar to a Generalized Linear Model (GLM). The predictors
+in this model would operate on the household level, not on the level of
+individuals. One example of a predictor would be the strain or variant
+of the infectious agent.
 
 Lets simulate some data again, with a simple binary predictor called
-strain_type. The SAR for strain_type = 0 is 0.2 and for strain_type = 1
-it is 0.5.
+strain_type. The transmission probability for strain_type = 0 is 0.2 and
+for strain_type = 1 it is 0.5.
 
 ``` r
 set.seed(10266)
@@ -184,7 +189,7 @@ my_simulated_data <- data.frame(s0 = c(2,3,4,2,1,5,4,4,4,1,1,3,4,1,1,2,3,1,3,6),
                                 strain_type = rep(c(0,1), each = 10))
 
 my_simulated_data$infected <- rchainbinom(n = nrow(my_simulated_data),
-                                          sar = 0.2 + my_simulated_data$strain_type*0.3,
+                                          prob = 0.2 + my_simulated_data$strain_type*0.3,
                                           s0 = my_simulated_data$s0,
                                           i0 = my_simulated_data$i0)
 ```
@@ -213,7 +218,7 @@ summary(cbmod_res)
 ```
 
     ## Chain Binomial model with identity link.
-    ## Model successfully fitted in 0.07 seconds
+    ## Model successfully fitted in 0.05 seconds
     ## 
     ## Model log-likelihood:             -19.6
     ## Null log-likelihood:              -24.0
@@ -261,7 +266,7 @@ initial susceptible individuals, where only 4 of them are observed
 `dcbhyper` function, using the `s0_obs` argument.
 
 ``` r
-dcbhyper(x=0:4, s0 = 5, sar=0.25, s0_obs = 4)
+dcbhyper(x=0:4, s0 = 5, prob = 0.25, s0_obs = 4)
 ```
 
     ## [1] 0.2623329 0.1470408 0.1563287 0.2069753 0.2273222

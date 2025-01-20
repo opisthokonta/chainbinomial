@@ -33,13 +33,13 @@ cb_invlink <- function(x, link){
 
 # Objective function used with optim.
 cb_reg_obj <- function(par, xmat, y, s0, i0, generations, link){
-  sar_hat <- cb_invlink(as.numeric(xmat %*% par), link = link)
+  prob_hat <- cb_invlink(as.numeric(xmat %*% par), link = link)
 
-  if (any(sar_hat > 1 | sar_hat < 0)){
+  if (any(prob_hat > 1 | prob_hat < 0)){
     return(Inf)
   }
 
-  nll <- negloglok_cb(sar = sar_hat, infected = y, s0 = s0, i0 = i0, generations = generations,
+  nll <- negloglok_cb(prob = prob_hat, infected = y, s0 = s0, i0 = i0, generations = generations,
                      transform_inv_logit = FALSE)
 
   return(nll)
@@ -60,7 +60,7 @@ initial_params <- function(y, s0, x, link){
 }
 
 
-#' Fitting models for Secondary Attack Rate with Chain Binomial response
+#' Fitting models for the Transmission Probability with Chain Binomial response
 #'
 #' @param y numeric, the number of infected cases.
 #' @param s0 numeric, the number of initial susceptibles.
@@ -80,8 +80,8 @@ initial_params <- function(y, s0, x, link){
 #' * `p_values` P-values of the null hypothesis that the regression regression coefficient estimate is 0.
 #' * `loglikelihood` the log likelihood value at the point estimate.
 #' * `npar` Number of parameters.
-#' * `sar_hat` Vector of fitted secondary attack rates.
-#' * `fitted_values` Vector of expected outbreak size (final attack rate).
+#' * `sar_hat` Vector of fitted transmission probabilities.
+#' * `fitted_values` Vector of expected outbreak size (attack rate).
 #' * `link` Link function used by the regression model.
 #' * `null_model` = Null model, fitted with [estimate_sar()]. This is equivalent to an intercept only model.
 #' * `warnings` Warning_messages,
@@ -100,7 +100,7 @@ initial_params <- function(y, s0, x, link){
 #'
 #' @examples
 #' set.seed(234)
-#' mydata <- data.frame(infected = rchainbinom(n = 15, s0 = 5, sar = 0.2,
+#' mydata <- data.frame(infected = rchainbinom(n = 15, s0 = 5, prob = 0.2,
 #'    i0 = 1, generations = Inf),
 #'    s0 = 5, i0 = 1, generations = Inf)
 #' xmat <- model.matrix(~ 1, data = mydata)
@@ -183,13 +183,13 @@ cbmod <- function(y, s0, x = NULL, i0 = 1, generations = Inf, link = 'identity',
   beta_se <- sqrt(diag(vcov))
   names(beta_se) <- colnames(x)
 
-  sar_hat <- cb_invlink(as.numeric(x %*% optim_res$par), link = link)
+  prob_hat <- cb_invlink(as.numeric(x %*% optim_res$par), link = link)
 
   # Null model, useful for testing.
   sar_hat_0 <- estimate_sar(infected = y, s0 = s0, i0 = i0, generations = generations)
 
   # Fitted values (aka estimate of expected final attack rate).
-  yhat <- echainbinom(s0 = s0, i0 = i0, sar = sar_hat, generations = generations)
+  yhat <- echainbinom(s0 = s0, i0 = i0, prob = prob_hat, generations = generations)
 
   # p-values
   p_values <- stats::pnorm(abs(beta_hat), mean = 0, sd = beta_se, lower.tail = FALSE) * 2
@@ -204,7 +204,7 @@ cbmod <- function(y, s0, x = NULL, i0 = 1, generations = Inf, link = 'identity',
               p_values = p_values,
               loglikelihood = -optim_res$value,
               npar = length(optim_res$par),
-              sar_hat = sar_hat,
+              prob_hat = prob_hat,
               fitted_values = yhat,
               link = link,
               null_model = sar_hat_0,
@@ -366,8 +366,8 @@ coef.cbmod <- function(object, ...){
 #'
 #' @param object a fitted object of class inheriting from "cbmod".
 #' @param x matrix of predictors (design matrix). Must have the same column names and order as the x matrix used to fit the model.
-#' @param type the type of prediction, either 'link' (default) or 'sar'. The default is on the scale
-#' of the linear predictors. 'sar' gives the predicted secondary attack rate, by transforming the linear
+#' @param type the type of prediction, either 'link' (default) or 'prob'. The default is on the scale
+#' of the linear predictors. 'prob' gives the predicted transmission probability, by transforming the linear
 #'  predictors by the inverse link function used in the model fit.
 #' @param ... additional arguments.
 #'
@@ -375,14 +375,14 @@ coef.cbmod <- function(object, ...){
 #'
 #' @examples
 #' set.seed(234)
-#' mydata <- data.frame(infected = rchainbinom(n = 15, s0 = 5, sar = 0.2,
+#' mydata <- data.frame(infected = rchainbinom(n = 15, s0 = 5, prob = 0.2,
 #'   i0 = 1, generations = Inf),
 #'   s0 = 5, i0 = 1, generations = Inf)
 #' xmat <- model.matrix(~ 1, data = mydata)
 #' res <- cbmod(y = mydata$infected, s0 = mydata$s0, x = xmat, i0 = mydata$i0,
 #'   generations = mydata$generations, link = 'identity')
 #' summary(res)
-#' predict(res, x = xmat, type = 'sar')
+#' predict(res, x = xmat, type = 'prob')
 #'
 #' @export
 predict.cbmod <- function(object, x, type = 'link', ...){
@@ -394,25 +394,23 @@ predict.cbmod <- function(object, x, type = 'link', ...){
     x <- cbind(`(Intercept)` = 1, x)
   }
 
-
   # Sort the input columns to match the order of the parameter vector.
   x <- x[,match(colnames(x), names(object$parameters)), drop=FALSE]
-
 
   if(!identical(colnames(x), names(object$parameters))){
     stop('The column names and order in newdata must match those of names(object$parameters).')
   }
 
   stopifnot(length(type) == 1)
-  stopifnot(type %in% c('link', 'response', 'sar'))
+  stopifnot(type %in% c('link', 'response', 'sar', 'prob'))
 
   eta_hat <- as.numeric(x %*% object$parameters)
 
-  if (type %in% c('response', 'sar')){
-    sar_hat <- cb_invlink(eta_hat, link = object$link)
+  if (type %in% c('response', 'sar', 'prob')){
+    prob_hat <- cb_invlink(eta_hat, link = object$link)
 
-    if (any(sar_hat < 0) | any(sar_hat > 1)){
-      warning('predicted SAR smaller outside 0-1 range.')
+    if (any(prob_hat < 0) | any(prob_hat > 1)){
+      warning('predicted transmission probability smaller outside 0-1 range.')
     }
 
   }
@@ -420,8 +418,8 @@ predict.cbmod <- function(object, x, type = 'link', ...){
 
   if (type == 'link'){
     return(eta_hat)
-  } else if (type %in% c('response', 'sar')){
-    return(sar_hat)
+  } else if (type %in% c('response', 'sar', 'prob')){
+    return(prob_hat)
   }
 
 }
@@ -448,7 +446,7 @@ residuals.cbmod <- function(object, type = 'response', ...){
   } else if (type == 'far'){
     res <- (object$null_model$data$infected / object$null_model$data$s0) - (object$fitted_values / object$null_model$data$s0)
   } else if (type == 'pearson'){
-    vv <- varchainbinom(s0 = object$null_model$data$s0, sar = object$sar_hat, i0 = object$null_model$data$i0, generation = object$null_model$data$generations)
+    vv <- varchainbinom(s0 = object$null_model$data$s0, prob = object$prob_hat, i0 = object$null_model$data$i0, generation = object$null_model$data$generations)
     res <- response_resid / sqrt(vv)
   }
 

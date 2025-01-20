@@ -7,20 +7,20 @@ inv_logit <- function(x){
 
 
 # The negative chain binomial log-likelihood, for use with optim.
-negloglok_cb <- function(sar, infected, s0, i0 , generations, transform_inv_logit = TRUE){
+negloglok_cb <- function(prob, infected, s0, i0 , generations, transform_inv_logit = TRUE){
 
   # The parameter should be transformed when using this function for optimization (estimation),
   # but not when computing the hessian (for standard errors) or when the parameter
   # has already been transformed (in regression modelling).
   if (transform_inv_logit){
-    sar <- inv_logit(sar)
+    prob <- inv_logit(prob)
   } else {
-    if (any(sar < 0) | any(sar > 1)){
+    if (any(prob < 0) | any(prob > 1)){
       return(Inf)
     }
   }
 
-  nll <- -sum(log(dchainbinom(x = infected, s0 = s0, sar = sar, i0 = i0, generations = generations)), na.rm = TRUE)
+  nll <- -sum(log(dchainbinom(x = infected, s0 = s0, prob = prob, i0 = i0, generations = generations)), na.rm = TRUE)
 
   if (is.nan(nll)){
     return(Inf)
@@ -30,11 +30,11 @@ negloglok_cb <- function(sar, infected, s0, i0 , generations, transform_inv_logi
 }
 
 
-#' Estimate Secondary Attack Rate of the Chain Binomial Model
+#' Estimate Transmission Probability of the Chain Binomial Model
 #'
 #' Given data on the number of infected after a number of generation, initial
 #' number of susceptible, and initial number of infected, estimate the
-#' secondary attack rate (SAR) using maximum likelihood.
+#' transmission probability using maximum likelihood.
 #'
 #' @param infected numeric.
 #' @param s0 numeric.
@@ -43,7 +43,7 @@ negloglok_cb <- function(sar, infected, s0, i0 , generations, transform_inv_logi
 #' @param se logical. If TRUE (default), the standard error is computed.
 #'
 #' @returns A list of class `sar` with the following components:
-#' * `sar_hat` The point estimate of the secondary attack rate.
+#' * `prob_hat` The point estimate of the transmission probability.
 #' * `se` Standard error of the estimate (if se = TRUE).
 #' * `loglikelihood` The log likelihood value at the point estimate.
 #' * `data` The input data.
@@ -71,23 +71,23 @@ estimate_sar <- function(infected, s0, i0 = 1, generations=Inf, se = TRUE){
             length(se) == 1)
 
 
-  sar_init <- 0.5
-  optim_res <- stats::optim(par = sar_init,
+  prob_init <- 0.5
+  optim_res <- stats::optim(par = prob_init,
                      fn = negloglok_cb, method = 'L-BFGS-B',
                      hessian = FALSE,
                      infected = infected, s0 = s0, i0 = i0, generations = generations)
 
 
-  sar_hat <- inv_logit(optim_res$par)
+  prob_hat <- inv_logit(optim_res$par)
 
   if (se){
-    he <- numDeriv::hessian(negloglok_cb, x = sar_hat,
+    he <- numDeriv::hessian(negloglok_cb, x = prob_hat,
                             infected = infected, s0 = s0, i0 = i0,
                             generations = generations,
                             transform_inv_logit = FALSE)
-    sar_se <- sqrt(as.numeric(solve(he)))
+    prob_se <- sqrt(as.numeric(solve(he)))
   } else {
-    sar_se <- NA
+    prob_se <- NA
   }
 
 
@@ -96,8 +96,8 @@ estimate_sar <- function(infected, s0, i0 = 1, generations=Inf, se = TRUE){
               i0 = i0,
               generations = generations)
 
-  res <- list(sar_hat = sar_hat,
-              se = sar_se,
+  res <- list(prob_hat = prob_hat,
+              se = prob_se,
               loglikelihood = -optim_res$value,
               data = inp)
 
@@ -119,7 +119,7 @@ estimate_sar <- function(infected, s0, i0 = 1, generations=Inf, se = TRUE){
 obj_ci_wilks <- function(x, infected, s0, i0, generations, max_loglik, critical_value){
 
   # Log likelihood at the parameter value x.
-  x_loglik <-  -negloglok_cb(sar = x, infected = infected, s0 = s0, i0 = i0,
+  x_loglik <-  -negloglok_cb(prob = x, infected = infected, s0 = s0, i0 = i0,
                              generations = generations, transform_inv_logit = FALSE)
 
   # -2 log-likelihood ratio.
@@ -204,21 +204,21 @@ confint.sar <- function(object, parm = NULL, level = 0.95, method = 'chisq', ...
     # Compute Standard error if needed.
     if (is.na(object$se)){
 
-      he <- numDeriv::hessian(negloglok_cb, x = object$sar_hat,
+      he <- numDeriv::hessian(negloglok_cb, x = object$prob_hat,
                               infected = object$data$infected,
                               s0 = object$data$s0,
                               i0 = object$data$i0,
                               generations = object$data$generations,
                               transform_inv_logit = FALSE)
-      sar_se <- sqrt(as.numeric(solve(he)))
+      prob_se <- sqrt(as.numeric(solve(he)))
 
     } else{
-      sar_se <- object$se
+      prob_se <- object$se
     }
 
     # compute CI using normal approximation.
-    ci_lwr <- max(object$sar_hat + (sar_se * stats::qnorm((1-level)/2, lower.tail = TRUE)), 0)
-    ci_upr <- min(object$sar_hat + (sar_se * stats::qnorm((1-level)/2, lower.tail = FALSE)) , 1)
+    ci_lwr <- max(object$prob_hat + (prob_se * stats::qnorm((1-level)/2, lower.tail = TRUE)), 0)
+    ci_upr <- min(object$prob_hat + (prob_se * stats::qnorm((1-level)/2, lower.tail = FALSE)) , 1)
 
   } else if (method == 'chisq'){
 
@@ -228,7 +228,7 @@ confint.sar <- function(object, parm = NULL, level = 0.95, method = 'chisq', ...
 
     critical_value_lower <- stats::qchisq(plwr, df = 1, lower.tail = FALSE)
 
-    uniroot_res_lwr <- uniroot2(f = obj_ci_wilks, interval = find_interval_lwr(object$sar_hat),
+    uniroot_res_lwr <- uniroot2(f = obj_ci_wilks, interval = find_interval_lwr(object$prob_hat),
                        infected = object$data$infected, s0 = object$data$s0,
                        i0 = object$data$i0, generations = object$data$generations,
                        max_loglik = object$loglikelihood,
@@ -237,7 +237,7 @@ confint.sar <- function(object, parm = NULL, level = 0.95, method = 'chisq', ...
 
     # Try again if it fails, with new search interval.
     if (is.na(uniroot_res_lwr$root)){
-      uniroot_res_lwr <- uniroot2(f = obj_ci_wilks, interval = find_interval_lwr(object$sar_hat, x = 2),
+      uniroot_res_lwr <- uniroot2(f = obj_ci_wilks, interval = find_interval_lwr(object$prob_hat, x = 2),
                                   infected = object$data$infected, s0 = object$data$s0,
                                   i0 = object$data$i0, generations = object$data$generations,
                                   max_loglik = object$loglikelihood,
@@ -248,7 +248,7 @@ confint.sar <- function(object, parm = NULL, level = 0.95, method = 'chisq', ...
 
     critical_value_upper <- stats::qchisq(pupr, df = 1, lower.tail = TRUE)
 
-    uniroot_res_upr <- uniroot2(f = obj_ci_wilks, interval = find_interval_upr(object$sar_hat),
+    uniroot_res_upr <- uniroot2(f = obj_ci_wilks, interval = find_interval_upr(object$prob_hat),
                        infected = object$data$infected, s0 = object$data$s0,
                        i0 = object$data$i0, generations = object$data$generations,
                        max_loglik = object$loglikelihood,
@@ -259,7 +259,7 @@ confint.sar <- function(object, parm = NULL, level = 0.95, method = 'chisq', ...
 
     # Try again if it fails, with new search interval.
     if (is.na(uniroot_res_upr$root)){
-      uniroot_res_upr <- uniroot2(f = obj_ci_wilks, interval = find_interval_upr(object$sar_hat, x = 2),
+      uniroot_res_upr <- uniroot2(f = obj_ci_wilks, interval = find_interval_upr(object$prob_hat, x = 2),
                                   infected = object$data$infected, s0 = object$data$s0,
                                   i0 = object$data$i0, generations = object$data$generations,
                                   max_loglik = object$loglikelihood,
@@ -268,8 +268,8 @@ confint.sar <- function(object, parm = NULL, level = 0.95, method = 'chisq', ...
     }
 
 
-    ci_lwr <- min(object$sar_hat, uniroot_res_lwr$root)
-    ci_upr <- max(object$sar_hat, uniroot_res_upr$root)
+    ci_lwr <- min(object$prob_hat, uniroot_res_lwr$root)
+    ci_upr <- max(object$prob_hat, uniroot_res_upr$root)
 
   }
 

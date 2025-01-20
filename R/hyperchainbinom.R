@@ -13,10 +13,10 @@
 #' @param i0 the number of primary cases.
 #'
 #' @export
-dcbhyper <- function(x, s0, sar, s0_obs, i0 = 1){
+dcbhyper <- function(x, s0, prob, s0_obs, i0 = 1){
 
   # Combine input to matrix, to expand/recycle input data.
-  inp <- as.matrix(cbind(x, s0, sar, s0_obs, i0))
+  inp <- as.matrix(cbind(x, s0, prob, s0_obs, i0))
 
   stopifnot(any(inp[,'s0_obs'] <= inp[,'s0']))
 
@@ -26,7 +26,7 @@ dcbhyper <- function(x, s0, sar, s0_obs, i0 = 1){
 
     true_escaped <- inp[ii, 's0'] - 0:inp[ii, 's0']
 
-    dd <- dchainbinom(x=0:inp[ii, 's0'], s0 = inp[ii, 's0'], sar = inp[ii, 'sar'], i0 = inp[ii, 'i0'])
+    dd <- dchainbinom(x=0:inp[ii, 's0'], s0 = inp[ii, 's0'], prob = inp[ii, 'prob'], i0 = inp[ii, 'i0'])
 
     # x: I_obs
     # m: I
@@ -42,26 +42,26 @@ dcbhyper <- function(x, s0, sar, s0_obs, i0 = 1){
 
 #' @rdname dcbhyper
 #' @export
-ecbhyper <- function(s0, sar, s0_obs, i0 = 1){
+ecbhyper <- function(s0, prob, s0_obs, i0 = 1){
 
   stopifnot(is.numeric(s0) | is.logical(s0),
-            is.numeric(sar) | is.logical(sar),
+            is.numeric(prob) | is.logical(prob),
             is.numeric(i0) | is.logical(i0),
             is.numeric(s0_obs) | is.logical(s0_obs),
-            all(sar >= 0, na.rm = TRUE),
-            all(sar <= 1, na.rm = TRUE),
+            all(prob >= 0, na.rm = TRUE),
+            all(prob <= 1, na.rm = TRUE),
             all(s0 >= 0, na.rm = TRUE),
             all(i0 >= 1, na.rm = TRUE),
             all(s0_obs >= 1, na.rm = TRUE))
 
   # Coerce to numericals, in case of logicals being provided.
   s0 <- as.numeric(s0)
-  sar <- as.numeric(sar)
+  prob <- as.numeric(prob)
   i0 <- as.numeric(i0)
   s0_obs <- as.numeric(s0_obs)
 
   # Combine input to matrix, to expand/recycle input data.
-  inp <- as.matrix(cbind(s0, sar, s0_obs, i0))
+  inp <- as.matrix(cbind(s0, prob, s0_obs, i0))
 
   n <- nrow(inp)
   res <- numeric(n)
@@ -74,7 +74,7 @@ ecbhyper <- function(s0, sar, s0_obs, i0 = 1){
     }
     xx <- 0:inp[ii, 's0_obs']
 
-    pp <- dcbhyper(x  = xx, s0 = inp[ii, 's0'], i0 = inp[ii, 'i0'], sar = inp[ii, 'sar'], s0_obs = inp[ii, 's0_obs'])
+    pp <- dcbhyper(x  = xx, s0 = inp[ii, 's0'], i0 = inp[ii, 'i0'], prob = inp[ii, 'prob'], s0_obs = inp[ii, 's0_obs'])
     res[ii] <- sum(xx * pp)
   }
 
@@ -87,20 +87,20 @@ ecbhyper <- function(s0, sar, s0_obs, i0 = 1){
 
 
 # The negative chain binomial log-likelihood, for use with optim.
-negloglok_cbhyper <- function(sar, infected, s0, s0_obs, i0, transform_inv_logit = TRUE){
+negloglok_cbhyper <- function(prob, infected, s0, s0_obs, i0, transform_inv_logit = TRUE){
 
   # The parameter should be transformed when using this function for optimization (estimation),
   # but not when computing the hessian (for standard errors) or when the parameter
   # has already been transformed (in regression modelling).
   if (transform_inv_logit){
-    sar <- inv_logit(sar)
+    prob <- inv_logit(prob)
   } else {
-    if (any(sar < 0) | any(sar > 1)){
+    if (any(prob < 0) | any(prob > 1)){
       return(Inf)
     }
   }
 
-  nll <- -sum(log(dcbhyper(x = infected, s0 = s0, s0_obs = s0_obs, sar = sar, i0 = i0)), na.rm = TRUE)
+  nll <- -sum(log(dcbhyper(x = infected, s0 = s0, s0_obs = s0_obs, prob = prob, i0 = i0)), na.rm = TRUE)
 
   if (is.nan(nll)){
     return(Inf)
