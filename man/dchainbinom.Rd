@@ -8,44 +8,73 @@
 \alias{varchainbinom}
 \title{The Chain Binomial distribution}
 \usage{
-dchainbinom(x, s0, sar, i0 = 1, generations = Inf)
+dchainbinom(
+  x,
+  s0,
+  prob,
+  i0 = 1,
+  generations = Inf,
+  sar = lifecycle::deprecated()
+)
 
-rchainbinom(n, s0, sar, i0 = 1, generations = Inf)
+rchainbinom(
+  n,
+  s0,
+  prob,
+  i0 = 1,
+  generations = Inf,
+  sar = lifecycle::deprecated()
+)
 
-pchainbinom(q, s0, sar, i0 = 1, generations = Inf)
+pchainbinom(
+  q,
+  s0,
+  prob,
+  i0 = 1,
+  generations = Inf,
+  sar = lifecycle::deprecated()
+)
 
-echainbinom(s0, sar, i0 = 1, generations = Inf)
+echainbinom(s0, prob, i0 = 1, generations = Inf, sar = lifecycle::deprecated())
 
-varchainbinom(s0, sar, i0 = 1, generations = Inf)
+varchainbinom(
+  s0,
+  prob,
+  i0 = 1,
+  generations = Inf,
+  sar = lifecycle::deprecated()
+)
 }
 \arguments{
 \item{x}{numeric vector of the number of infected.}
 
 \item{s0}{the number of initial susceptibles.}
 
-\item{sar}{the secondary attack rate, or the per person risk of infection by an infected.}
+\item{prob}{the transmission probability.}
 
 \item{i0}{the number of primary cases.}
 
 \item{generations}{the number of generations. Default is Inf, which represents the entire epidemic.}
+
+\item{sar}{Deprecated. Please use the argument 'prob' instead.}
 
 \item{n}{number of observations. If length(n) > 1, the length is taken to be the number required.}
 
 \item{q}{numeric vector of the number of infected.}
 }
 \value{
-\code{dchainbinom} gives the probability of x infected, given s0, i0, sar and generations. \code{echainbinom} gives the expected value.
-\code{rchainbinom} generates random data.
+\code{dchainbinom} gives the probability of x infected, given s0, i0, prob and generations. \code{echainbinom} gives the expected value,
+\code{varchainbinom} gives the variance, \code{rchainbinom} generates random data.
 }
 \description{
 Probability mass function, cumulative, expected value, variance function, and random generation, for the chain binomial distribution,
-with parameters s0, sar, i0, and number of generations, for the number of infected
+with parameters s0, prob, i0, and number of generations, for the number of infected
 cases in a population of size s0 after a given number of generations.
 }
 \examples{
-dchainbinom(x = 0:5, s0 = 5, sar = 0.2, i0 = 1, generations = Inf)
-rchainbinom(n = 10, s0 = 5, sar = 0.2, i0 = 1, generations = Inf)
-echainbinom(s0 = 5, sar = 0.2, i0 = 1, generations = Inf)
-varchainbinom(s0 = 5, sar = 0.2, i0 = 1, generations = Inf)
+dchainbinom(x = 0:5, s0 = 5, prob = 0.2, i0 = 1, generations = Inf)
+rchainbinom(n = 10, s0 = 5, prob = 0.2, i0 = 1, generations = Inf)
+echainbinom(s0 = 5, prob = 0.2, i0 = 1, generations = Inf)
+varchainbinom(s0 = 5, prob = 0.2, i0 = 1, generations = Inf)
 
 }

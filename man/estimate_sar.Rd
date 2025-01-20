@@ -2,7 +2,7 @@
 % Please edit documentation in R/estimate_sar.R
 \name{estimate_sar}
 \alias{estimate_sar}
-\title{Estimate Secondary Attack Rate of the Chain Binomial Model}
+\title{Estimate Transmission Probability of the Chain Binomial Model}
 \usage{
 estimate_sar(infected, s0, i0 = 1, generations = Inf, se = TRUE)
 }
@@ -20,7 +20,7 @@ estimate_sar(infected, s0, i0 = 1, generations = Inf, se = TRUE)
 \value{
 A list of class \code{sar} with the following components:
 \itemize{
-\item \code{sar_hat} The point estimate of the secondary attack rate.
+\item \code{prob_hat} The point estimate of the transmission probability.
 \item \code{se} Standard error of the estimate (if se = TRUE).
 \item \code{loglikelihood} The log likelihood value at the point estimate.
 \item \code{data} The input data.
@@ -29,7 +29,7 @@ A list of class \code{sar} with the following components:
 \description{
 Given data on the number of infected after a number of generation, initial
 number of susceptible, and initial number of infected, estimate the
-secondary attack rate (SAR) using maximum likelihood.
+transmission probability using maximum likelihood.
 }
 \examples{
 set.seed(234)

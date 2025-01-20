@@ -11,8 +11,8 @@
 
 \item{x}{matrix of predictors (design matrix). Must have the same column names and order as the x matrix used to fit the model.}
 
-\item{type}{the type of prediction, either 'link' (default) or 'sar'. The default is on the scale
-of the linear predictors. 'sar' gives the predicted secondary attack rate, by transforming the linear
+\item{type}{the type of prediction, either 'link' (default) or 'prob'. The default is on the scale
+of the linear predictors. 'prob' gives the predicted transmission probability, by transforming the linear
 predictors by the inverse link function used in the model fit.}
 
 \item{...}{additional arguments.}
@@ -25,13 +25,13 @@ Predict Method for cbmod Fits
 }
 \examples{
 set.seed(234)
-mydata <- data.frame(infected = rchainbinom(n = 15, s0 = 5, sar = 0.2,
+mydata <- data.frame(infected = rchainbinom(n = 15, s0 = 5, prob = 0.2,
   i0 = 1, generations = Inf),
   s0 = 5, i0 = 1, generations = Inf)
 xmat <- model.matrix(~ 1, data = mydata)
 res <- cbmod(y = mydata$infected, s0 = mydata$s0, x = xmat, i0 = mydata$i0,
   generations = mydata$generations, link = 'identity')
 summary(res)
-predict(res, x = xmat, type = 'sar')
+predict(res, x = xmat, type = 'prob')
 
 }

@@ -5,20 +5,20 @@
 \alias{ecbhyper}
 \title{The Hyper Chain Binomial distribution}
 \usage{
-dcbhyper(x, s0, sar, s0_obs, i0 = 1)
+dcbhyper(x, s0, prob, s0_obs, i0 = 1)
 
-ecbhyper(s0, sar, s0_obs, i0 = 1)
+ecbhyper(s0, prob, s0_obs, i0 = 1)
 }
 \arguments{
 \item{x}{numeric vector of the number of infected.}
 
 \item{s0}{the number of initial susceptibles.}
 
-\item{sar}{the secondary attack rate, or the per person risk of infection by an infected.}
-
 \item{s0_obs}{The number of observed individuals.}
 
 \item{i0}{the number of primary cases.}
+
+\item{sar}{the secondary attack rate, or the per person risk of infection by an infected.}
 }
 \description{
 Probability mass function, expected value, and random generation, for the hyper chain binomial distribution,

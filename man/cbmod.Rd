@@ -2,7 +2,7 @@
 % Please edit documentation in R/modelling.R
 \name{cbmod}
 \alias{cbmod}
-\title{Fitting models for Secondary Attack Rate with Chain Binomial response}
+\title{Fitting models for the Transmission Probability with Chain Binomial response}
 \usage{
 cbmod(
   y,
@@ -38,8 +38,8 @@ A list of class \code{cbmod} with the following components:
 \item \code{p_values} P-values of the null hypothesis that the regression regression coefficient estimate is 0.
 \item \code{loglikelihood} the log likelihood value at the point estimate.
 \item \code{npar} Number of parameters.
-\item \code{sar_hat} Vector of fitted secondary attack rates.
-\item \code{fitted_values} Vector of expected outbreak size (final attack rate).
+\item \code{sar_hat} Vector of fitted transmission probabilities.
+\item \code{fitted_values} Vector of expected outbreak size (attack rate).
 \item \code{link} Link function used by the regression model.
 \item \code{null_model} = Null model, fitted with \code{\link[=estimate_sar]{estimate_sar()}}. This is equivalent to an intercept only model.
 \item \code{warnings} Warning_messages,
@@ -48,14 +48,14 @@ A list of class \code{cbmod} with the following components:
 }
 }
 \description{
-Fitting models for Secondary Attack Rate with Chain Binomial response
+Fitting models for the Transmission Probability with Chain Binomial response
 }
 \details{
 The following link functions are available: \code{identity}, \code{log}, \code{logit}, and \code{cloglog}.
 }
 \examples{
 set.seed(234)
-mydata <- data.frame(infected = rchainbinom(n = 15, s0 = 5, sar = 0.2,
+mydata <- data.frame(infected = rchainbinom(n = 15, s0 = 5, prob = 0.2,
    i0 = 1, generations = Inf),
    s0 = 5, i0 = 1, generations = Inf)
 xmat <- model.matrix(~ 1, data = mydata)
