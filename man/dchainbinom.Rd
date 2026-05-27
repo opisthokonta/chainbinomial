@@ -7,6 +7,9 @@
 \alias{echainbinom}
 \alias{varchainbinom}
 \alias{dchainbinom2}
+\alias{pchainbinom2}
+\alias{echainbinom2}
+\alias{varchainbinom2}
 \title{The Chain Binomial distribution}
 \usage{
 dchainbinom(
@@ -47,6 +50,12 @@ varchainbinom(
 )
 
 dchainbinom2(x, s0, prob, cpi)
+
+pchainbinom2(q, s0, prob, cpi)
+
+echainbinom2(s0, prob, cpi)
+
+varchainbinom2(s0, prob, cpi)
 }
 \arguments{
 \item{x}{Numeric vector of the number of infected.}

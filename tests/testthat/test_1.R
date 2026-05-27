@@ -603,6 +603,26 @@ test_that("Expected value == s0", {
 })
 
 
+expval_lk_1 <- echainbinom2(s0 = 4, prob = 0.3, cpi = 0.1)
+expval_lk_2 <- echainbinom2(s0 = 4, prob = c(0.1, 0.2, 0.3, 0.4), cpi = 0.1)
+
+test_that("Expected value Longini-Koopman", {
+
+  expect_true(length(expval_lk_1) == 1)
+  expect_true(!is.na(expval_lk_1))
+  expect_true(expval_lk_1 > 0)
+  expect_true(expval_lk_1 < 4)
+
+  expect_true(length(expval_lk_2) == 4)
+  expect_true(all(!is.na(expval_lk_2)))
+  expect_true(all(expval_lk_2 > 0))
+  expect_true(all(expval_lk_2 < 4))
+
+})
+
+
+
+
 # Variance ----
 
 # Variance should be same as for ordinary binomial when g=1.
@@ -626,6 +646,25 @@ test_that("Variance g=1", {
   expect_true(varcb_vs_varb_g1(s0 = 9, prob = 0.6))
 
 })
+
+
+var_lk_1 <- varchainbinom2(s0 = 4, prob = 0.3, cpi = 0.1)
+var_lk_2 <- varchainbinom2(s0 = 4, prob = c(0.1, 0.2, 0.3, 0.4), cpi = 0.1)
+
+test_that("Variance value Longini-Koopman", {
+
+  expect_true(length(var_lk_1) == 1)
+  expect_true(!is.na(var_lk_1))
+  expect_true(var_lk_1 > 0)
+
+  expect_true(length(var_lk_2) == 4)
+  expect_true(all(!is.na(var_lk_2)))
+  expect_true(all(var_lk_2 > 0))
+
+})
+
+
+
 
 # Cumulative distribution function ----
 
@@ -656,6 +695,28 @@ test_that("CDF", {
   expect_true(pchainbinom(1, s0 = 3, prob = 0.2, generations = Inf) == pchainbinom(1.9, s0 = 3, prob = 0.2, generations = Inf))
 
 })
+
+
+test_that("CDF (LK)", {
+
+  # Check that the result is as expected.
+  expect_true(pchainbinom2(2, s0 = 6, prob = 0.22, cpi = 0.15) == sum(dchainbinom2(0:2, s0 = 6, prob = 0.22, cpi = 0.15)))
+
+  # Same as ordinary binomial when prob=0
+  expect_true(all(pchainbinom2(0:3, s0 = 3, prob = 0, cpi = 0.3) - pbinom(q  = 0:3, size=  3, prob = 0.3) < 0.00001))
+  expect_true(all(pchainbinom2(0:5, s0 = 3, prob = 0, cpi = 0.3) - pbinom(q  = 0:5, size = 3, prob = 0.3) < 0.00001))
+
+  # Should be 1 when q = s0.
+  expect_true(pchainbinom2(3, s0 = 3, prob = 0.2, cpi = 0.3) == 1)
+
+  # Should be 1 when q > s0.
+  expect_true(pchainbinom2(5, s0 = 3, prob = 0.2, cpi = 0.3) == 1)
+
+  # Check the floor.
+  expect_true(pchainbinom2(0, s0 = 3, prob = 0.2, cpi = 0.3) == pchainbinom2(0.9, s0 = 3, prob = 0.2, cpi = 0.3))
+
+})
+
 
 # Estimation and modelling ----
 

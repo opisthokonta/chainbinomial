@@ -108,3 +108,146 @@ dchainbinom2 <- function(x, s0, prob, cpi){
 
 
 
+#' @rdname dchainbinom
+#' @export
+pchainbinom2 <- function(q, s0, prob, cpi){
+
+  # Check input.
+  stopifnot(is.numeric(q) | is.logical(q),
+            is.numeric(s0) | is.logical(s0),
+            all(q >= 0, na.rm = TRUE),
+            all(s0 >= 0, na.rm = TRUE))
+
+  stopifnot(is.numeric(prob) | is.logical(prob),
+            all(prob >= 0, na.rm = TRUE),
+            all(prob <= 1, na.rm = TRUE))
+
+  stopifnot(is.numeric(cpi) | is.logical(cpi),
+            all(cpi >= 0, na.rm = TRUE),
+            all(cpi <= 1, na.rm = TRUE))
+
+
+  # Coerce to numericals, in case of logicals being provided.
+  q <- as.numeric(q)
+  s0 <- as.numeric(s0)
+  prob <- as.numeric(prob)
+  cpi <- as.numeric(cpi)
+
+  # Combine input to matrix, to expand/recycle input data.
+  inp <- as.matrix(cbind(q, s0, prob, cpi))
+
+  n <- nrow(inp)
+  res <- numeric(n)
+
+  for (ii in 1:n){
+
+    if (any(is.na(inp[ii,]))){
+      res[ii] <- NA
+      next
+    }
+
+    xx <- 0:floor(inp[ii, 'q'])
+    pp <- dchainbinom2(x  = xx, s0 = inp[ii, 's0'], prob = inp[ii, 'prob'], cpi = inp[ii, 'cpi'])
+    res[ii] <- sum(pp)
+  }
+
+  return(res)
+
+}
+
+
+
+
+#' @rdname dchainbinom
+#' @export
+echainbinom2 <- function(s0, prob, cpi){
+
+  stopifnot(is.numeric(s0) | is.logical(s0),
+            all(s0 >= 0, na.rm = TRUE))
+
+
+  stopifnot(is.numeric(prob) | is.logical(prob),
+            all(prob >= 0, na.rm = TRUE),
+            all(prob <= 1, na.rm = TRUE))
+
+  stopifnot(is.numeric(cpi) | is.logical(cpi),
+            all(cpi >= 0, na.rm = TRUE),
+            all(cpi <= 1, na.rm = TRUE))
+
+
+  # Coerce to numericals, in case of logicals being provided.
+  s0 <- as.numeric(s0)
+  prob <- as.numeric(prob)
+  cpi <- as.numeric(cpi)
+
+  # Combine input to matrix, to expand/recycle input data.
+  inp <- as.matrix(cbind(s0, prob, cpi))
+
+  n <- nrow(inp)
+  res <- numeric(n)
+
+  for (ii in 1:n){
+
+    if (any(is.na(inp[ii,]))){
+      res[ii] <- NA
+      next
+    }
+    xx <- 0:inp[ii, 's0']
+    pp <- dchainbinom2(x  = xx, s0 = inp[ii, 's0'], prob = inp[ii, 'prob'], cpi = inp[ii, 'cpi'])
+    res[ii] <- sum(xx * pp)
+  }
+
+  return(res)
+
+}
+
+
+#' @rdname dchainbinom
+#' @export
+varchainbinom2 <- function(s0, prob, cpi){
+
+  stopifnot(is.numeric(s0) | is.logical(s0),
+            all(s0 >= 0, na.rm = TRUE))
+
+  stopifnot(is.numeric(prob) | is.logical(prob),
+            all(prob >= 0, na.rm = TRUE),
+            all(prob <= 1, na.rm = TRUE))
+
+  stopifnot(is.numeric(cpi) | is.logical(cpi),
+            all(cpi >= 0, na.rm = TRUE),
+            all(cpi <= 1, na.rm = TRUE))
+
+
+  # Coerce to numericals, in case of logicals being provided.
+  s0 <- as.numeric(s0)
+  prob <- as.numeric(prob)
+  cpi <- as.numeric(cpi)
+
+  # Combine input to matrix, to expand/recycle input data.
+  inp <- as.matrix(cbind(s0, prob, cpi))
+
+  n <- nrow(inp)
+  ex <- numeric(n)
+  ex2 <- numeric(n)
+
+  for (ii in 1:n){
+
+    if (any(is.na(inp[ii,]))){
+      res[ii] <- NA
+      next
+    }
+    xx <- 0:inp[ii, 's0']
+    pp <- dchainbinom2(x  = xx, s0 = inp[ii, 's0'],  prob = inp[ii, 'prob'], cpi = inp[ii, 'cpi'])
+    ex[ii] <- sum(xx * pp)
+    ex2[ii] <- sum(xx^2 * pp)
+  }
+
+  res <- ex2 - (ex^2)
+
+  return(res)
+
+}
+
+
+
+
