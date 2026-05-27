@@ -3,12 +3,12 @@
 #' The Hyper Chain Binomial distribution
 #'
 #' Probability mass function, expected value, and random generation, for the hyper chain binomial distribution,
-#' with parameters s0, sar, i0, and s0_obs for the number of observed infected
+#' with parameters s0, prob, i0, and s0_obs for the number of observed infected
 #' cases in a population of size s0 with s0_obs observed individuals.
 #'
 #' @param x numeric vector of the number of infected.
 #' @param s0 the number of initial susceptibles.
-#' @param sar the secondary attack rate, or the per person risk of infection by an infected.
+#' @param prob the transmission, or the per person risk of infection by an infected.
 #' @param s0_obs The number of observed individuals.
 #' @param i0 the number of primary cases.
 #'
@@ -196,7 +196,7 @@ estimate_sar_cbhyper <- function(infected, s0, s0_obs, i0 = 1, se = TRUE){
 obj_ci_wilks2 <- function(x, infected, s0, i0, s0_obs, max_loglik, critical_value){
 
   # Log likelihood at the parameter value x.
-  x_loglik <-  -negloglok_cbhyper(sar = x, infected = infected, s0 = s0, i0 = i0, s0_obs = s0_obs,
+  x_loglik <-  -negloglok_cbhyper(prob = x, infected = infected, s0 = s0, i0 = i0, s0_obs = s0_obs,
                                   #generations = generations,
                                   transform_inv_logit = FALSE)
 

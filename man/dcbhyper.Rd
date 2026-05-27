@@ -14,14 +14,14 @@ ecbhyper(s0, prob, s0_obs, i0 = 1)
 
 \item{s0}{the number of initial susceptibles.}
 
+\item{prob}{the transmission, or the per person risk of infection by an infected.}
+
 \item{s0_obs}{The number of observed individuals.}
 
 \item{i0}{the number of primary cases.}
-
-\item{sar}{the secondary attack rate, or the per person risk of infection by an infected.}
 }
 \description{
 Probability mass function, expected value, and random generation, for the hyper chain binomial distribution,
-with parameters s0, sar, i0, and s0_obs for the number of observed infected
+with parameters s0, prob, i0, and s0_obs for the number of observed infected
 cases in a population of size s0 with s0_obs observed individuals.
 }

@@ -152,10 +152,10 @@ my_tp_estimate <- estimate_sar(infected = my_simulated_data$infected,
                                  i0 = my_simulated_data$i0,
                                  generations = Inf)
 
-my_tp_estimate$sar_hat
+my_tp_estimate$prob_hat
 ```
 
-    ## NULL
+    ## [1] 0.334902
 
 We can also compute 95% confidence intervals
 

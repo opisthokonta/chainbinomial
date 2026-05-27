@@ -207,7 +207,7 @@ sar_res <- estimate_sar(infected = dta_outbreak_sizes$I,
                         s0 = dta_outbreak_sizes$S0, 
                         i0 = dta_outbreak_sizes$I0)
 
-sar_res$sar_hat
+sar_res$prob_hat
 
 confint(sar_res)
 ```
