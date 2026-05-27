@@ -91,7 +91,6 @@ dcb_1_ginf <- dchainbinom(x = 0:5, s0 = 5, prob = 0.11, generations = Inf)
 
 dcb_2_ginf <- dchainbinom(x = 0:5, s0 = 5, prob = 0.00014, i0 = 1, generations = Inf)
 
-
 tol_sum_to_1 <- 2e-15
 
 test_that("PMF is ok", {
@@ -216,6 +215,7 @@ test_that("PMF when g = 1", {
 
 
 
+
 # Prob for x = 0 ----
 # The probability for x = 0 should be the same as the ordinary binomial, when i0=1,
 # but not necessarily if i0 > 1.
@@ -257,6 +257,62 @@ test_that("P(x=0)", {
 
 
 })
+
+
+# Longini-Koopman PMF. ----
+dcb_lk_1 <- dchainbinom2(x = 0:5, s0 = 5, prob = 0.11, cpi = 0)
+dcb_lk_2 <- dchainbinom2(x = 0:5, s0 = 5, prob = 0.21, cpi = 0.05)
+
+
+test_that("PMF (LK) OK", {
+
+  expect_true(abs(sum(dcb_lk_1) - 1) < tol_sum_to_1)
+  expect_true(abs(sum(dcb_lk_2) - 1) < tol_sum_to_1)
+
+  expect_true(all(dcb_lk_1 >= 0))
+  expect_true(all(dcb_lk_2 >= 0))
+
+  expect_true(dcb_lk_1[1] == 1)
+
+})
+
+
+check_sum_to_1_lk <- function(s0, prob, cpi){
+
+  ss <- sum(dchainbinom2(x = 0:s0, s0 = s0, prob = prob, cpi = cpi))
+
+  if (ss == 1){
+    return(TRUE)
+  } else {
+    abs(ss-1) < 1e-15
+  }
+}
+
+test_that("PMF (LK) sum to 1", {
+
+  expect_true(check_sum_to_1_lk(s0 = 3, prob = 0.1, cpi = 0.1))
+  expect_true(check_sum_to_1_lk(s0 = 8, prob = 0.3, cpi = 0.09))
+  expect_true(check_sum_to_1_lk(s0 = 2, prob = 0.1, cpi = 0.12))
+  expect_true(check_sum_to_1_lk(s0 = 1, prob = 0.2, cpi = 0.02))
+  expect_true(check_sum_to_1_lk(s0 = 0, prob = 0.2, cpi = 0.02))
+  expect_true(check_sum_to_1_lk(s0 = 3, prob = 0.1, cpi = 1))
+
+
+})
+
+
+# For the Longini-Koopman model, when transmission probability = 0,
+# the disease is not infectious and should be the same as ordinary Binomial model.
+test_that("PMF (LK) when prob = 0", {
+
+  expect_true(all(dchainbinom2(x = 0:4, s0 = 4, prob = 0, cpi = 0.3) - dbinom(0:4, size = 4, prob = 0.3) <= 1e-14))
+  expect_true(all(dchainbinom2(x = 0:6, s0 = 6, prob = 0, cpi = 0.3) - dbinom(0:6, size = 6, prob = 0.3) <= 1e-14))
+
+  expect_true(all(dchainbinom2(x = 0:4, s0 = 4, prob = 0, cpi = 0.1) - dbinom(0:4, size = 4, prob = 0.1) <= 1e-14))
+  expect_true(all(dchainbinom2(x = 0:6, s0 = 6, prob = 0, cpi = 0.1) - dbinom(0:6, size = 6, prob = 0.1) <= 1e-14))
+
+})
+
 
 
 
@@ -306,6 +362,23 @@ vr11_b <- rep(dchainbinom(x = 0:3, s0 = 3, prob = 0.25, i0 = 1, generations = In
 vr12_a <- dchainbinom(x = 0:3, s0 = rep(0:3, 3), prob = 0.25, i0 = 1, generations = Inf)
 vr12_b <- rep(c(dchainbinom(x = 0:3, s0 = 0:3, prob = 0.25, i0 = 1, generations = Inf)), 3)
 
+vr13_a <- dchainbinom2(x = rep(0:4, 3), s0 = 4, prob = 0.25, cpi = 0.3)
+vr13_b <- rep(c(dchainbinom2(x = rep(0:4), s0 = 4, prob = 0.25, cpi = 0.3)), 3)
+
+vr14_a <- dchainbinom2(x = 0:3, s0 = rep(0:3, 3), prob = 0.25, cpi = 0.3)
+vr14_b <- rep(c(dchainbinom2(x = 0:3, s0 = 0:3, prob = 0.25, cpi = 0.3)), 3)
+
+vr15_a <- dchainbinom2(x = 0:3, s0 = 3, prob =  rep(c(0.1, 0.2, 0.3), each = 4), cpi = 0.3)
+vr15_b <- c(dchainbinom2(x = 0:3, s0 = 3, prob = 0.1, cpi = 0.3),
+            dchainbinom2(x = 0:3, s0 = 3, prob = 0.2, cpi = 0.3),
+            dchainbinom2(x = 0:3, s0 = 3, prob = 0.3, cpi = 0.3))
+
+vr16_a <- dchainbinom2(x = 0:3, s0 = 3, prob = 0.2, cpi = rep(c(0.1, 0.2, 0.3), each = 4))
+vr16_b <- c(dchainbinom2(x = 0:3, s0 = 3, prob = 0.2, cpi = 0.1),
+            dchainbinom2(x = 0:3, s0 = 3, prob = 0.2, cpi = 0.2),
+            dchainbinom2(x = 0:3, s0 = 3, prob = 0.2, cpi = 0.3))
+
+
 
 test_that("Correct vector recycling", {
 
@@ -321,6 +394,10 @@ test_that("Correct vector recycling", {
   expect_true(all(vr10_a == vr10_b))
   expect_true(all(vr11_a == vr11_b))
   expect_true(all(vr12_a == vr12_b))
+  expect_true(all(vr13_a == vr13_b))
+  expect_true(all(vr14_a == vr14_b))
+  expect_true(all(vr15_a == vr15_b))
+  expect_true(all(vr16_a == vr16_b))
 
 })
 
@@ -753,7 +830,6 @@ test_that("simple estimation works", {
     sar_est_1_g1_ci_99_chisq <- confint(sar_est_1_g1, method = 'chisq', level = 0.99)
   )
 
-
   expect_no_condition(
     sar_est_1_g1_ci_95_chisq <- confint(sar_est_1_g1, method = 'chisq', level = 0.95)
   )
@@ -1006,8 +1082,89 @@ test_that("simple estimation works", {
   expect_true(sar_est_1_ginf_na$prob_hat <= 1)
   expect_true(sar_est_1_ginf_na$prob_hat >= 0)
 
+})
+
+
+# Simulate some simple Longini-Koopman data.
+set.seed(234)
+dta_i_lk <- sample(0:4, prob = dchainbinom2(x = 0:4, s0 = 4, prob = 0.4, cpi = 0.2), size = 55, replace = TRUE)
+
+test_that("simple estimation works (LK)", {
+
+  expect_no_condition(
+    sar_est_lk_1 <- estimate_sar(infected = dta_i_lk, s0 = 4, model = 'lk')
+  )
+
+  expect_true('sar' %in% class(sar_est_lk_1))
+
+  # The reasonableness of results.
+  expect_true(all(!is.na(sar_est_lk_1$prob_hat)))
+  expect_true(is.numeric(sar_est_lk_1$prob_hat))
+  expect_true(length(sar_est_lk_1$prob_hat) == 2)
+  expect_true(all(sar_est_lk_1$prob_hat <= 1))
+  expect_true(all(sar_est_lk_1$prob_hat >= 0))
+
+  expect_true(all(!is.na(sar_est_lk_1$se)))
+  expect_true(is.numeric(sar_est_lk_1$se))
+  expect_true(length(sar_est_lk_1$se) == 2)
+  expect_true(all(sar_est_lk_1$se >= 0))
+
+
+  # Confidence intervals.
+
+  # Check default values
+  expect_no_condition(
+    sar_est_lk_1_ci <- confint(sar_est_lk_1)
+  )
+
+  expect_no_condition(
+    sar_est_lk_1_ci_99 <- confint(sar_est_lk_1, level = 0.99)
+  )
+
+  expect_no_condition(
+    sar_est_lk_1_ci_90 <- confint(sar_est_lk_1, level = 0.90)
+  )
+
+
+  # Check that the upper and lower ends are correct.
+  expect_true(sar_est_lk_1_ci[1,1] < sar_est_lk_1_ci[1,2])
+  expect_true(sar_est_lk_1_ci[2,1] < sar_est_lk_1_ci[2,2])
+
+  expect_true(sar_est_lk_1_ci_99[1,1] < sar_est_lk_1_ci_99[1,2])
+  expect_true(sar_est_lk_1_ci_99[2,1] < sar_est_lk_1_ci_99[1,2])
+
+  expect_true(sar_est_lk_1_ci_90[1,1] < sar_est_lk_1_ci_90[1,2])
+  expect_true(sar_est_lk_1_ci_90[2,1] < sar_est_lk_1_ci_90[1,2])
+
+
+  expect_true(sar_est_lk_1_ci[1,1] < sar_est_lk_1$prob_hat[1])
+  expect_true(sar_est_lk_1_ci[2,1] < sar_est_lk_1$prob_hat[2])
+  expect_true(sar_est_lk_1_ci[1,2] > sar_est_lk_1$prob_hat[1])
+  expect_true(sar_est_lk_1_ci[2,2] > sar_est_lk_1$prob_hat[2])
+
+  expect_true(sar_est_lk_1_ci_99[1,1] < sar_est_lk_1$prob_hat[1])
+  expect_true(sar_est_lk_1_ci_99[2,1] < sar_est_lk_1$prob_hat[2])
+  expect_true(sar_est_lk_1_ci_99[1,2] > sar_est_lk_1$prob_hat[1])
+  expect_true(sar_est_lk_1_ci_99[2,2] > sar_est_lk_1$prob_hat[2])
+
+  expect_true(sar_est_lk_1_ci_90[1,1] < sar_est_lk_1$prob_hat[1])
+  expect_true(sar_est_lk_1_ci_90[2,1] < sar_est_lk_1$prob_hat[2])
+  expect_true(sar_est_lk_1_ci_90[1,2] > sar_est_lk_1$prob_hat[1])
+  expect_true(sar_est_lk_1_ci_90[2,2] > sar_est_lk_1$prob_hat[2])
+
+
+  # Check that the 95% interval is wider than the 90% interval.
+  expect_true(sar_est_lk_1_ci_90[1,1] > sar_est_lk_1_ci[1,1])
+  expect_true(sar_est_lk_1_ci_90[2,1] > sar_est_lk_1_ci[2,1])
+
+  expect_true(sar_est_lk_1_ci_90[1,2] < sar_est_lk_1_ci[1,2])
+  expect_true(sar_est_lk_1_ci_90[2,2] < sar_est_lk_1_ci[2,2])
+
 
 })
+
+
+
 
 
 # cbmod(y = mod_dat1_na$infected, s0 = mod_dat1_na$s0, generations = Inf, x = xmat, link = 'identity')

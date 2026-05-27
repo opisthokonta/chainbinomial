@@ -4,7 +4,7 @@
 \alias{confint.sar}
 \title{Confidence intervals for sar Object.}
 \usage{
-\method{confint}{sar}(object, parm = NULL, level = 0.95, method = "chisq", ...)
+\method{confint}{sar}(object, parm = NULL, level = 0.95, method = NULL, ...)
 }
 \arguments{
 \item{object}{a sar object.}

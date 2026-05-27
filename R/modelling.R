@@ -39,7 +39,7 @@ cb_reg_obj <- function(par, xmat, y, s0, i0, generations, link){
     return(Inf)
   }
 
-  nll <- negloglok_cb(prob = prob_hat, infected = y, s0 = s0, i0 = i0, generations = generations,
+  nll <- negloglok_cb(prob = prob_hat, infected = y, s0 = s0, i0 = i0, generations = generations, model = 'rf',
                      transform_inv_logit = FALSE)
 
   return(nll)
@@ -446,7 +446,7 @@ residuals.cbmod <- function(object, type = 'response', ...){
   } else if (type == 'far'){
     res <- (object$null_model$data$infected / object$null_model$data$s0) - (object$fitted_values / object$null_model$data$s0)
   } else if (type == 'pearson'){
-    vv <- varchainbinom(s0 = object$null_model$data$s0, prob = object$prob_hat, i0 = object$null_model$data$i0, generation = object$null_model$data$generations)
+    vv <- varchainbinom(s0 = object$null_model$data$s0, prob = object$prob_hat, i0 = object$null_model$data$i0, generations = object$null_model$data$generations)
     res <- response_resid / sqrt(vv)
   }
 

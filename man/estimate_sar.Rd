@@ -4,7 +4,14 @@
 \alias{estimate_sar}
 \title{Estimate Transmission Probability of the Chain Binomial Model}
 \usage{
-estimate_sar(infected, s0, i0 = 1, generations = Inf, se = TRUE)
+estimate_sar(
+  infected,
+  s0,
+  i0 = NULL,
+  generations = NULL,
+  model = "rf",
+  se = TRUE
+)
 }
 \arguments{
 \item{infected}{numeric.}
@@ -14,6 +21,8 @@ estimate_sar(infected, s0, i0 = 1, generations = Inf, se = TRUE)
 \item{i0}{numeric.}
 
 \item{generations}{numeric.}
+
+\item{model}{character, default is 'rf' (Reed-Frost model), but can also be 'lk' (Longini-Koopman model). See 'Details'.}
 
 \item{se}{logical. If TRUE (default), the standard error is computed.}
 }

@@ -186,21 +186,24 @@ compute_factors <- function(maxi, prob, i0){
 
 #' The Chain Binomial distribution
 #'
-#' Probability mass function, cumulative, expected value, variance function, and random generation, for the chain binomial distribution,
-#' with parameters s0, prob, i0, and number of generations, for the number of infected
-#' cases in a population of size s0 after a given number of generations.
+#' Probability mass function, cumulative, expected value, variance function, and random generation, for the chain binomial distribution
+#' for the number of infected cases in a population of size s0. The `chainbinom` family has parameters s0, i0, prob and number of generations,
+#' and corresponds to the classical Reed-Frost model. The `chainbinom2` family has parameters prob and cpi, and is the Longini-Koopman model.
 #'
-#' @param x numeric vector of the number of infected.
-#' @param q numeric vector of the number of infected.
-#' @param n number of observations. If length(n) > 1, the length is taken to be the number required.
-#' @param s0 the number of initial susceptibles.
-#' @param prob the transmission probability.
+#' @param x Numeric vector of the number of infected.
+#' @param q Numeric vector of the number of infected.
+#' @param n Number of observations. If length(n) > 1, the length is taken to be the number required.
+#' @param s0 The number of initial susceptibles.
+#' @param prob The transmission probability.
 #' @param sar Deprecated. Please use the argument 'prob' instead.
-#' @param i0 the number of primary cases.
-#' @param generations the number of generations. Default is Inf, which represents the entire epidemic.
+#' @param cpi The community probability of infection. .
+#' @param i0 The number of primary cases.
+#' @param generations The number of generations. Default is Inf, which represents the entire epidemic.
 #'
 #' @returns `dchainbinom` gives the probability of x infected, given s0, i0, prob and generations. `echainbinom` gives the expected value,
 #' `varchainbinom` gives the variance, `rchainbinom` generates random data.
+#'
+#' `dchainbinom2` gives the probability of x infected, given s0, prob and cpi.
 #'
 #' @examples
 #' dchainbinom(x = 0:5, s0 = 5, prob = 0.2, i0 = 1, generations = Inf)
@@ -210,7 +213,6 @@ compute_factors <- function(maxi, prob, i0){
 #'
 #' @export
 dchainbinom <- function(x, s0, prob, i0 = 1, generations = Inf, sar = lifecycle::deprecated()){
-
 
   # Check input.
   stopifnot(is.numeric(x) | is.logical(x),
@@ -537,3 +539,8 @@ varchainbinom <- function(s0, prob, i0 = 1, generations = Inf, sar = lifecycle::
   return(res)
 
 }
+
+
+
+
+
